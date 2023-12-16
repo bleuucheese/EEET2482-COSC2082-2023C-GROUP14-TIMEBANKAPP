@@ -1,0 +1,9 @@
+# Users file
+# Format username: password: phoneNum: email: street: city: lat: lon: cardNum: cvcNum: balance: skRating: spRating: hRating: skill1, skill2, skill3
+blucheese 123 0912951022 blucheese@gmail.com T2 Masteri Thao Dien, Thao Dien Ward Saigon 10.8032 106.741 6362970000457013 777 500 play piano chess maths 
+hello 123 456 abc@gmail.com RMIT Vietnam Saigon 10.2 106.7 3566000020000410 222 500 chess 
+attilasz 7931 343434 bme@gmail.com 235 Nguyen Van Cu, Nguyen Cu Trinh Ward Saigon 10.45 106.99 4007702835532454 139 888 play the guitar tutoring chess 
+hehe 15122023 0909189738 hehe@gmail.com FTU University, Ba Dinh Hanoi 10.22 106.222 5200533989557118 555 1922 cooking clean the house 
+je 19042004 090909090909 je@gmail.com Riverside Aparment, Phu My Hung, Saigon 10.12 106.99 4347699988887777 666 22 nail salon pet care 
+karin 8112004 0919191919 karin@gmail.com Vin City, Ba Dinh, Hanoi 10.33 106.732 4701322211111234 345 30 tutor python fix the computer assemble hardware help with assignments 
+tester: 123: 09091020920: tester@gmail.com: Turtle Lake, Ward 6, District 3: Saigon: 10.45: 106.332: 2223000048410010: 333: 2023: 0: 0: 0: football coaching, wedding photography, 

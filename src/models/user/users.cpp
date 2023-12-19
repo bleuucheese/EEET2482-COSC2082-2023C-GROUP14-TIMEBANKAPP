@@ -1,5 +1,6 @@
 #define _USE_MATH_DEFINES
 
+
 #include <cmath>
 #include <iostream>
 #include <string>
@@ -215,6 +216,7 @@ private:
     float hostRatingScore;
     vector<Review> receivedReviews;
     vector<Request> receivedRequests;
+    vector<RegularMember *> blockedMembers;
 
 public:
     // Constructor

@@ -1,16 +1,17 @@
 #include <iostream>
 #include <string>
 
-#include "views.h"
+#include "TimeBankSystem.h"
 using std::cin;
 using std::cout;
 
-System::System()
-{
 
+// Constructor
+TimeBankSystem::TimeBankSystem()
+{
 }
 
-void System::welcomeScreen()
+void TimeBankSystem::welcomeScreen()
     {
         cout << "EEET2482/COSC2082 ASSIGNMENT\n";
         cout << "TIME BANK APPLICATION\n\n";
@@ -31,7 +32,7 @@ void System::welcomeScreen()
 
 int main()
 {
-    System sys;
+    TimeBankSystem sys;
     sys.welcomeScreen();
     return 0;
 }

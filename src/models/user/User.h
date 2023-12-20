@@ -13,7 +13,7 @@ class User
 private:
     string username;
     string password;
-    string role; // Admin, Guest, RegularMember
+    string role; // Admin, RegularMember
     bool isAuthenticated = false;
 
 public:

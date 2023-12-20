@@ -4,43 +4,46 @@
 #include <string>
 #include <vector>
 #include "User.h"
-#include "../Address.h"
 #include "Request.h"
 #include "Review.h"
+#include "Skill.h"
 
-using std::vector;
 using std::string;
+using std::vector;
 class RegularMember : public User
 {
 private:
-    int creditPoints;
+    int creditPoints = 20;
     string phoneNumber;
     string email;
-    Address homeAddress;
+    string homeAddress;
+    enum allowedCities
+    {
+        Hanoi = 24,
+        Saigon = 28
+    } city; // Hanoi or Saigon only
     string creditCardNumber;
-    int cvcNumber;
     float balance;
-    vector<string> skills;
     float skillRatingScore;
     float supporterRatingScore;
     float hostRatingScore;
-    vector<Review> receivedReviews;
-    // vector<Request> receivedRequests;
+    vector<Skill *> skills;
+    vector<SkillListing *> skillListings;
+    vector<Review *> sentreceivedReviews;
+    vector<Request *> sentreceivedRequests;
     vector<RegularMember *> blockedMembers;
 
 public:
     // Constructor
-    RegularMember(string username, string password, string phoneNumber, string email, Address homeAddress, string creditCardNumber, int cvcNumber, float balance, vector<string> skills) : User(username, password, "RegularMember"){};
+    
 
     // Getters and Setters
     int getCreditPoints() { return creditPoints; };
     string getPhoneNumber() { return phoneNumber; };
     string getEmail() { return email; };
-    Address getHomeAddress() { return homeAddress; };
     string getCreditCardNumber() { return creditCardNumber; };
-    int getCvcNumber() { return cvcNumber; };
+
     float getBalance() { return balance; };
-    vector<string> getSkills() { return skills; };
     float getSkillRatingScore() { return skillRatingScore; };
     float getSupporterRatingScore() { return supporterRatingScore; };
     float getHostRatingScore() { return hostRatingScore; };
@@ -51,11 +54,11 @@ public:
     void setCreditPoints(int creditPoints) { this->creditPoints = creditPoints; };
     void setPhoneNumber(string phoneNumber) { this->phoneNumber = phoneNumber; };
     void setEmail(string email) { this->email = email; };
-    void setHomeAddress(Address homeAddress) { this->homeAddress = homeAddress; };
+
     void setCreditCardNumber(string creditCardNumber) { this->creditCardNumber = creditCardNumber; };
-    void setCvcNumber(int cvcNumber) { this->cvcNumber = cvcNumber; };
+
     void setBalance(float balance) { this->balance = balance; };
-    void setSkills(vector<string> skills) { this->skills = skills; };
+
     void setSkillRating(float skillRatingScore) { this->skillRatingScore = skillRatingScore; };
     void setSupporterRating(float supporterRatingScore) { this->supporterRatingScore = supporterRatingScore; };
     void setHostRating(float hostRatingScore) { this->hostRatingScore = hostRatingScore; };
@@ -73,6 +76,12 @@ public:
     void printMemberInfo();
     void printRestrictedMemberInfo();
     bool topUp(int credPoints);
+
+    friend class Skill;
+    friend class SkillListing;
+    friend class Request;
+    friend class Review;
+    friend class Address;
 };
 
 #endif // EEET2482_COSC2082_2023C_GROUP14_TIMEBANKAPP_SRC_MODELS_USER_REGULARMEMBER_H

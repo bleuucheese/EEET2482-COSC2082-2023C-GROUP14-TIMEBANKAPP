@@ -3,34 +3,40 @@
 #include <iostream>
 #include <string>
 #include "RegularMember.h"
+#include "Skill.h"
+#include "myUtils.h"
 using std::cin;
 using std::cout;
 
 class SkillListing
 {
 private:
-    string skillPerformed;
+    Skill *skillPerformed;
+    string listingID; // Lxxxxxxxx
     int consumedCredsPerHour = 0;
-    int minHostRatingScore = -1;
-    int listingState = 0; // 0 = available, 1 = booked, 2 = completed
-    RegularMember *pOwner;
+    float minHostRatingScore = -1; // -1 = no minimum rating score, optional
+    int listingState = 0; // 0 = available, 1 = hidden, 2 = booked, 3 = completed
+    string supporterName; // username of the member who created the listing
+    string hostName; // username of the member who booked the listing
+    // TimePeriod workingTimeSlot; 
 
 public:
-    SkillListing(string skillPerformed = "", int consumedCreds = 0, int minHostRatingScore = -1, int listingState = 0, RegularMember *pOwner = nullptr){};
+    SkillListing(Skill *skillPerformed = nullptr, int consumedCreds = 0, float minHostRatingScore = -1, string supporterName = "", string hostName = "");
 
     // Getters
-    string getSkillPerformed() { return this->skillPerformed; };
+  
     int getConsumedCredsPerHour() { return this->consumedCredsPerHour; };
     int getMinHostRatingScore() { return this->minHostRatingScore; };
     int getListingState() { return this->listingState; };
-    RegularMember *getPOwner() { return this->pOwner; };
+
+    
 
     // Setters
-    void setSkillPerformed(string skillPerformed) { this->skillPerformed = skillPerformed; };
+    
     void setConsumedCredsPerHour(int consumedCreds) { this->consumedCredsPerHour = consumedCreds; };
     void setMinHostRatingScore(int minHostRatingScore) { this->minHostRatingScore = minHostRatingScore; };
     void setListingState(int listingState) { this->listingState = listingState; };
-    void setPOwner(RegularMember *pOwner) { this->pOwner = pOwner; };
+   
 
     // Methods
     void displaySkillListing(){};

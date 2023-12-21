@@ -3,36 +3,39 @@
 #include <ctime>
 #include <sstream>
 #include "Review.h"
+#include "../../utils/myUtils.h"
 
 using std::cin;
 using std::cout;
 
 // Constructor for review by host
-Review::Review(int skillRatingScore, int supporterRatingScore, std::string comments, RegularMember *pReviewer, RegularMember *pReviewee)
+Review::Review(string listingID, int skillRatingScore, int supporterRatingScore, std::string comments, string reviewer, string reviewee)
 {
+    this->reviewID = "S" + generateRandomID();
     this->skillRating = skillRatingScore;
     this->supporterRating = supporterRatingScore;
     this->comments = comments;
-    this->pReviewer = pReviewer;
-    this->pReviewee = pReviewee;
-    this->timestamp = parseDate();
-    this->reviewType = 0;
+    this->reviewer = reviewer;
+    this->reviewee = reviewee;
 }
 
 // Constructor for review by supporter
-Review::Review(int hostRatingScore, std::string comments, RegularMember *pReviewer, RegularMember *pReviewee)
+Review::Review(string listingID, int hostRatingScore, std::string comments, string reviewer, string reviewee)
 {
+    this->reviewID = "H" + generateRandomID();
     this->hostRating = hostRatingScore;
     this->comments = comments;
-    this->pReviewer = pReviewer;
-    this->pReviewee = pReviewee;
-    this->timestamp = parseDate();
-    this->reviewType = 1;
+    this->reviewer = reviewer;
+    this->reviewee = reviewee;
 }
 
 void Review::printReview()
 {
-    cout << pReviewer->getUsername() << " ~ posted on " << this->timestamp << "\n";
+    cout << "Review ID: " << this->reviewID << "\n";
+    cout << "Listing ID: " << this->listingID << "\n";
+    cout << reviewer << " ~ posted on ";
+    (this->timestamp).getFormattedTimestamp();
+    cout << "\n";
     if (this->skillRating != 0)
     {
         cout << "Skill Rating: " << this->skillRating << "\n";
@@ -46,20 +49,10 @@ void Review::printReview()
     cout << std::endl;
 }
 
-string Review::parseDate()
+int main()
 {
-    // Get current system time
-    std::time_t now = std::time(0);
-    std::tm *localTime = std::localtime(&now);
-
-    // Format the timestamp (assuming YYYY-MM-DD HH:MM:SS format)
-    std::ostringstream timestampStream;
-    timestampStream << (localTime->tm_year + 1900) << '-'
-                    << (localTime->tm_mon + 1) << '-'
-                    << localTime->tm_mday << ' '
-                    << localTime->tm_hour << ':'
-                    << localTime->tm_min << ':'
-                    << localTime->tm_sec;
-    return timestampStream.str();
+    Review review("L0000001", 5, 4, "Smart supporter", "user1", "user2");
+    Review review2("L0000001", 5, "Generous host", "user2", "user1");
+    review.printReview();
+    return 0;
 }
-

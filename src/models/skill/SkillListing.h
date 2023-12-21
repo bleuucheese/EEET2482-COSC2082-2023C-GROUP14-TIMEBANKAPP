@@ -2,9 +2,9 @@
 #define EEET2482_COSC2082_2023C_GROUP14_TIMEBANKAPP_SRC_MODELS_SKILL_SKILLLISTING_H
 #include <iostream>
 #include <string>
-#include "RegularMember.h"
+#include "../user/RegularMember.h"
 #include "Skill.h"
-#include "myUtils.h"
+#include "../../utils/myUtils.h"
 using std::cin;
 using std::cout;
 
@@ -39,7 +39,7 @@ public:
    
 
     // Methods
-    void displaySkillListing(){};
+    void displaySkillListing();
 };
 
 #endif // EEET2482_COSC2082_2023C_GROUP14_TIMEBANKAPP_SRC_MODELS_SKILL_SKILLLISTING_H

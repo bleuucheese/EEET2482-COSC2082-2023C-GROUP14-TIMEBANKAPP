@@ -4,8 +4,11 @@
 #include <iostream>
 #include <string>
 #include "SkillListing.h"
-#include "RegularMember.h"
+#include "../user/RegularMember.h"
 
+using std::string;
+
+class SkillListing; // forward declaration
 class Request
 {
 
@@ -19,11 +22,21 @@ private:
 
 public:
     Request();
-    
+
     SkillListing *getPSkillListing();
     void setPSkillListing(SkillListing *pSkillListing);
-    enum requestState getRequestState();
-    void setRequestState(enum requestState requestState);
+    // getters and setters
+    string getRequestID();
+    void setRequestID(string requestID);
+    string getRequestStatus();
+    void setRequestStatus(string requestStatus);
+    string getRequestTimeStamp();
+    void setRequestTimeStamp(string requestTimeStamp);
+    string getRequesterName();
+    void setRequesterName(string requesterName);
+    string getReceiverName();
+    void setReceiverName(string receiverName);
+
     void showInfo();
 };
 

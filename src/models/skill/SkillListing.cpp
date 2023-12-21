@@ -2,20 +2,20 @@
 #include <string>
 #include "SkillListing.h"
 #include "Skill.h"
-#include "myUtils.h"
+
 using std::cin;
 using std::cout;
 using std::string;
 
-// Constructor
-SkillListing::SkillListing(Skill *skillPerformed = nullptr, int consumedCreds = 0, float minHostRatingScore = -1, string supporterName = "", string hostName = "")
+// Constructor implementation without default arguments
+SkillListing::SkillListing(Skill *skillPerformed, int consumedCreds, float minHostRatingScore, string supporterName, string hostName)
 {
     this->skillPerformed = skillPerformed;
-    this->consumedCredsPerHour = consumedCredsPerHour;
+    this->consumedCredsPerHour = consumedCreds;
     this->minHostRatingScore = minHostRatingScore;
     this->listingState = 0;
     this->listingID = "L" + generateRandomID();
-};
+}
 
 // Methods
 void SkillListing::displaySkillListing()

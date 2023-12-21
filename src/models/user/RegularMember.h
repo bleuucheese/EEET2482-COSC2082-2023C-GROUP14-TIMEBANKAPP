@@ -3,16 +3,22 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "../skill/Request.h"
+#include "../skill/Review.h"
+#include "../skill/Skill.h"
 #include "User.h"
-#include "Request.h"
-#include "Review.h"
-#include "Skill.h"
 
 using std::string;
 using std::vector;
+
+class Skill;        // Forward declaration to avoid circular dependency
+class SkillListing; // Forward declaration to avoid circular dependency
+class Request;      // Forward declaration to avoid circular dependency
+class Review;       // Forward declaration to avoid circular dependency
 class RegularMember : public User
 {
 private:
+    string fullName;
     int creditPoints = 20;
     string phoneNumber;
     string email;
@@ -22,6 +28,8 @@ private:
         Hanoi = 24,
         Saigon = 28
     } city; // Hanoi or Saigon only
+    double latitude;
+    double longitude;
     string creditCardNumber;
     float balance;
     float skillRatingScore;
@@ -35,7 +43,7 @@ private:
 
 public:
     // Constructor
-    
+    RegularMember(string username = "", string password = "", string fullName = "", string phoneNumber = "", string email = "", string homeAddress = "", allowedCities city = Hanoi, double latitude = 0, double longitude = 0, string creditCardNumber = "", float balance = 0);
 
     // Getters and Setters
     int getCreditPoints() { return creditPoints; };
@@ -44,9 +52,7 @@ public:
     string getCreditCardNumber() { return creditCardNumber; };
 
     float getBalance() { return balance; };
-    float getSkillRatingScore() { return skillRatingScore; };
-    float getSupporterRatingScore() { return supporterRatingScore; };
-    float getHostRatingScore() { return hostRatingScore; };
+
     // vector<Review> getReceivedReviews() { return receivedReviews; };
     // vector<Request> getReceivedRequests() { return receivedRequests; };
     vector<RegularMember *> getBlockedMembers() { return blockedMembers; };
@@ -73,7 +79,7 @@ public:
     float getHostRatingScore();
     bool payRegistrationFee();
     double calculateDistance(RegularMember &otherMember);
-    void printMemberInfo();
+    void showInfo();
     void printRestrictedMemberInfo();
     bool topUp(int credPoints);
 

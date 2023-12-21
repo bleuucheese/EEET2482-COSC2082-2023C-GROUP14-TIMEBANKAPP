@@ -3,69 +3,73 @@
 #include <string>
 #include <vector>
 #include <cmath>
-#include "User.h"
-#include "Review.h"
-#include "Address.h"
+#include "./User.h"
+#include "../skill/Review.h"
+#include "../skill/Skill.h"
 #include "RegularMember.h"
-
 
 using std::cin;
 using std::cout;
 using std::string;
 
 // Constructor
-RegularMember::RegularMember(string username, string password, string phoneNumber, string email, Address homeAddress, string creditCardNumber, int cvcNumber, float balance, vector<string> skills) : User(username, password, "RegularMember")
+RegularMember::RegularMember(string username = "", string password = "", string fullName = "", string phoneNumber = "", string email = "", string homeAddress = "", allowedCities city, double latitude, double longitude, string creditCardNumber = "", float balance = 0) : User(username, password, "RegularMember")
 {
+
+    this->fullName = fullName;
     this->creditPoints = 20;
     this->phoneNumber = phoneNumber;
     this->email = email;
     this->homeAddress = homeAddress;
+    this->city = city;
+    this->latitude = latitude;
+    this->longitude = longitude;
     this->creditCardNumber = creditCardNumber;
-    this->cvcNumber = cvcNumber;
     this->balance = balance;
-    this->skills = skills;
     this->skillRatingScore = 0;
     this->supporterRatingScore = 0;
     this->hostRatingScore = 0;
-};
+}
 
 void RegularMember::printReceivedReviews()
 {
-    for (int i = 0; i < this->receivedReviews.size(); i++)
+    for (int i = 0; i < this->sentreceivedReviews.size(); i++)
     {
-        this->receivedReviews[i].printReview();
+        (this->sentreceivedReviews[i])->printReview();
     }
 }
 
 float RegularMember::getSkillRatingScore()
 {
+    this->skillRatingScore = 0; // Reset the skill rating score before calculating
     // Calculate the average skill rating score
-    for (int i = 0; i < this->receivedReviews.size(); i++)
+    for (int i = 0; i < this->sentreceivedReviews.size(); i++)
     {
-        this->skillRatingScore += this->receivedReviews[i].getSkillRatingScore();
+        this->skillRatingScore += (this->sentreceivedReviews[i])->getSkillRating();
     }
-    return (float)this->skillRatingScore / this->receivedReviews.size();
+    return (float)this->skillRatingScore / this->sentreceivedReviews.size();
 }
 
 float RegularMember::getSupporterRatingScore()
 {
+    this->supporterRatingScore = 0; // Reset the supporter rating score before calculating
     // Calculate the average supporter rating score
-    for (int i = 0; i < this->receivedReviews.size(); i++)
+    for (int i = 0; i < this->sentreceivedReviews.size(); i++)
     {
-        this->supporterRatingScore += this->receivedReviews[i].getSupporterRatingScore();
+        this->supporterRatingScore += (this->sentreceivedReviews[i])->getSupporterRating();
     }
-    return (float)this->supporterRatingScore / this->receivedReviews.size();
+    return (float)this->supporterRatingScore / this->sentreceivedReviews.size();
 }
 
 float RegularMember::getHostRatingScore()
 {
     this->hostRatingScore = 0;
     // Calculate the average host rating score
-    for (int i = 0; i < this->receivedReviews.size(); i++)
+    for (int i = 0; i < this->sentreceivedReviews.size(); i++)
     {
-        this->hostRatingScore += this->receivedReviews[i].getHostRatingScore();
+        this->hostRatingScore += (this->sentreceivedReviews[i])->getHostRating();
     }
-    return (float)this->hostRatingScore / this->receivedReviews.size();
+    return (float)this->hostRatingScore / this->sentreceivedReviews.size();
 }
 
 // Pay to the system for the registration fee
@@ -87,10 +91,10 @@ bool RegularMember::payRegistrationFee()
 double RegularMember::calculateDistance(RegularMember &otherMember)
 {
     long double lat1, lon1, lat2, lon2;
-    lat1 = this->homeAddress.getLatitude();
-    lon1 = this->homeAddress.getLongitude();
-    lat2 = otherMember.homeAddress.getLatitude();
-    lon2 = otherMember.homeAddress.getLongitude();
+    lat1 = this->latitude;
+    lon1 = this->longitude;
+    lat2 = otherMember.latitude;
+    lon2 = otherMember.longitude;
 
     const int R = 6371; // Radius of the Earth in kilometers
     double latDistance = (lat2 - lat1) * M_PI / 180.0;
@@ -100,29 +104,28 @@ double RegularMember::calculateDistance(RegularMember &otherMember)
     return R * c * 1000;
 }
 
-void RegularMember::printMemberInfo()
+void RegularMember::showInfo()
 {
     cout << "Username: " << this->getUsername() << "\n";
     cout << "Credit points: " << this->creditPoints << "\n"; // 20 credit points for each new member
     cout << "Phone number: " << this->phoneNumber << "\n";
     cout << "Email: " << this->email << "\n";
-    cout << "Home address: " << this->homeAddress.getStreet() << ", " << this->homeAddress.getCity() << "\n";
-    cout << "Credit card number: " << this->creditCardNumber << "\n";
-    cout << "CVC number: " << this->cvcNumber << "\n";
+    cout << "Home address: " << this->homeAddress << "\n";
+    cout << "City: " << this->city << "\n"; // Hanoi or Saigon only
     cout << "Balance: " << this->balance << "\n";
     cout << "Skills: ";
     for (int i = 0; i < this->skills.size(); i++)
     {
-        cout << this->skills[i] << ", ";
+        (this->skills[i])->showInfo();
     }
     cout << "\n";
     cout << "Skill rating score: " << getSkillRatingScore() << "\n";
     cout << "Supporter rating score: " << getSupporterRatingScore() << "\n";
     cout << "Host rating score: " << getHostRatingScore() << "\n";
     cout << "Received reviews: \n";
-    for (int i = 0; i < this->receivedReviews.size(); i++)
+    for (int i = 0; i < this->sentreceivedReviews.size(); i++)
     {
-        this->receivedReviews[i].printReview();
+        (this->sentreceivedReviews[i])->printReview();
     }
 }
 
@@ -132,7 +135,8 @@ void RegularMember::printRestrictedMemberInfo()
     cout << "Credit points: " << this->creditPoints << "\n"; // 20 credit points for each new member
     cout << "Phone number: " << this->phoneNumber << "\n";
     cout << "Email: " << this->email << "\n";
-    cout << "Home address: " << this->homeAddress.getStreet() << ", " << this->homeAddress.getCity() << "\n";
+    cout << "Home address: " << this->homeAddress << "\n";
+    cout << "City: " << this->city << "\n"; // Hanoi or Saigon only
     cout << "Skills: ";
     for (int i = 0; i < this->skills.size(); i++)
     {

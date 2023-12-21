@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <vector>
-#include "RegularMember.h"
+#include "./models/user/RegularMember.h"
 using std::cout;
 using std::cin;
 

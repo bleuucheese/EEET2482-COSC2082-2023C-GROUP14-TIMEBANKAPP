@@ -3,105 +3,123 @@
 #include <ctime>
 #include "DateTime.h"
 #include <string>
+#include <sstream>
+#include <iomanip>
 
-using std::string;
 using std::cin;
 using std::cout;
+using std::string;
 
-// Constructor
-Date::Date() {
-  // Get current date
-  time_t now = time(0);
-  tm *ltm = localtime(&now);
-  day = ltm->tm_mday;
-  month = ltm->tm_mon + 1;
-  year = ltm->tm_year + 1900;
-}
-
-Date::Date(int Day, int Month, int Year) {
-  day = Day;
-  month = Month;
-  year = Year;
-}
-
-bool Date::isLeapYear(int year) {
-  // A year is a leap year if it is divisible by 4 but not by 100, except that years divisible by 400 are leap years.
+bool DateTime::isLeapYear(int year)
+{
   return (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
 }
 
-int Date::daysInMonth(int month, int year) {
-  if (month == 2) {
+int DateTime::daysInMonth(int month, int year)
+{
+  if (month == 2)
+  {
     return isLeapYear(year) ? 29 : 28;
-  } else if (month == 4 || month == 6 || month == 9 || month == 11) {
+  }
+  else if (month == 4 || month == 6 || month == 9 || month == 11)
+  {
     return 30;
-  } else {
+  }
+  else
+  {
     return 31;
   }
 }
 
-Date Date::addDays(Date date, int days) {
-  int totalDays = date.day + days;
-  int remainingDays = totalDays;
-  int newMonth = date.month;
-  int newYear = date.year;
+void DateTime::addTimePeriod(int days, int hours, int minutes, int seconds)
+{
+  tm.tm_mday += days;
+  tm.tm_hour += hours;
+  tm.tm_min += minutes;
+  tm.tm_sec += seconds;
+  mktime(&tm); // Return DateTime object with normalized values
+}
 
-  while (remainingDays > daysInMonth(newMonth, newYear)) {
-    remainingDays -= daysInMonth(newMonth, newYear);
-    newMonth++;
-    if (newMonth > 12) {
-      newMonth = 1;
-      newYear++;
-    }
+DateTime DateTime::calculateEndDate(int days, int hours, int minutes, int seconds)
+{
+  DateTime endDate = *this;
+  endDate.addTimePeriod(days, hours, minutes, seconds);
+  return endDate;
+}
+
+bool DateTime::isValidFormat(const std::string &timestamp)
+{
+  // Format should be "dd/mm/yyyy hh:mm:ss"
+  std::istringstream ss(timestamp);
+  ss >> std::get_time(&tm, "%d/%m/%Y %H:%M:%S");
+  return !ss.fail() && ss.eof();
+}
+
+bool DateTime::isValidDate()
+{
+  // Check if the parsed date is valid
+  std::tm copy = tm;
+  copy.tm_isdst = -1; // Not considering daylight saving time
+
+  std::time_t tt = std::mktime(&copy);
+  if (tt == -1)
+  {
+    return false; // mktime returns -1 for invalid date/time
   }
 
-  return Date{remainingDays, newMonth, newYear};
+  // Ensure the time components are within valid ranges
+  if (tm.tm_hour < 0 || tm.tm_hour > 23 ||
+      tm.tm_min < 0 || tm.tm_min > 59 ||
+      tm.tm_sec < 0 || tm.tm_sec > 59)
+  {
+    return false;
+  }
+
+  // Ensure that the normalized date matches the original date
+  std::tm *ptm = std::localtime(&tt);
+  return ptm && ptm->tm_mday == tm.tm_mday &&
+         ptm->tm_mon == tm.tm_mon && ptm->tm_year == tm.tm_year;
 }
 
-Date Date::addTimePeriod(Date startDate, int days, int hours, int minutes, int seconds) {
-  int totalSeconds = days * 24 * 60 * 60 + hours * 60 * 60 + minutes * 60 + seconds;
-  int totalDays = totalSeconds / (24 * 60 * 60);
-  return addDays(startDate, totalDays);
+
+DateTime::DateTime()
+{
+  std::time_t current_time = std::time(nullptr);
+  tm = *std::localtime(&current_time);
 }
 
-Date Date::parseDate(std::string str) {
-  Date date;
-  sscanf(str.c_str(), "%d-%d-%d", &date.day, &date.month, &date.year);
-  return date;
+// Constructor that takes a timestamp string
+DateTime::DateTime(const std::string &timestamp)
+{
+  if (!isValidFormat(timestamp))
+  {
+    throw std::invalid_argument("Invalid date format");
+  }
+
+  // Set initial values
+  std::istringstream ss(timestamp);
+  ss >> std::get_time(&tm, "%d/%m/%Y %H:%M:%S");
 }
 
-string Date::formatDate(Date date) {
-  char buffer[20];
-  sprintf(buffer, "%d-%d-%d", date.day, date.month, date.year);
-  return string(buffer);
+std::time_t DateTime::toTimeT() const
+{
+  return std::mktime(const_cast<std::tm *>(&tm));
 }
 
-string Date::calculateEndDate(int days, int hours, int minutes, int seconds) {
-  
-  Date endDate = addTimePeriod(*this, days, hours, minutes, seconds);
-  return formatDate(endDate);
+std::string DateTime::getFormattedTimestamp() const
+{
+  std::ostringstream oss;
+  oss << std::put_time(&tm, "%d/%m/%Y %H:%M:%S");
+  return oss.str();
 }
 
-int main() {
-  string startDateStr;
-  string timePeriodStr;
-
-  cout << "Enter start date (dd-mm-yyyy): ";
-  cin >> startDateStr;
-
-  cout << "Enter time period (dd-hh-mm-ss): ";
-  cin >> timePeriodStr;
-
-  Date startDate = startDate.parseDate(startDateStr);
-  int days, hours, minutes, seconds;
-  sscanf(timePeriodStr.c_str(), "%d-%d-%d-%d", &days, &hours, &minutes, &seconds);
-
-  Date endDate = endDate.addTimePeriod(startDate, days, hours, minutes, seconds);
-
-  cout << "End date: " << endDate.formatDate(endDate) << std::endl;
-  Date startDate1 = Date(28, 2, 2025);
-  cout << startDate1.calculateEndDate(days, hours, minutes, seconds) << std::endl;
-
-  Date dateToday;
-  cout << dateToday.formatDate(dateToday) << std::endl;
-  return 0;
-}
+// int main()
+// {
+//   DateTime dt;
+//   cout << dt.getFormattedTimestamp() << "\n";
+//   DateTime dt1("12/12/2023 23:59:59");
+//   cout << dt1.getFormattedTimestamp();
+//   dt.addTimePeriod(0, 36, 0, 0);
+//   cout << dt.getFormattedTimestamp() << "\n";
+//   return 0;
+// }

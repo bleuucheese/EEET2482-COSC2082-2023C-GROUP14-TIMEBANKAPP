@@ -15,23 +15,26 @@ class Skill;        // Forward declaration to avoid circular dependency
 class SkillListing; // Forward declaration to avoid circular dependency
 class Request;      // Forward declaration to avoid circular dependency
 class Review;       // Forward declaration to avoid circular dependency
+
+enum allowedCities
+{
+    Hanoi = 24,
+    Saigon = 28
+}; // Hanoi or Saigon only
 class RegularMember : public User
 {
+
 private:
     string fullName;
-    int creditPoints = 20;
+    int creditPoints;
     string phoneNumber;
     string email;
     string homeAddress;
-    enum allowedCities
-    {
-        Hanoi = 24,
-        Saigon = 28
-    } city; // Hanoi or Saigon only
+    allowedCities city; // Hanoi or Saigon only
     double latitude;
     double longitude;
     string creditCardNumber;
-    float balance;
+    float balance; // Assume that the balance is in USD, and each card has 100 USD
     float skillRatingScore;
     float supporterRatingScore;
     float hostRatingScore;
@@ -43,7 +46,7 @@ private:
 
 public:
     // Constructor
-    RegularMember(string username = "", string password = "", string fullName = "", string phoneNumber = "", string email = "", string homeAddress = "", allowedCities city = Hanoi, double latitude = 0, double longitude = 0, string creditCardNumber = "", float balance = 0);
+    RegularMember(string username = "", string password = "", string fullName = "", string phoneNumber = "", string email = "", string homeAddress = "", allowedCities city = Hanoi, double latitude = 0, double longitude = 0, string creditCardNumber = "", float balance = 0, int creditPoints =20, float skillRatingScore = 0, float supporterRatingScore = 0, float hostRatingScore = 0);
 
     // Getters and Setters
     int getCreditPoints() { return creditPoints; };
@@ -74,6 +77,7 @@ public:
 
     // Member functions
     void printReceivedReviews();
+    void printSkills();
     float getSkillRatingScore();
     float getSupporterRatingScore();
     float getHostRatingScore();
@@ -87,7 +91,8 @@ public:
     friend class SkillListing;
     friend class Request;
     friend class Review;
-    friend class Address;
+    friend class FileHandler;
+    friend class TimeBankSystem;
 };
 
 #endif // EEET2482_COSC2082_2023C_GROUP14_TIMEBANKAPP_SRC_MODELS_USER_REGULARMEMBER_H

@@ -1,14 +1,25 @@
 #include <iostream>
 #include "Skill.h"
+#include "../../utils/myUtils.h"
 
-using std::cout;
 using std::cin;
+using std::cout;
+using std::string;
 
-Skill::Skill(string skillName, string description, std::string skillEfficiency)
+Skill::Skill(string skillID, string skillName, string description, std::string skillEfficiency, std::string ownerName)
 {
+    if (skillID.empty())
+    {
+        this->skillID = "S" + generateRandomID();
+    }
+    else
+    {
+        this->skillID = skillID;
+    }
     this->skillName = skillName;
     this->description = description;
     this->skillEfficiency = skillEfficiency;
+    this->ownerName = ownerName;
 }
 
 void Skill::showInfo()
@@ -18,3 +29,10 @@ void Skill::showInfo()
     cout << "Description: " << this->description << "\n";
     cout << "Skill Efficiency: " << this->skillEfficiency << "\n";
 }
+
+// int main()
+// {
+//     Skill skill("Cooking", "Cooking food", "5");
+//     skill.showInfo();
+//     return 0;
+// }

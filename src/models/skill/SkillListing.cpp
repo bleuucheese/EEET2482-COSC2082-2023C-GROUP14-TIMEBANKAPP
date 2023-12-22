@@ -2,36 +2,35 @@
 #include <string>
 #include "SkillListing.h"
 #include "Skill.h"
+#include "../../utils/myUtils.h"
 
 using std::cin;
 using std::cout;
 using std::string;
 
 // Constructor implementation without default arguments
-SkillListing::SkillListing(Skill *skillPerformed, int consumedCreds, float minHostRatingScore, string supporterName, string hostName)
+SkillListing::SkillListing(string listingID, string skillID, int consumedCreds, float minHostRatingScore, int listingState, string supporterName, string hostName, Period workingTimeSlot)
 {
-    this->skillPerformed = skillPerformed;
+    // this->skillPerformed = skillPerformed;
+    this->supporterName = supporterName;
+    this->hostName = hostName;
+    this->workingTimeSlot = workingTimeSlot;
     this->consumedCredsPerHour = consumedCreds;
     this->minHostRatingScore = minHostRatingScore;
-    this->listingState = 0;
+    this->listingState = listingState;
     this->listingID = "L" + generateRandomID();
+    this->skillID = skillID;
 }
 
 // Methods
 void SkillListing::displaySkillListing()
 {
-    if (this->skillPerformed != nullptr)
-    {
-        cout << "Perform skill: ";
-        (this->skillPerformed)->showInfo();
-        cout << "Cost: " << this->consumedCredsPerHour << "\n";
-        cout << "Minimum Host Rating Score: " << this->minHostRatingScore << "\n";
-        cout << "Listing State: " << this->listingState << "\n";
-        cout << "Owner: " << this->supporterName << "\n";
-        cout << "Host: " << this->hostName << "\n";
-    }
-    else
-    {
-        cout << "Error in displaying skill listing due to null pointer to Skill\n";
-    }
+    cout << "Listing ID: " << this->listingID << "\n";
+    cout << "Skill Perform: " << this->skillID << "\n";
+    cout << "Cost: " << this->consumedCredsPerHour << "\n";
+    cout << "Minimum Host Rating Score: " << this->minHostRatingScore << "\n";
+    cout << "Listing State: " << this->listingState << "\n";
+    cout << "Owner: " << this->supporterName << "\n";
+    cout << "Host: " << this->hostName << "\n";
+    cout << "Working Time Slot: " << this->workingTimeSlot.getFormattedPeriod() << "\n";
 };

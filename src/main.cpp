@@ -15,9 +15,9 @@ int main()
 
         cin >> choice;
     } while (choice < 1 || choice > 3);
-    switch(choice) {
-        
+    switch (choice)
+    {
     }
 
-        return 0;
+    return 0;
 }

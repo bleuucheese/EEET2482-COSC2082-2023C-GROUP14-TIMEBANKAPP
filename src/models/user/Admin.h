@@ -12,9 +12,13 @@ private:
 
 public:
     // Constructor
-    explicit Admin(float revenue):User("@dmin", "2023", "Admin"){}; // avoid implicit type conversion
+    explicit Admin(float revenue = 0); // avoid implicit type conversion
     float getRevenue() { return revenue; };
     void setRevenue(float revenue) { this->revenue = revenue; };
+    void showInfo();
+
+    friend class TimeBankSystem;
+    friend class FileHandler;
 };
 
 #endif // EEET2482_COSC2082_2023C_GROUP14_TIMEBANKAPP_SRC_MODELS_USER_ADMIN_H

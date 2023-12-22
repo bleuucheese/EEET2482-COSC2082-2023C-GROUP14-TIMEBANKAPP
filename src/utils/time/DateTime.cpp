@@ -81,7 +81,6 @@ bool DateTime::isValidDate()
          ptm->tm_mon == tm.tm_mon && ptm->tm_year == tm.tm_year;
 }
 
-
 DateTime::DateTime()
 {
   std::time_t current_time = std::time(nullptr);

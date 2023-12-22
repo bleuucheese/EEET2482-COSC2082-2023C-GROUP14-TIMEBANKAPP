@@ -9,15 +9,18 @@ class Skill
 {
 
 private:
-    string skillID; // S0001, S0002, S0003, ...
+    string skillID; // Sxxxxxxxx
     string skillName;
     string description;
     std::string skillEfficiency;
+    std::string ownerName; // username of the member who created the skill
 
 public:
-    Skill(string skillName = "", string description = "", std::string skillEfficiency = "");
+    Skill(string skillID = "",string skillName = "", string description = "", std::string skillEfficiency = "",std::string ownerName = "");
 
     void showInfo();
+
+    friend class SkillListing;
 };
 
 #endif // EEET2482_COSC2082_2023C_GROUP14_TIMEBANKAPP_SRC_MODELS_SKILL_SKILL_H

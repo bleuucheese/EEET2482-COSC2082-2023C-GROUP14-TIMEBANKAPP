@@ -5,6 +5,7 @@
 #include <string>
 #include "SkillListing.h"
 #include "../user/RegularMember.h"
+#include "../../utils/time/DateTime.h"
 
 using std::string;
 
@@ -14,14 +15,15 @@ class Request
 
 private:
     string requestID; // Rxxxxxxxx
-    SkillListing *pSkillListing;
+    // SkillListing *pSkillListing;
+    string listingID;                      // Lxxxxxxxx
     std::string requestStatus = "Pending"; // Pending, Accepted, Rejected
-    std::string requestTimeStamp;          // DD/MM/YYYY HH:MM:SS format, change to type Calendar later
+    DateTime requestTimeStamp;             // DD/MM/YYYY HH:MM:SS format
     std::string requesterName;
     std::string receiverName;
 
 public:
-    Request();
+    Request(std::string requestID = "", std::string listingID = "", std::string requesterName = "", std::string receiverName = "", DateTime requestTimeStamp = DateTime(), std::string requestStatus = "Pending");
 
     SkillListing *getPSkillListing();
     void setPSkillListing(SkillListing *pSkillListing);

@@ -1,1 +1,5 @@
-skillID,skillName,skillDescription,skillEfficiency,ownerName
+skillID,skillName,description,skillEfficiency,ownerName
+S20232981,Chess,I can tutor anyone with elo ranging from 200-1600,Master,testing2
+S20232325,Math,Teach kindergarten children about abacus,Advanced,testing5
+S20230765,Violin,Play violin at parties - weddings - or any small ceremonies,Adequate,testing1
+S20231311,Piano,Fix broken cords and fine tune classical ones,Professional,cplusplus

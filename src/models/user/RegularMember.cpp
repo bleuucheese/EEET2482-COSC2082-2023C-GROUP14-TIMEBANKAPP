@@ -53,7 +53,7 @@ void RegularMember::printSkills()
     }
     for (int i = 0; i < this->skills.size(); i++)
     {
-        cout << this->skills[i] << ", ";
+        // cout << this->skills[i] << ", "; // Print the address of the skill
         if (i == this->skills.size() - 1)
         {
             (this->skills[i])->showInfo();

@@ -164,16 +164,320 @@ void FileHandler::saveUsers(const std::string &filename, const std::vector<Regul
     outFile.close();
 }
 
-int main()
+Admin FileHandler::loadAdmin(const std::string &filename)
 {
-    FileHandler fileHandler;
-    std::vector<RegularMember> memberList = fileHandler.loadUsers("../../databases/users.csv");
-    for (RegularMember &member : memberList)
+    std::ifstream file(filename);
+    if (!file.is_open())
     {
-        member.showInfo();
+        throw std::runtime_error("Unable to open file: " + filename);
     }
-    RegularMember newMember("test", "test", "test", "test", "test", "test", Hanoi, 0, 0, "test", 0, 20, 0, 0, 0);
-    memberList.push_back(newMember);
-    fileHandler.saveUsers("../../databases/users.csv", memberList);
-    return 0;
+
+    std::string line;
+    // Skip the header line
+    getline(file, line);
+
+    if (getline(file, line))
+    {
+        std::stringstream ss(line);
+        std::string username, password, role;
+        std::string isAuthenticatedStr;
+        bool isAuthenticated;
+        double revenue;
+        char delimiter = ',';
+
+        getline(ss, username, delimiter);
+        getline(ss, password, delimiter);
+        getline(ss, role, delimiter);
+        getline(ss, isAuthenticatedStr, delimiter);
+        isAuthenticated = isAuthenticatedStr == "True";
+        ss >> revenue;
+        // cout << revenue << std::endl;
+
+        return Admin(revenue);
+    }
+    else
+    {
+        throw std::runtime_error("File is empty: " + filename);
+    }
 }
+
+void FileHandler::saveAdmin(const std::string &filename, const Admin &admin)
+{
+    std::ofstream file(filename);
+    if (!file.is_open())
+    {
+        throw std::runtime_error("Unable to open file: " + filename);
+    }
+    // write header
+    file << "username,password,role,isAuthenticated,revenue" << std::endl;
+    file << admin.getUsername() << ','
+         << admin.getPassword() << ','
+         << admin.getRole() << ','
+         << (admin.getIsAuthenticated() ? "True" : "False") << ','
+         << admin.getRevenue() << std::endl;
+}
+
+std::vector<Skill> FileHandler::loadSkills(const std::string &filename)
+{
+    std::vector<Skill> skills;
+    std::ifstream file(filename);
+
+    if (!file.is_open())
+    {
+        throw std::runtime_error("Unable to open file: " + filename);
+    }
+
+    std::string line;
+    // Skip the header line
+    getline(file, line);
+    while (getline(file, line))
+    {
+        std::stringstream ss(line);
+        std::string skillID, skillName, description, skillEfficiency, ownerName;
+        char delimiter = ',';
+
+        getline(ss, skillID, delimiter);
+        getline(ss, skillName, delimiter);
+        getline(ss, description, delimiter);
+        getline(ss, skillEfficiency, delimiter);
+        getline(ss, ownerName, delimiter);
+
+        skills.push_back(Skill(skillID, skillName, description, skillEfficiency, ownerName));
+    }
+
+    return skills;
+}
+
+void FileHandler::saveSkills(const std::string &filename, const std::vector<Skill> &skills)
+{
+    std::ofstream file(filename);
+
+    if (!file.is_open())
+    {
+        throw std::runtime_error("Unable to open file: " + filename);
+    }
+
+    // write header
+    file << "skillID,skillName,description,skillEfficiency,ownerName" << std::endl;
+
+    for (const auto &skill : skills)
+    {
+        file << skill.getSkillID() << ','
+             << skill.getSkillName() << ','
+             << skill.getDescription() << ','
+             << skill.getSkillEfficiency() << ','
+             << skill.getOwnerName() << std::endl;
+    }
+}
+
+std::vector<SkillListing> FileHandler::loadListings(const std::string &filename)
+{
+    std::vector<SkillListing> listings;
+    std::ifstream file(filename);
+
+    if (!file.is_open())
+    {
+        throw std::runtime_error("Unable to open file: " + filename);
+    }
+
+    std::string line;
+    // Skip the header line
+    getline(file, line);
+    while (getline(file, line))
+    {
+        std::stringstream ss(line);
+        std::string listingID, skillID, supporterName, hostName;
+        int consumedCreds, listingState;
+        float minHostRatingScore;
+        std::string startDateStr, endDateStr;
+        char delimiter = ',';
+
+        getline(ss, listingID, delimiter);
+        getline(ss, skillID, delimiter);
+        ss >> consumedCreds >> delimiter;
+        ss >> minHostRatingScore >> delimiter;
+        ss >> listingState >> delimiter;
+        getline(ss, supporterName, delimiter);
+        getline(ss, hostName, delimiter);
+        getline(ss, startDateStr, delimiter);
+        getline(ss, endDateStr);
+
+        DateTime startDate(startDateStr), endDate(endDateStr);
+        Period workingTimeSlot(startDate, endDate);
+
+        listings.push_back(SkillListing(listingID, skillID, consumedCreds, minHostRatingScore, listingState, supporterName, hostName, workingTimeSlot));
+    }
+
+    return listings;
+}
+
+void FileHandler::saveListings(const std::string &filename, const std::vector<SkillListing> &listings)
+{
+    std::ofstream file(filename);
+
+    if (!file.is_open())
+    {
+        throw std::runtime_error("Unable to open file: " + filename);
+    }
+
+    // write header
+    file << "listingID,skillID,consumedCredsPerHour,minHostRatingScore,listingState,supporterName,hostName,startDate,endDate" << std::endl;
+
+    for (const auto &listing : listings)
+    {
+        file << listing.getListingID() << ','
+             << listing.getSkillID() << ','
+             << listing.getConsumedCredsPerHour() << ','
+             << listing.getMinHostRatingScore() << ','
+             << listing.getListingState() << ','
+             << listing.getSupporterName() << ','
+             << listing.getHostName() << ','
+             << listing.getWorkingTimeSlot().getStartDate().getFormattedTimestamp() << ','
+             << listing.getWorkingTimeSlot().getEndDate().getFormattedTimestamp() << std::endl;
+    }
+}
+
+std::vector<Review> FileHandler::loadReviews(const std::string &filename)
+{
+    std::vector<Review> reviews;
+    std::ifstream file(filename);
+
+    if (!file.is_open())
+    {
+        throw std::runtime_error("Unable to open file: " + filename);
+    }
+
+    std::string line;
+    // Skip the header line
+    getline(file, line);
+    while (getline(file, line))
+    {
+        std::stringstream ss(line);
+        std::string reviewID, listingID, comments, reviewer, reviewee, timeStampStr;
+        int skillRating, supporterRating, hostRating;
+        char delimiter = ',';
+
+        getline(ss, reviewID, delimiter);
+        getline(ss, listingID, delimiter);
+        ss >> skillRating >> delimiter;
+        ss >> supporterRating >> delimiter;
+        ss >> hostRating >> delimiter;
+        getline(ss, comments, delimiter);
+        getline(ss, reviewer, delimiter);
+        getline(ss, reviewee, delimiter);
+        getline(ss, timeStampStr);
+
+        DateTime timeStamp(timeStampStr);
+
+        if (reviewID[0] == 'S')
+        {
+            reviews.push_back(Review(reviewID, listingID, skillRating, supporterRating, comments, reviewer, reviewee, timeStamp));
+        }
+        else if (reviewID[0] == 'H')
+        {
+            reviews.push_back(Review(reviewID, listingID, hostRating, comments, reviewer, reviewee, timeStamp));
+        }
+        else
+        {
+            throw std::runtime_error("Invalid review type in file: " + filename);
+        }
+    }
+
+    return reviews;
+}
+
+void FileHandler::saveReviews(const std::string &filename, const std::vector<Review> &reviews)
+{
+    std::ofstream file(filename);
+
+    if (!file.is_open())
+    {
+        throw std::runtime_error("Unable to open file: " + filename);
+    }
+
+    // write header
+    file << "reviewID,listingID,skillRating,supporterRating,hostRating,comments,reviewer,reviewee,timestamp" << std::endl;
+
+    for (const auto &review : reviews)
+    {
+        file << review.getReviewID() << ','
+             << review.getListingID() << ','
+             << review.getSkillRating() << ','
+             << review.getSupporterRating() << ','
+             << review.getHostRating() << ','
+             << review.getComments() << ','
+             << review.getReviewer() << ','
+             << review.getReviewee() << ','
+             << review.getTimestamp().getFormattedTimestamp() << std::endl;
+    }
+}
+
+std::vector<Request> FileHandler::loadRequests(const std::string &filename)
+{
+    std::vector<Request> requests;
+    std::ifstream file(filename);
+
+    if (!file.is_open())
+    {
+        throw std::runtime_error("Unable to open file: " + filename);
+    }
+
+    std::string line;
+    // Skip the header line
+    getline(file, line);
+    while (getline(file, line))
+    {
+        std::stringstream ss(line);
+        std::string requestID, listingID, requesterName, receiverName, requestTimeStampStr, requestStatus;
+        char delimiter = ',';
+
+        getline(ss, requestID, delimiter);
+        getline(ss, listingID, delimiter);
+        getline(ss, requesterName, delimiter);
+        getline(ss, receiverName, delimiter);
+        getline(ss, requestTimeStampStr, delimiter);
+        getline(ss, requestStatus);
+
+        DateTime requestTimeStamp(requestTimeStampStr);
+        requests.push_back(Request(requestID, listingID, requesterName, receiverName, requestTimeStamp, requestStatus));
+    }
+
+    return requests;
+}
+
+void FileHandler::saveRequests(const std::string &filename, const std::vector<Request> &requests)
+{
+    std::ofstream file(filename);
+
+    if (!file.is_open())
+    {
+        throw std::runtime_error("Unable to open file: " + filename);
+    }
+
+    // write header
+    file << "requestID,listingID,requesterName,receiverName,requestTimeStamp,requestStatus" << std::endl;
+
+    for (const auto &request : requests)
+    {
+        file << request.getRequestID() << ','
+             << request.getListingID() << ','
+             << request.getRequesterName() << ','
+             << request.getReceiverName() << ','
+             << request.getRequestTimeStamp().getFormattedTimestamp() << ','
+             << request.getRequestStatus() << std::endl;
+    }
+}
+
+// int main()
+// {
+//     FileHandler fileHandler;
+//     std::vector<RegularMember> memberList = fileHandler.loadUsers("../../databases/users.csv");
+//     for (RegularMember &member : memberList)
+//     {
+//         member.showInfo();
+//     }
+//     RegularMember newMember("test", "test", "test", "test", "test", "test", Hanoi, 0, 0, "test", 0, 20, 0, 0, 0);
+//     memberList.push_back(newMember);
+//     fileHandler.saveUsers("../../databases/users.csv", memberList);
+//     return 0;
+// }

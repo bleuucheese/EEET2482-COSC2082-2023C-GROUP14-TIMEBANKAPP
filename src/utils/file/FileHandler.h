@@ -35,10 +35,10 @@ public:
     RegularMember parseCSVLine(const std::string &csvLine);
     std::string convertToCSV(const RegularMember &member);
 
-    // Function to load data from the CSV file into a vector<Admin>
-    std::vector<Admin> loadAdmin(const std::string &filename);
-    // Function to save data from the vector<Admin> to the CSV file
-    void saveAdmin(const std::string &filename, const std::vector<Admin> &adminList);
+    // Function to load data from the CSV file into an Admin object
+    Admin loadAdmin(const std::string &filename);
+    // Function to save data from the Admin object to the CSV file
+    void saveAdmin(const std::string &filename, const Admin &admin);
 
     // Function to load data from the CSV file into a vector<RegularMember>
     std::vector<RegularMember> loadUsers(const std::string &filename);

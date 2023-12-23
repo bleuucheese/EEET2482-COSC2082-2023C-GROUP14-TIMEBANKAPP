@@ -5,6 +5,9 @@
 #include "User.h"
 
 using std::string;
+
+// Forward declaration to avoid circular dependency
+class RegularMember;
 class Admin : public User
 {
 private:
@@ -13,11 +16,14 @@ private:
 public:
     // Constructor
     explicit Admin(float revenue = 0); // avoid implicit type conversion
-    float getRevenue() { return revenue; };
+    float getRevenue() const { return revenue; };
     void setRevenue(float revenue) { this->revenue = revenue; };
     void showInfo();
 
+    bool resetPasswordForMember(RegularMember &member, string newPassword);
+
     friend class TimeBankSystem;
+    friend class RegularMember;
     friend class FileHandler;
 };
 

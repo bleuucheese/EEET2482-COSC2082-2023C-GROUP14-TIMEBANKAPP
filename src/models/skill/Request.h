@@ -25,21 +25,29 @@ private:
 public:
     Request(std::string requestID = "", std::string listingID = "", std::string requesterName = "", std::string receiverName = "", DateTime requestTimeStamp = DateTime(), std::string requestStatus = "Pending");
 
-    SkillListing *getPSkillListing();
-    void setPSkillListing(SkillListing *pSkillListing);
-    // getters and setters
-    string getRequestID();
-    void setRequestID(string requestID);
-    string getRequestStatus();
-    void setRequestStatus(string requestStatus);
-    string getRequestTimeStamp();
-    void setRequestTimeStamp(string requestTimeStamp);
-    string getRequesterName();
-    void setRequesterName(string requesterName);
-    string getReceiverName();
-    void setReceiverName(string receiverName);
+    // SkillListing *getPSkillListing();
+    // void setPSkillListing(SkillListing *pSkillListing);
+
+    // Getters
+    string getRequestID() const { return requestID; };
+    string getListingID() const { return listingID; };
+    std::string getRequestStatus() const { return requestStatus; };
+    DateTime getRequestTimeStamp() const { return requestTimeStamp; };
+    std::string getRequesterName() const { return requesterName; };
+    std::string getReceiverName() const { return receiverName; };
+
+    // Setters
+    void setRequestID(string requestID) { this->requestID = requestID; };
+    void setListingID(string listingID) { this->listingID = listingID; };
+    void setRequestStatus(std::string requestStatus) { this->requestStatus = requestStatus; };
+    void setRequestTimeStamp(DateTime requestTimeStamp) { this->requestTimeStamp = requestTimeStamp; };
+    void setRequesterName(std::string requesterName) { this->requesterName = requesterName; };
+    void setReceiverName(std::string receiverName) { this->receiverName = receiverName; };
 
     void showInfo();
+
+    friend class TimeBankSystem;
+    friend class FileHandler;
 };
 
 #endif // EEET2482_COSC2082_2023C_GROUP14_TIMEBANKAPP_SRC_MODELS_SKILL_REQUEST_H

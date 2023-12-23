@@ -15,10 +15,9 @@ class DateTime
 private:
     std::tm tm;
 
+public:
     bool isValidFormat(const std::string &timestamp);
     bool isValidDate();
-
-public:
     bool isLeapYear(int year);
     int daysInMonth(int month, int year);
 

@@ -18,7 +18,13 @@ SkillListing::SkillListing(string listingID, string skillID, int consumedCreds, 
     this->consumedCredsPerHour = consumedCreds;
     this->minHostRatingScore = minHostRatingScore;
     this->listingState = listingState;
-    this->listingID = "L" + generateRandomID();
+    if (!listingID.empty())
+    {
+        this->listingID = listingID;
+        
+    } else {
+        this->listingID = "L" + generateRandomID();
+    }
     this->skillID = skillID;
 }
 

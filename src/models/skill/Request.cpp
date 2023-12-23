@@ -6,7 +6,7 @@ using std::cin;
 using std::cout;
 using std::string;
 
-Request::Request(string requestID, string listingID, std::string requesterName, std::string receiverName,DateTime requestTimeStamp, std::string requestStatus)
+Request::Request(string requestID, string listingID, std::string requesterName, std::string receiverName, DateTime requestTimeStamp, std::string requestStatus)
 {
     if (requestID.empty())
     {
@@ -17,6 +17,8 @@ Request::Request(string requestID, string listingID, std::string requesterName, 
         this->requestID = requestID;
     }
     this->requestStatus = requestStatus;
-    this->requesterName = "";
-    this->receiverName = "";
-    
+    this->requesterName = requesterName;
+    this->receiverName = receiverName;
+    this->requestTimeStamp = requestTimeStamp;
+    this->listingID = listingID;
+}

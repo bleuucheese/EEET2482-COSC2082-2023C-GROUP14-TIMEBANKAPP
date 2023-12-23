@@ -7,6 +7,8 @@
 #include <regex>
 #include <stdexcept>
 #include "./myUtils.h"
+#include "myUtils.h"
+#include "./time/DateTime.h"
 
 using std::cin;
 using std::cout;
@@ -245,3 +247,164 @@ std::string getValidCardNumber()
     }
 }
 
+std::string getValidCity()
+{
+    std::string city;
+    while (true)
+    {
+        std::cout << "Enter city (Hanoi or Saigon): ";
+        std::cin >> city;
+        if (city == "Hanoi" || city == "Saigon")
+        {
+            return city;
+        }
+        else
+        {
+            std::cout << "Invalid city. Please enter Hanoi or Saigon." << std::endl;
+        }
+    }
+}
+
+double getValidDouble(const std::string &prompt)
+{
+    double value;
+    while (true)
+    {
+        std::cout << prompt;
+        if (std::cin >> value)
+        {
+            // Check if there is any extra input (non-numeric characters)
+            if (std::cin.peek() == '\n')
+            {
+                // Valid float input
+                break;
+            }
+            else
+            {
+                std::cout << "Invalid input. Please enter a valid double." << std::endl;
+                std::cin.clear();                                                   // Clear the error state
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignore the rest of the line
+            }
+        }
+        else
+        {
+            std::cout << "Invalid input. Please enter a valid double." << std::endl;
+            std::cin.clear();                                                   // Clear the error state
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignore the rest of the line
+        }
+    }
+    return value;
+}
+
+double getValidLatitude()
+{
+    return getValidDouble("Enter latitude (in decimal, e.g: 10.455): ");
+}
+
+double getValidLongitude()
+{
+    return getValidDouble("Enter longitude (in decimal, e.g: 106.344): ");
+}
+
+std::string getValidStringInput(const std::string &prompt)
+{
+    std::string input;
+    while (true)
+    {
+        std::cout << prompt;
+        getline(std::cin, input);
+        if (std::regex_match(input, std::regex("^[a-zA-Z0-9 -]+$")))
+        {
+            return input;
+        }
+        else
+        {
+            std::cout << "Invalid input. Please try again." << std::endl;
+        }
+    }
+}
+
+float getValidFloat(const std::string &prompt)
+{
+    float value;
+    while (true)
+    {
+        std::cout << prompt;
+        if (std::cin >> value)
+        {
+            // Check if there is any extra input (non-numeric characters)
+            if (std::cin.peek() == '\n')
+            {
+                // Valid float input
+                break;
+            }
+            else
+            {
+                std::cout << "Invalid input. Please enter a valid float." << std::endl;
+                std::cin.clear();                                                   // Clear the error state
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignore the rest of the line
+            }
+        }
+        else
+        {
+            std::cout << "Invalid input. Please enter a valid float." << std::endl;
+            std::cin.clear();                                                   // Clear the error state
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignore the rest of the line
+        }
+    }
+    return value;
+}
+
+int getValidInt(const std::string &prompt)
+{
+    int value;
+    while (true)
+    {
+        std::cout << prompt;
+        if (std::cin >> value)
+        {
+            // Check if there is any extra input (non-numeric characters)
+            if (std::cin.peek() == '\n')
+            {
+                // Valid int input
+                break;
+            }
+            else
+            {
+                std::cout << "Invalid input. Please enter a valid integer." << std::endl;
+                std::cin.clear();                                                   // Clear the error state
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignore the rest of the line
+            }
+        }
+        else
+        {
+            std::cout << "Invalid input. Please enter a valid integer." << std::endl;
+            std::cin.clear();                                                   // Clear the error state
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignore the rest of the line
+        }
+    }
+    return value;
+}
+
+std::string getValidTimestamp(const std::string &prompt)
+{
+    std::string input;
+    DateTime dateTimeChecker; // Assuming DateTime has a default constructor
+
+    while (true)
+    {
+        std::cout << prompt;
+        std::getline(std::cin, input);
+
+        if (dateTimeChecker.isValidFormat(input) && dateTimeChecker.isValidDate())
+        {
+            break; // Break the loop if the timestamp is valid
+        }
+        else
+        {
+            std::cout << "Invalid timestamp. Please try again." << std::endl;
+        }
+    }
+
+    return input;
+}

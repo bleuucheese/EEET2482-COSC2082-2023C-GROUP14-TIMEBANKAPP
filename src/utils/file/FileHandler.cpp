@@ -369,11 +369,11 @@ std::vector<Review> FileHandler::loadReviews(const std::string &filename)
 
         DateTime timeStamp(timeStampStr);
 
-        if (reviewID[0] == 'S')
+        if (reviewID[1] == 'S')
         {
             reviews.push_back(Review(reviewID, listingID, skillRating, supporterRating, comments, reviewer, reviewee, timeStamp));
         }
-        else if (reviewID[0] == 'H')
+        else if (reviewID[1] == 'H')
         {
             reviews.push_back(Review(reviewID, listingID, hostRating, comments, reviewer, reviewee, timeStamp));
         }

@@ -396,13 +396,19 @@ std::string getValidTimestamp(const std::string &prompt)
         std::cout << prompt;
         std::getline(std::cin, input);
 
-        if (dateTimeChecker.isValidFormat(input) && dateTimeChecker.isValidDate())
+        std::regex pattern("^\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}:\\d{2}$");
+        if (!dateTimeChecker.isValidFormat(input) && !dateTimeChecker.isValidDate())
         {
-            break; // Break the loop if the timestamp is valid
+
+            std::cout << "Invalid time. Please try again." << std::endl;
+        }
+        if (std::regex_match(input, pattern))
+        {
+            break; // Break if passed 2 test cases
         }
         else
         {
-            std::cout << "Invalid timestamp. Please try again." << std::endl;
+            std::cout << "Invalid format. Please try again." << std::endl;
         }
     }
 

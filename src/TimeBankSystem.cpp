@@ -154,10 +154,10 @@ void TimeBankSystem::adminMenu()
         // method to view sales figures and statistics
         break;
     case 3:
-        // method to reset password
+        promptAdminChangePassword();
         break;
     case 4:
-        logout();
+        // logout();
         systemMenu();
         break;
     }
@@ -167,11 +167,11 @@ void TimeBankSystem::regularMemberMenu()
 {
     cout << "===========MEMBER MENU=============\n";
     cout << "1. Manage Personal Account\n";
-    cout << "2. Skills\n";
-    cout << "3. Listings\n";
-    cout << "4. Requests\n";
-    cout << "5. Reviews\n";
-    cout << "6. Search Job Market\n";
+    cout << "2. Manage Skills\n";
+    cout << "3. Manage Listings\n";
+    cout << "4. Manage Requests\n";
+    cout << "5. Manage Reviews\n";
+    cout << "6. Search\n";
     cout << "7. Sign Out\n";
 
     switch (promptAndGetChoice(1, 7))
@@ -281,7 +281,8 @@ bool TimeBankSystem::login(const std::string &username, const std::string &passw
         if (user.username == username && user.password == password)
         {
             user.isAuthenticated = true;
-            this->currentMember = user; // Set current member to the user who just logged in
+            this->currentMember = &user; // Set current member to the user who just logged in
+            extractMemberData();         // Extract data from the system's vectors to the current member's vectors
             return true;
         }
     }
@@ -290,21 +291,21 @@ bool TimeBankSystem::login(const std::string &username, const std::string &passw
 
 void TimeBankSystem::logout()
 {
-    if (admin.isAuthenticated)
+    if (this->admin.isAuthenticated)
     {
         admin.isAuthenticated = false;
     }
-    for (auto &user : this->memberList)
-    {
-        if (user.isAuthenticated)
-        {
-            user.isAuthenticated = false;
-        }
-    }
-    this->currentMember.isAuthenticated = false;
+    // for (auto &user : this->memberList)
+    // {
+    //     if (user.isAuthenticated)
+    //     {
+    //         user.isAuthenticated = false;
+    //     }
+    // }
+    (this->currentMember)->isAuthenticated = false;
 }
 
-RegularMember TimeBankSystem::findMemberByUsername(string usn)
+RegularMember &TimeBankSystem::findMemberByUsername(string usn)
 {
     for (RegularMember &member : this->memberList)
     {
@@ -314,6 +315,30 @@ RegularMember TimeBankSystem::findMemberByUsername(string usn)
         }
     }
     throw std::runtime_error("Member not found!");
+}
+
+Skill &TimeBankSystem::findSkillByID(string skillID)
+{
+    for (Skill &skill : this->skillList)
+    {
+        if (skill.skillID == skillID)
+        {
+            return skill;
+        }
+    }
+    // throw std::runtime_error("Skill not found!");
+}
+
+SkillListing &TimeBankSystem::findListingByID(string listingID)
+{
+    for (SkillListing &listing : this->skillListingList)
+    {
+        if (listing.listingID == listingID)
+        {
+            return listing;
+        }
+    }
+    throw std::runtime_error("Listing not found!");
 }
 
 void TimeBankSystem::addMember(RegularMember &member)
@@ -437,19 +462,28 @@ void TimeBankSystem::profileMenu()
 {
     cout << "======PROFILE MENU======\n";
     cout << "1. View Profile\n";
-    cout << "2. Sell Credits\n";
-    cout << "3. Back\n";
+    cout << "2. Top Up Credits\n";
+    cout << "3. Sell Credits\n";
+    cout << "4. Block a Member\n";
+    cout << "5. Back\n";
 
-    switch (promptAndGetChoice(1, 3))
+    switch (promptAndGetChoice(1, 5))
     {
     case 1:
-        viewProfile();
+        viewProfile(); // can view blocked members' usernames
         break;
     case 2:
-        // method to sell credits
+        promptTopUp();
         break;
     case 3:
-        regularMemberMenu(); // Return to the previous menu
+        promptSellCredits();
+        break;
+    case 4:
+        promptBlockMember();
+        break;
+
+    case 5:
+        regularMemberMenu();
         break;
     }
 }
@@ -476,69 +510,6 @@ void TimeBankSystem::skillMenu()
     }
 }
 
-void TimeBankSystem::requestMenu()
-{
-    cout << "======REQUESTS MENU======\n";
-    cout << "1. View Requests\n";
-    cout << "2. Add Request\n";
-    cout << "3. Back\n";
-
-    switch (promptAndGetChoice(1, 3))
-    {
-    case 1:
-        // method to view requests
-        break;
-    case 2:
-        // method to add request
-        break;
-    case 3:
-        return;
-        break;
-    }
-}
-
-void TimeBankSystem::reviewMenu()
-{
-    cout << "======REVIEWS MENU======\n";
-    cout << "1. View Review History\n";
-    cout << "2. Add Review\n";
-    cout << "3. Back\n";
-
-    switch (promptAndGetChoice(1, 3))
-    {
-    case 1:
-        // method to view reviews
-        break;
-    case 2:
-        // method to add review
-        break;
-    case 3:
-        return;
-        break;
-    }
-}
-
-void TimeBankSystem::searchMenu()
-{
-    cout << "======SEARCH MENU======\n";
-    cout << "1. Search by Skill\n";
-    cout << "2. Search by Location\n";
-    cout << "3. Back\n";
-
-    switch (promptAndGetChoice(1, 3))
-    {
-    case 1:
-        // method to search by skill
-        break;
-    case 2:
-        // method to search by location
-        break;
-    case 3:
-        return;
-        break;
-    }
-}
-
 void TimeBankSystem::listingMenu()
 {
     cout << "======LISTING MENU======\n";
@@ -558,10 +529,79 @@ void TimeBankSystem::listingMenu()
         break;
     case 3:
         // method to hide listing
+        promptHideListing();
         break;
 
     case 4:
         regularMemberMenu();
+        break;
+    }
+}
+
+void TimeBankSystem::requestMenu()
+{
+    cout << "======REQUESTS MENU======\n";
+    cout << "1. View Requests\n";
+    cout << "2. Add Request\n";
+    cout << "3. Back\n";
+
+    switch (promptAndGetChoice(1, 3))
+    {
+    case 1:
+        // method to view requests, and prompt them to get the ID of the request they want to respond.
+        break;
+    case 2:
+        // method to add request: display a list of listings, and then prompt them to get the ID of the listing they want to request
+        break;
+    case 3:
+        return;
+        break;
+    }
+}
+
+void TimeBankSystem::reviewMenu()
+{
+    cout << "======REVIEWS MENU======\n";
+    cout << "1. View Review History\n";
+    cout << "2. Add Review For a Host\n";
+    cout << "3. Add Review For a Supporter\n";
+    cout << "4. Back\n";
+
+    switch (promptAndGetChoice(1, 3))
+    {
+    case 1:
+        // method to view reviews
+        break;
+    case 2:
+        // method for a supporter to add review: #RH type
+        break;
+    case 3:
+        // method for a host to add review: #RS type
+        break;
+
+    case 4:
+        regularMemberMenu();
+        break;
+    }
+}
+
+void TimeBankSystem::searchMenu()
+{
+    cout << "======SEARCH MENU======\n";
+    cout << "1. Search for a Member\n";
+    cout << "2. Search for a listing\n";
+    cout << "3. Back\n";
+
+    switch (promptAndGetChoice(1, 3))
+    {
+    case 1:
+        // method to search by username
+        break;
+    case 2:
+        // method to search by location, and min host rate, and by current credits: isEligibleForViewingListing()
+        break;
+    case 3:
+        return;
         break;
     }
 }
@@ -580,8 +620,58 @@ void TimeBankSystem::viewProfile()
     }*/
 
     cout << "=============YOUR INFORMATION=============\n";
-    this->currentMember.showInfo();
+    (this->currentMember)->showInfo();
     profileMenu();
+}
+
+void TimeBankSystem::promptAdminChangePassword()
+{
+    string username, newPassword;
+    do
+    {
+        cout << "Enter the username of the member you want to reset password: ";
+        cin >> username;
+        if (isUniqueUsername(username))
+        {
+            cout << "User not found! Please try again.\n";
+        }
+        else if (username == "@dmin2023")
+        {
+            cout << "You cannot reset your own password! Please try again.\n";
+        }
+
+    } while (isUniqueUsername(username) || username == "@dmin2023");
+    fflush(stdin); // Clear input buffer
+    newPassword = getValidPassword();
+    if (!admin.resetPasswordForMember(findMemberByUsername(username), newPassword))
+    {
+        cout << "Please try again\n";
+    }
+    adminMenu();
+}
+
+bool TimeBankSystem::isSkillIDExistAndOwned(string skillID)
+{
+    for (Skill &skill : this->skillList)
+    {
+        if (skill.skillID == skillID && skill.getOwnerName() == (this->currentMember)->getUsername())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool TimeBankSystem::isListingIDExistAndOwned(string listingID)
+{
+    for (SkillListing &listing : this->skillListingList)
+    {
+        if (listing.listingID == listingID && listing.getSupporterName() == (this->currentMember)->getUsername())
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 // Functions to ask user input for adding new objects to the system's vectors
@@ -592,10 +682,10 @@ void TimeBankSystem::promptAddSkill()
     skillName = getValidStringInput("Enter skill name: ");
     skillDescription = getValidStringInput("Enter skill description: ");
     skillEfficiency = getValidStringInput("Enter skill efficiency (Skillful/Adequate/Medium/...): ");
-    ownerName = this->currentMember.getUsername();
+    ownerName = (this->currentMember)->getUsername();
     Skill newSkill(skillID, skillName, skillDescription, skillEfficiency, ownerName);
     addSkill(newSkill);
-    currentMember.skills.push_back(&newSkill);
+    (currentMember)->skills.push_back(&newSkill);
     cout << "Skill added successfully!\n";
     regularMemberMenu();
 }
@@ -607,10 +697,16 @@ void TimeBankSystem::promptAddListing()
     int consumedCredsPerHour = 0;
     float minHostRatingScore = -1;
     int listingState = 0; // 0 = available, 1 = hidden, 2 = booked, 3 = completed; default = available when listing is created
-    std::string supporterName = this->currentMember.getUsername();
-    std::string hostName = ""; // Host name is empty when listing is created, will be updated when the listing is booked by that host
     Period workingTimeSlot;
-    skillID = getValidStringInput("Enter skillID to begin making a Job Listing on the market: ");
+
+    do
+    {
+        skillID = getValidStringInput("Enter skillID to begin making a Job Listing on the market: ");
+        if (!isSkillIDExistAndOwned(skillID))
+        {
+            cout << "SkillID not found or not one of your added skills! Please try again.\n";
+        }
+    } while (!isSkillIDExistAndOwned(skillID));
 
     consumedCredsPerHour = getValidInt("Enter consumed credits per hour: ");
     do
@@ -633,15 +729,124 @@ void TimeBankSystem::promptAddListing()
         }
     } while (buffer != "Y" || buffer != "y" || buffer != "N" || buffer != "n");
     fflush(stdin); // Clear input buffer
-
+    std::string supporterName = (this->currentMember)->getUsername();
+    std::string hostName = ""; // Host name is empty when listing is created, will be updated when the listing is booked by that host
     startDate = getValidTimestamp("Enter start date in DD/MM/YYYY HH:MM:SS format: ");
     endDate = getValidTimestamp("Enter end date in DD/MM/YYYY HH:MM:SS format: ");
     workingTimeSlot = Period(DateTime(startDate), DateTime(endDate));
     SkillListing newListing(listingID, skillID, consumedCredsPerHour, minHostRatingScore, listingState, supporterName, hostName, workingTimeSlot);
     addListing(newListing);
-    currentMember.skillListings.push_back(&newListing);
+    (currentMember->skillListings).push_back(&newListing);
 
     cout << "Listing added successfully!\n";
+    regularMemberMenu();
+}
+
+void TimeBankSystem::promptHideListing()
+{
+    std::string listingID;
+    // Prompt user to enter listingID until they enter a valid listingID that is owned by them
+    do
+    {
+        listingID = getValidStringInput("Enter listingID to hide: ");
+        if (!isListingIDExistAndOwned(listingID))
+        {
+            cout << "ListingID not found or not one of your added listings! Please try again.\n";
+        }
+
+    } while ((!isListingIDExistAndOwned(listingID)) || findListingByID(listingID).getListingState() != 0);
+
+    if (findListingByID(listingID).hideListing())
+    {
+        cout << "Listing hidden successfully!\n";
+    }
+    else
+    {
+        cout << "Listing hide failed! Please try again.\n";
+    }
+    regularMemberMenu();
+}
+
+void TimeBankSystem::promptTopUp()
+{
+    int amount = getValidInt("Enter amount of credit to top up: ");
+    // Authorize the payment by get the user to enter their password to confirm
+    string password;
+    do
+    {
+        cout << "Enter your password to confirm transaction: ";
+        cin >> password;
+        if (password != (this->currentMember)->getPassword())
+        {
+            cout << "Wrong password! Please try again.\n";
+        }
+    } while (password != (this->currentMember)->getPassword());
+    cout << "Processing payment...\n";
+
+    if (currentMember->topUp(amount))
+    {
+        cout << "Top up successful! Added " << amount << " credits to your account.\n";
+        this->admin.revenue += amount; // Add the amount of credits to the system's revenue
+    }
+    else
+    {
+        cout << "Top up failed! Please try again.\n";
+    }
+    regularMemberMenu();
+}
+
+void TimeBankSystem::promptSellCredits()
+{
+    // This will transfer 90% value of the amount of credits to the member's bank account from the system's revenue
+    int amount = getValidInt("Enter amount of credit to sell: ");
+    if (currentMember->sellCredits(amount))
+    {
+        cout << "Sell credits successful! Added $" << amount * 0.9 << " to your account.\n";
+        this->admin.revenue -= amount * 0.9;
+    }
+    else
+    {
+        cout << "Sell credits failed! Please try again.\n";
+    }
+    regularMemberMenu();
+}
+
+void TimeBankSystem::promptBlockMember()
+{
+    string username;
+    std::fstream blockFile("./databases/blocklist.csv", std::ios::app);
+
+    do
+    {
+        cout << "Enter the username of the member you want to block: ";
+        cin >> username;
+        if (isUniqueUsername(username))
+        {
+            cout << "User not found! Please try again.\n";
+        }
+        else if (username == this->currentMember->getUsername())
+        {
+            cout << "You cannot block yourself! Please try again.\n";
+        }
+        else if (username == "@dmin2023")
+        {
+            cout << "You cannot block the admin! Please try again.\n";
+        }
+
+    } while (isUniqueUsername(username) || username == currentMember->getUsername() || username == "@dmin2023");
+    RegularMember blockedMember = findMemberByUsername(username);
+    if (currentMember->blockMember(blockedMember))
+    {
+        cout << "Block successful!\n";
+        // Write the blocked member directly to the file
+        blockFile << currentMember->getUsername() << "," << username << "\n";
+        // Update the blocked member list of the currently logged in user
+        // currentMember->blockedMembers.push_back(&blockedMember);
+    }
+    else
+    {
+        cout << "Block failed! Please try again.\n";
+    }
     regularMemberMenu();
 }
 
@@ -652,6 +857,8 @@ void TimeBankSystem::loadData()
     this->admin = fileHandler.loadAdmin("./databases/admin.csv");
     this->skillList = fileHandler.loadSkills("./databases/skills.csv");
     this->skillListingList = fileHandler.loadListings("./databases/listings.csv");
+    this->requestList = fileHandler.loadRequests("./databases/requests.csv");
+    this->reviewList = fileHandler.loadReviews("./databases/reviews.csv");
 }
 
 void TimeBankSystem::saveData()
@@ -661,16 +868,106 @@ void TimeBankSystem::saveData()
     fileHandler.saveAdmin("./databases/admin.csv", this->admin);
     fileHandler.saveSkills("./databases/skills.csv", this->skillList);
     fileHandler.saveListings("./databases/listings.csv", this->skillListingList);
+    fileHandler.saveRequests("./databases/requests.csv", this->requestList);
+    fileHandler.saveReviews("./databases/reviews.csv", this->reviewList);
 }
 
-int main()
+void TimeBankSystem::extractMemberData()
 {
-    TimeBankSystem sys;
-    sys.loadData();
-    sys.welcomeScreen();
-    sys.systemMenu();
-    sys.logout();
-    sys.saveData();
 
-    return 0;
+    // Clear the current member's vectors first
+    (this->currentMember)->skills.clear();
+    (this->currentMember)->skillListings.clear();
+    (this->currentMember)->sentreceivedRequests.clear();
+    (this->currentMember)->sentreceivedReviews.clear();
+    (this->currentMember)->blockedMembers.clear();
+
+    // Extract data from skillList, skillListingList, requestList, reviewList to current user's skillListings, requests, reviews vectors of pointers
+    /*skill*/
+    for (Skill &skill : this->skillList)
+    {
+        if (skill.getOwnerName() == (this->currentMember)->getUsername())
+        {
+            (this->currentMember)->skills.push_back(&skill);
+        }
+    }
+
+    /*skillListing*/
+    for (SkillListing &listing : this->skillListingList)
+    {
+        if (listing.getSupporterName() == (this->currentMember)->getUsername())
+        {
+            (this->currentMember)->skillListings.push_back(&listing);
+        }
+    }
+
+    /*request*/
+    for (Request &request : this->requestList)
+    {
+        if (request.getRequesterName() == (this->currentMember)->getUsername()) // If the current member is the host
+        {
+            (this->currentMember)->sentreceivedRequests.push_back(&request); // sentRequest
+        }
+        else if (request.getReceiverName() == (this->currentMember)->getUsername()) // If the current member is the supporter
+        {
+            (this->currentMember)->sentreceivedRequests.push_back(&request); // receivedRequest
+        }
+    }
+
+    /*review*/
+    for (Review &review : this->reviewList)
+    {
+        if (review.getReviewer() == (this->currentMember)->getUsername())
+        {
+            (this->currentMember)->sentreceivedReviews.push_back(&review); // sentReview
+        }
+        else if (review.getReviewee() == (this->currentMember)->getUsername())
+        {
+            (this->currentMember)->sentreceivedReviews.push_back(&review); // receivedReview
+        }
+    }
+
+    /*blockList*/
+    std::fstream blockFile("./databases/blocklist.csv", std::ios::in);
+    std::string line;
+    std::string blocker, blockedMemberUsername;
+
+    // Skip the first line
+    std::getline(blockFile, line);
+
+    while (std::getline(blockFile, line))
+    {
+        std::stringstream ss(line);
+        std::getline(ss, blocker, ',');               // Read the blocker username
+        std::getline(ss, blockedMemberUsername, ','); // Read the blocked member username
+
+        if (blocker == (this->currentMember)->getUsername())
+        {
+            // You don't need to read blockedMemberUsername again here.
+            // Instead, you can directly add it to the vector.
+            RegularMember *blockedMember = &findMemberByUsername(blockedMemberUsername);
+
+            if (blockedMember != nullptr)
+            {
+                (this->currentMember)->blockedMembers.push_back(blockedMember);
+            }
+            else
+            {
+                cout << "Error populating blocked members list!\n";
+            }
+        }
+    }
 }
+
+// int main()
+// {
+//     TimeBankSystem sys;
+//     sys.loadData();
+//     sys.welcomeScreen();
+//     sys.systemMenu();
+//     sys.logout();
+
+//     sys.saveData();
+
+//     return 0;
+// }

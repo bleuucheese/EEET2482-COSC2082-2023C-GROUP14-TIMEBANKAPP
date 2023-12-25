@@ -46,7 +46,7 @@ private:
 
 public:
     // Constructor
-    RegularMember(string username = "", string password = "", string fullName = "", string phoneNumber = "", string email = "", string homeAddress = "", allowedCities city = Hanoi, double latitude = 0, double longitude = 0, string creditCardNumber = "", float balance = 0, int creditPoints =20, float skillRatingScore = 0, float supporterRatingScore = 0, float hostRatingScore = 0);
+    RegularMember(string username = "", string password = "", string fullName = "", string phoneNumber = "", string email = "", string homeAddress = "", allowedCities city = Hanoi, double latitude = 0, double longitude = 0, string creditCardNumber = "", float balance = 0, int creditPoints = 20, float skillRatingScore = 0, float supporterRatingScore = 0, float hostRatingScore = 0);
 
     // Getters and Setters
     int getCreditPoints() { return creditPoints; };
@@ -71,8 +71,6 @@ public:
     void setSkillRating(float skillRatingScore) { this->skillRatingScore = skillRatingScore; };
     void setSupporterRating(float supporterRatingScore) { this->supporterRatingScore = supporterRatingScore; };
     void setHostRating(float hostRatingScore) { this->hostRatingScore = hostRatingScore; };
-    // void setReceivedReviews(vector<Review> receivedReviews) { this->receivedReviews = receivedReviews; };
-    // void setReceivedRequests(vector<Request> receivedRequests) { this->receivedRequests = receivedRequests; };
     void setBlockedMembers(vector<RegularMember *> blockedMembers) { this->blockedMembers = blockedMembers; };
 
     // Member functions
@@ -86,6 +84,10 @@ public:
     void showInfo();
     void printRestrictedMemberInfo();
     bool topUp(int credPoints);
+
+    bool sellCredits(int credPoints);
+
+    bool blockMember(RegularMember &memberToBlock);
 
     friend class Skill;
     friend class SkillListing;

@@ -45,6 +45,8 @@ public:
     // Methods
     void displaySkillListing();
 
+    bool hideListing();
+
     friend class TimeBankSystem;
     friend class FileHandler;
 };

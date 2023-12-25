@@ -35,6 +35,7 @@ public:
 
     friend class SkillListing;
     friend class FileHandler;
+    friend class TimeBankSystem;
 };
 
 #endif // EEET2482_COSC2082_2023C_GROUP14_TIMEBANKAPP_SRC_MODELS_SKILL_SKILL_H

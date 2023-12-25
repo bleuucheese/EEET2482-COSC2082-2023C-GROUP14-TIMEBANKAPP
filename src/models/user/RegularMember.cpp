@@ -8,6 +8,13 @@
 #include "../skill/Skill.h"
 #include "RegularMember.h"
 
+// Define ANSI escape codes for text formatting
+#define RESET "\033[0m"
+#define BOLD "\033[1m"
+#define RED "\033[31m"
+#define GREEN "\033[32m"
+#define YELLOW "\033[33m"
+
 using std::cin;
 using std::cout;
 using std::string;
@@ -68,12 +75,17 @@ float RegularMember::getSkillRatingScore()
         return this->skillRatingScore;
     }
     this->skillRatingScore = 0; // Reset the skill rating score before calculating
+    int count = 0;              // Count the number of reviews with skill rating score > 0 (1->5)
     // Calculate the average skill rating score
     for (int i = 0; i < this->sentreceivedReviews.size(); i++)
     {
-        this->skillRatingScore += (this->sentreceivedReviews[i])->getSkillRating();
+        if ((this->sentreceivedReviews[i])->getSkillRating() != 0)
+        {
+            this->skillRatingScore += (this->sentreceivedReviews[i])->getSkillRating();
+            count++;
+        }
     }
-    return (float)this->skillRatingScore / this->sentreceivedReviews.size();
+    return (float)this->skillRatingScore / count;
 }
 
 float RegularMember::getSupporterRatingScore()
@@ -83,12 +95,17 @@ float RegularMember::getSupporterRatingScore()
         return this->supporterRatingScore;
     }
     this->supporterRatingScore = 0; // Reset the supporter rating score before calculating
+    int count = 0;                  // Count the number of reviews with supporter rating score > 0 (1->5)
     // Calculate the average supporter rating score
     for (int i = 0; i < this->sentreceivedReviews.size(); i++)
     {
-        this->supporterRatingScore += (this->sentreceivedReviews[i])->getSupporterRating();
+        if ((this->sentreceivedReviews[i])->getSupporterRating() != 0)
+        {
+            this->supporterRatingScore += (this->sentreceivedReviews[i])->getSupporterRating();
+            count++;
+        }
     }
-    return (float)this->supporterRatingScore / this->sentreceivedReviews.size();
+    return (float)this->supporterRatingScore / count;
 }
 
 float RegularMember::getHostRatingScore()
@@ -98,12 +115,17 @@ float RegularMember::getHostRatingScore()
         return this->hostRatingScore;
     }
     this->hostRatingScore = 0;
+    int count = 0; // Count the number of reviews with host rating score > 0 (1->5)
     // Calculate the average host rating score
     for (int i = 0; i < this->sentreceivedReviews.size(); i++)
     {
-        this->hostRatingScore += (this->sentreceivedReviews[i])->getHostRating();
+        if ((this->sentreceivedReviews[i])->getHostRating() != 0)
+        {
+            this->hostRatingScore += (this->sentreceivedReviews[i])->getHostRating();
+            count++;
+        }
     }
-    return (float)this->hostRatingScore / this->sentreceivedReviews.size();
+    return (float)this->hostRatingScore / count;
 }
 
 // Pay to the system for the registration fee
@@ -140,30 +162,108 @@ double RegularMember::calculateDistance(RegularMember &otherMember)
 
 void RegularMember::showInfo()
 {
-    cout << "Username: " << this->getUsername() << "\n";
-    cout << "Credit points: " << this->creditPoints << "\n"; // 20 credit points for each new member
-    cout << "Phone number: " << this->phoneNumber << "\n";
-    cout << "Email: " << this->email << "\n";
-    cout << "Home address: " << this->homeAddress << "\n";
-    cout << "City: ";
-    if ((this->city) == 24)
+    // Define ANSI escape codes for bold and blue text
+    const std::string BOLD_BLUE = "\033[1;34m"; // Bold Blue
+
+    std::cout << BOLD_BLUE << "Username:" << RESET << " " << getUsername() << "\n";
+    std::cout << BOLD_BLUE << "Password:" << RESET << " " << getPassword() << "\n";
+    std::cout << BOLD_BLUE << "Active status:" << RESET << " " << getIsAuthenticated() << "\n";
+    std::cout << BOLD_BLUE << "Full Name:" << RESET << " " << fullName << "\n";
+    std::cout << BOLD_BLUE << "Credit card Number:" << RESET << " " << creditCardNumber << "\n";
+    std::cout << BOLD_BLUE << "Balance:" << RESET << " " << balance << "\n";
+    std::cout << BOLD_BLUE << "Credit Points:" << RESET << " " << creditPoints << "\n";
+    std::cout << BOLD_BLUE << "Phone Number:" << RESET << " " << phoneNumber << "\n";
+    std::cout << BOLD_BLUE << "Email:" << RESET << " " << email << "\n";
+    std::cout << BOLD_BLUE << "Home Address:" << RESET << " " << homeAddress << "\n";
+    std::cout << BOLD_BLUE << "City:" << RESET << " ";
+    if (city == Hanoi)
     {
-        cout << "Hanoi"
-             << "\n";
+        std::cout << "Hanoi\n";
     }
     else
     {
-        cout << "Saigon"
-             << "\n";
-    };
-    cout << "Balance: " << this->balance << "\n";
-    cout << "Skills:\n";
-    printSkills();
-    cout << "Skill rating score: " << getSkillRatingScore() << "\n";
-    cout << "Supporter rating score: " << getSupporterRatingScore() << "\n";
-    cout << "Host rating score: " << getHostRatingScore() << "\n";
-    cout << "Received reviews: \n";
-    printReceivedReviews();
+        std::cout << "Saigon\n";
+    }
+    std::cout << BOLD_BLUE << "Balance:" << RESET << " " << balance << "\n";
+
+    // Print skills added by the member
+    std::cout << BOLD_BLUE << "Skills:" << RESET << " ";
+    if (skills.empty())
+    {
+        std::cout << "N/A";
+    }
+    else
+    {
+        for (size_t i = 0; i < skills.size(); ++i)
+        {
+
+            std::cout << skills[i]->getSkillID();
+            if (i != skills.size() - 1)
+            {
+                std::cout << ", ";
+            }
+        }
+    }
+    std::cout << "\n";
+
+    // Print listings created by the member
+    std::cout << BOLD_BLUE << "Listings:" << RESET << " ";
+    if (skillListings.empty())
+    {
+        std::cout << "N/A";
+    }
+    else
+    {
+        for (size_t i = 0; i < skillListings.size(); ++i)
+        {
+
+            std::cout << skillListings[i]->getListingID();
+            if (i != skillListings.size() - 1)
+            {
+                std::cout << ", ";
+            }
+        }
+    }
+    std::cout << "\n";
+
+    // Print blocked members' usernames
+    std::cout << BOLD_BLUE << "Blocked Members:" << RESET << " ";
+    if (blockedMembers.empty())
+    {
+        std::cout << "N/A";
+    }
+    else
+    {
+        for (size_t i = 0; i < blockedMembers.size(); ++i)
+        {
+
+            std::cout << blockedMembers[i]->getUsername();
+            if (i != blockedMembers.size() - 1)
+            {
+                std::cout << ", ";
+            }
+        }
+    }
+    std::cout << "\n";
+    // Pending requests counts
+    int countRequest = 0;
+
+    for (int i = 0; i < sentreceivedRequests.size(); i++)
+    {
+        if (sentreceivedRequests[i]->getReceiverName() == this->getUsername() && sentreceivedRequests[i]->getRequestStatus() == "Pending")
+        {
+            countRequest++;
+        }
+    }
+    std::cout << BOLD_BLUE << "Pending Requests:" << RESET << " " << countRequest << "\n";
+
+    // Rating scores
+    std::cout << BOLD_BLUE << "Skill Rating Score:" << RESET << " " << getSkillRatingScore()  << "\n";
+    std::cout << BOLD_BLUE << "Supporter Rating Score:" << RESET << " " << getSupporterRatingScore() << "\n";
+    std::cout << BOLD_BLUE << "Host Rating Score:" << RESET << " " << getHostRatingScore() << "\n";
+
+    // End with an empty line
+    std::cout << "\n";
 }
 
 void RegularMember::printRestrictedMemberInfo()
@@ -191,8 +291,6 @@ void RegularMember::printRestrictedMemberInfo()
 
 bool RegularMember::topUp(int credPoints)
 {
-    cout << "Enter the amount you want to top up: ";
-    cin >> credPoints;
     if (credPoints < 0)
     {
         cout << "Invalid amount!\n";
@@ -211,6 +309,39 @@ bool RegularMember::topUp(int credPoints)
 
     this->balance -= credPoints;
     this->creditPoints += credPoints;
+    return true;
+}
+
+bool RegularMember::sellCredits(int credPoints)
+{
+    if (credPoints < 0)
+    {
+        cout << "Invalid amount!\n";
+        return false;
+    }
+
+    if (credPoints > this->creditPoints)
+    {
+        cout << "You don't have enough credit points!\n";
+        return false;
+    }
+    // Exchange rate, the admin will profit 10% for commission fee: 1 credit point = $0.9
+    this->balance += credPoints * 0.9;
+    this->creditPoints -= credPoints;
+    return true;
+}
+
+bool RegularMember::blockMember(RegularMember &memberToBlock)
+{
+    for (int i = 0; i < this->blockedMembers.size(); i++)
+    {
+        if (this->blockedMembers[i]->getUsername() == memberToBlock.getUsername())
+        {
+            cout << "You have already blocked this member! Try again later.\n";
+            return false;
+        }
+    }
+    this->blockedMembers.push_back(&memberToBlock);
     return true;
 }
 

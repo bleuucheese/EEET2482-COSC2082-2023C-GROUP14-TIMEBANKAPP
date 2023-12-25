@@ -40,3 +40,16 @@ void SkillListing::displaySkillListing()
     cout << "Host: " << this->hostName << "\n";
     cout << "Working Time Slot: " << this->workingTimeSlot.getFormattedPeriod() << "\n";
 };
+
+bool SkillListing::hideListing()
+{
+    if (this->listingState == 0)
+    {
+        this->listingState = 1; // 1 = hidden
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}

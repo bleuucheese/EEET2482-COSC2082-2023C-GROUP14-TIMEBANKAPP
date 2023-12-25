@@ -1,4 +1,4 @@
-# This is a sample credit card number, they are not real, but they are valid according to the Luhn algorithm.
+# This is a sample of credit card numbers, they are not real, but they are valid according to the Luhn algorithm.
 # You can use them for testing purposes.
 // References:
 [1] https://www.freeformatter.com/credit-card-number-generator-validator.html

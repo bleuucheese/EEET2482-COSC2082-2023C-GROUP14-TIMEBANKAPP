@@ -5,6 +5,8 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
+#include <fstream>
+#include <regex>
 
 using std::cin;
 using std::cout;
@@ -49,6 +51,12 @@ DateTime DateTime::calculateEndDate(int days, int hours, int minutes, int second
 
 bool DateTime::isValidFormat(const std::string &timestamp)
 {
+
+  std::regex pattern("^\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}:\\d{2}$");
+  if (!std::regex_match(timestamp, pattern))
+  {
+    return false;
+  }
   // Format should be "dd/mm/yyyy hh:mm:ss"
   std::istringstream ss(timestamp);
   ss >> std::get_time(&tm, "%d/%m/%Y %H:%M:%S");
@@ -93,6 +101,10 @@ DateTime::DateTime(const std::string &timestamp)
   if (!isValidFormat(timestamp))
   {
     throw std::invalid_argument("Invalid date format");
+  }
+  if (!isValidDate())
+  {
+    throw std::invalid_argument("Invalid date");
   }
 
   // Set initial values

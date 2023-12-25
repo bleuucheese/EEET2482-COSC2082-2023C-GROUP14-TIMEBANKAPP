@@ -15,7 +15,7 @@ Review::Review(string reviewID, string listingID, int skillRatingScore, int supp
     this->timestamp = timestamp;
     if (reviewID == "")
     {
-        this->reviewID = "S" + generateRandomID();
+        this->reviewID = "RS" + generateRandomID();
     }
     else
     {
@@ -29,13 +29,13 @@ Review::Review(string reviewID, string listingID, int skillRatingScore, int supp
     this->reviewee = reviewee;
 }
 
-// Constructor for review by supporter1
+// Constructor for review by supporter
 Review::Review(string reviewID, string listingID, int hostRatingScore, std::string comments, string reviewer, string reviewee, DateTime timestamp)
 {
     this->timestamp = timestamp;
     if (reviewID == "")
     {
-        this->reviewID = "H" + generateRandomID();
+        this->reviewID = "RH" + generateRandomID();
     }
     else
     {

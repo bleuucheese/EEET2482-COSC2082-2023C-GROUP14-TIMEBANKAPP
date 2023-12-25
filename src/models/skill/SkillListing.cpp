@@ -68,13 +68,16 @@ bool SkillListing::unhideListing()
     }
 }
 
-int SkillListing::calculateTotalCreds()
+float SkillListing::calculateTotalCreds()
 {
     // For cases when the period starts on day one and ends on day two, three, etc.
     // Assume that max working hours per day is 4 hours
     /*TODO: implement later*/
-    long duration = this->workingTimeSlot.durationInSeconds(); // get working period in seconds
-    return (this->consumedCredsPerHour) / 3600 * duration;     // credits = credits per sec * duration
+    int duration = this->workingTimeSlot.durationInSeconds(); // get working period in seconds
+    // cout << "Duration: " << duration << " seconds.\n";
+    float credsPerSec = static_cast<float>(this->consumedCredsPerHour) / 3600.0f; // get creds per sec
+
+    return credsPerSec * static_cast<float>(duration); // credits = credits per sec * duration
 }
 
 bool SkillListing::isListingAvailable()

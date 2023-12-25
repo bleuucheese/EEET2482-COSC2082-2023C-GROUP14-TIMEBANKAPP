@@ -1,4 +1,5 @@
 requestID,listingID,requesterName,receiverName,requestTimeStamp,requestStatus
-R20232438,L20231346,bluecheese,testing2,25/12/2023 17:29:07,Pending
-R20234381,L20231346,cplusplus,testing2,25/12/2023 17:39:02,Pending
-R20237672,L20231346,testing1,testing2,25/12/2023 17:55:50,Pending
+R20232438,L20231346,bluecheese,testing2,25/12/2023 17:29:07,Accepted
+R20234381,L20231346,cplusplus,testing2,25/12/2023 17:39:02,Rejected
+R20237672,L20231346,testing1,testing2,25/12/2023 17:55:50,Rejected
+R20232759,L20232406,testing3,testing6,26/12/2023 00:10:24,Accepted

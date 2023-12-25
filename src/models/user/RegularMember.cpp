@@ -407,12 +407,3 @@ bool RegularMember::isBlockedBy(string blockerUsn)
     blockFile.close();
     return false;
 }
-
-// int main()
-// {
-//     RegularMember mem1("ha", "123", "Ha", "123", "ha@gmail.com", "123", Hanoi, 0, 0, "123", 0, 0, 0, 0);
-//     RegularMember mem2("bluchi", "123", "Bluchi", "123", "bluchi@gmail.com", "123", Saigon, 0, 0, "123", 0, 0, 0, 0);
-
-//     mem1.showInfo();
-//     return 0;
-// }

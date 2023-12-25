@@ -157,7 +157,7 @@ void TimeBankSystem::adminMenu()
         promptAdminChangePassword();
         break;
     case 4:
-        // logout();
+        logout();
         systemMenu();
         break;
     }
@@ -302,7 +302,11 @@ void TimeBankSystem::logout()
     //         user.isAuthenticated = false;
     //     }
     // }
-    (this->currentMember)->isAuthenticated = false;
+    if (this->currentMember != nullptr)
+    {
+        this->currentMember->isAuthenticated = false; // Hot fix for logout bug: segmentation fault
+    }
+    
 }
 
 RegularMember &TimeBankSystem::findMemberByUsername(string usn)
@@ -339,6 +343,18 @@ SkillListing &TimeBankSystem::findListingByID(string listingID)
         }
     }
     throw std::runtime_error("Listing not found!");
+}
+
+Request &TimeBankSystem::findRequestByID(string requestID)
+{
+    for (Request &request : this->requestList)
+    {
+        if (request.requestID == requestID)
+        {
+            return request;
+        }
+    }
+    throw std::runtime_error("Request not found!");
 }
 
 void TimeBankSystem::addMember(RegularMember &member)
@@ -555,6 +571,48 @@ void TimeBankSystem::requestMenu()
     {
     case 1:
         // method to view requests, and prompt them to get the ID of the request they want to respond.
+        printRequestTableMember();
+        cout << std::endl;
+        char choice;
+        do
+        {
+            cout << "Do you want to respond to a request? (Y/N): ";
+            cin >> choice;
+            if (choice == 'Y' || choice == 'y')
+            {
+                break;
+            }
+            else if (choice == 'N' || choice == 'n')
+            {
+                regularMemberMenu();
+            }
+            else
+            {
+                cout << "Invalid input! Please try again.\n";
+            }
+
+        } while (choice != 'Y' || choice != 'y' || choice != 'N' || choice != 'n');
+        cout << "1. Accept Request\n";
+        cout << "2. Reject Request\n";
+        switch (promptAndGetChoice(1, 2))
+        {
+        case 1:
+            if (promptRespondRequest())
+            {
+                respondRequestFromPrompt();
+            }
+            // else
+            // {
+            //     cout << "Cannot accept this request. Please try again.\n";
+            //     regularMemberMenu();
+            // }
+            break;
+        case 2:
+            // method to reject request
+            respondRequestFromPrompt();
+            break;
+        }
+
         break;
     case 2:
         // method to add request: display a list of listings, and then prompt them to get the ID of the listing they want to request
@@ -694,6 +752,18 @@ bool TimeBankSystem::isListingIDExistAndNotOwned(string listingID)
     for (SkillListing &listing : this->skillListingList)
     {
         if (listing.listingID == listingID && listing.getSupporterName() != (this->currentMember)->getUsername())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool TimeBankSystem::isRequestIDExistAndOwned(string requestID)
+{
+    for (Request &request : this->requestList)
+    {
+        if (request.requestID == requestID && request.getReceiverName() == (this->currentMember)->getUsername())
         {
             return true;
         }
@@ -885,6 +955,87 @@ void TimeBankSystem::addRequestFromPrompt()
     regularMemberMenu();
 }
 
+void TimeBankSystem::respondRequestFromPrompt()
+{
+    std::string requestID = getValidStringInput("Reenter requestID to confirm: ");
+    char requestStatus;
+
+    do
+    {
+        cout << "Enter A/R (A = Accept, R = Reject): ";
+        cin >> requestStatus;
+        if (requestStatus != 'A' && requestStatus != 'R')
+        {
+            cout << "Enter A/R. Please try again.\n";
+        }
+    } while (requestStatus != 'A' && requestStatus != 'R');
+
+    if (requestStatus == 'A')
+    {
+        findRequestByID(requestID).setRequestStatus("Accepted");
+        findListingByID(findRequestByID(requestID).getListingID()).setListingState(2); // Set to book
+        findListingByID(findRequestByID(requestID).getListingID()).setHostName(findRequestByID(requestID).getRequesterName());
+        cout << "Request accepted successfully!\n";
+    }
+    else if (requestStatus == 'R')
+    {
+        findRequestByID(requestID).setRequestStatus("Rejected");
+        cout << "Request rejected successfully!\n";
+    }
+    regularMemberMenu();
+}
+
+bool TimeBankSystem::promptRespondRequest()
+{
+    std::string requestID;
+    do
+    {
+        requestID = getValidStringInput("Enter requestID to respond: ");
+        if (!isRequestIDExistAndOwned(requestID))
+        {
+            cout << "RequestID not found or not one of your incomming requests! Please try again.\n";
+        }
+    } while (!isRequestIDExistAndOwned(requestID));
+
+    // cout << "Checking today's date and listing's start date...\n"; // For debugging purpose
+    if (!DateTime().isBeforeStartDate(findListingByID(findRequestByID(requestID).getListingID()).getWorkingTimeSlot().getStartDate()))
+    {
+        cout << "You cannot respond to this request because today's date is after the listing's start date!\n";
+        return false;
+    }
+
+    // cout << "Checking if the request is already accepted...\n"; // For debugging purpose
+    if (findRequestByID(requestID).getRequestStatus() == "Accepted")
+    {
+        cout << "You cannot respond to this request because it is already accepted!\n";
+        return false;
+    }
+
+    // cout << "Checking if the request is already rejected...\n"; // For debugging purpose
+    if (findRequestByID(requestID).getRequestStatus() == "Rejected")
+    {
+        cout << "You cannot respond to this request because it is already rejected!\n";
+        return false;
+    }
+
+    // Check with ongoing bookings of the supporter if they are available to accept the request (e,g: not overlapped with other bookings timeslot)
+    for (Request *request : currentMember->sentreceivedRequests)
+    {
+        if (request->getRequestStatus() == "Accepted")
+        {
+            if (findListingByID(request->getListingID()).getSupporterName() == findListingByID(findRequestByID(requestID).getListingID()).getSupporterName())
+            {
+                if (findListingByID(request->getListingID()).getWorkingTimeSlot().isOverlappedWith(findListingByID(findRequestByID(requestID).getListingID()).getWorkingTimeSlot()))
+                {
+                    cout << "You cannot respond to this request because you are not available at that time!\n";
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
 void TimeBankSystem::promptTopUp()
 {
     int amount = getValidInt("Enter amount of credit to top up: ");
@@ -966,6 +1117,28 @@ void TimeBankSystem::promptBlockMember()
         cout << "Block failed! Please try again.\n";
     }
     regularMemberMenu();
+}
+
+void TimeBankSystem::printRequestTableMember()
+{
+
+    std::cout << std::setw(10) << "Request ID" << std::setw(15) << "Listing ID"
+              << std::setw(15) << "Requester" << std::setw(15) << "Receiver"
+              << std::setw(20) << "Timestamp" << std::setw(15) << "Status" << std::endl;
+    std::cout << std::setfill('-') << std::setw(90) << "" << std::setfill(' ') << std::endl;
+
+    for (const auto &request : this->currentMember->sentreceivedRequests)
+    {
+        if (request->getReceiverName() == (this->currentMember)->getUsername())
+        {
+            std::cout << std::setw(10) << request->requestID
+                      << std::setw(15) << request->listingID
+                      << std::setw(15) << request->requesterName
+                      << std::setw(15) << request->receiverName
+                      << std::setw(25) << request->requestTimeStamp.getFormattedTimestamp()
+                      << std::setw(10) << request->requestStatus << std::endl;
+        }
+    }
 }
 
 void TimeBankSystem::loadData()
@@ -1073,6 +1246,57 @@ void TimeBankSystem::extractMemberData()
             {
                 cout << "Error populating blocked members list!\n";
             }
+        }
+    }
+}
+
+void TimeBankSystem::automaticallyUpdate()
+{
+    // Automatically update the booked listing state to ongoing when the start date is passed
+    for (SkillListing &listing : this->skillListingList)
+    {
+        if (listing.getListingState() == 2 && listing.getWorkingTimeSlot().getStartDate().isBeforeStartDate(DateTime()))
+        {
+            listing.setListingState(3);
+        }
+    }
+    // Automatically update the ongoing listing state to completed when the end date is passed
+    for (SkillListing &listing : this->skillListingList)
+    {
+        if (listing.getListingState() == 3 && listing.getWorkingTimeSlot().getEndDate().isBeforeStartDate(DateTime()))
+        {
+            listing.setListingState(4);
+            // Automatically increment the supporter's credit points when the listing is completed
+            int creds = listing.calculateTotalCreds();
+            cout << "Supporter earned " << creds << " credits for completing this listing!\n";
+            findMemberByUsername(listing.getSupporterName()).creditPoints += listing.calculateTotalCreds();
+            // Automatically decrement the host's credit points when the listing is completed
+            findMemberByUsername(listing.getHostName()).creditPoints -= listing.calculateTotalCreds();
+        }
+    }
+
+    // Automatically update the pending request state to rejected when the start date is passed
+    for (Request &request : this->requestList)
+    {
+        if (request.getRequestStatus() == "Pending" && findListingByID(request.getListingID()).getWorkingTimeSlot().getStartDate().isBeforeStartDate(DateTime()))
+        {
+            request.setRequestStatus("Rejected");
+        }
+    }
+    // Automatically update the pending request state to rejected when the listingID is hidden
+    for (Request &request : this->requestList)
+    {
+        if (request.getRequestStatus() == "Pending" && findListingByID(request.getListingID()).getListingState() == 1)
+        {
+            request.setRequestStatus("Rejected");
+        }
+    }
+    // Automatically update the pending request state to rejected when the listingID is booked by another host
+    for (Request &request : this->requestList)
+    {
+        if (request.getRequestStatus() == "Pending" && (findListingByID(request.getListingID()).getListingState() == 2 || findListingByID(request.getListingID()).getListingState() == 3))
+        {
+            request.setRequestStatus("Rejected");
         }
     }
 }

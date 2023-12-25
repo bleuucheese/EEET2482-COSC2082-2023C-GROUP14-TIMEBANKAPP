@@ -32,7 +32,7 @@ bool Period::isOverlappedWith(const Period &other) const
 // Method to calculate the duration of the period in seconds
 long Period::durationInSeconds() const
 {
-    return endDate.toTimeT() - startDate.toTimeT();
+    return static_cast<int>(endDate.toTimeT() - startDate.toTimeT());
 }
 
 // Method to compare two periods

@@ -48,6 +48,7 @@ public:
     RegularMember &findMemberByUsername(string username);
     Skill &findSkillByID(string skillID);
     SkillListing &findListingByID(string listingID);
+    Request &findRequestByID(string requestID);
     bool isSkillIDExistAndOwned(string skillID);
     bool isListingIDExistAndOwned(string listingID);
     bool isListingIDExistAndNotOwned(string listingID);
@@ -57,7 +58,6 @@ public:
 
     bool login(const std::string &username, const std::string &password);
     bool isUniqueUsername(string username);
-    
 
     // Functions for admin
     void promptAdminChangePassword();
@@ -68,12 +68,16 @@ public:
     void promptUnhideListing();
     bool promptAddRequest();
     void addRequestFromPrompt();
+    void promptHostReview();
+    void promptSupporterReview();
+
+    bool promptRespondRequest();
+    void respondRequestFromPrompt();
 
     void promptTopUp();
     void promptSellCredits();
     void promptBlockMember();
     void promptUnblockMember();
-    
 
     // Functions for adding new objects to the system's vectors
     void addMember(RegularMember &member);
@@ -81,7 +85,6 @@ public:
     void addListing(SkillListing &listing);
     void addRequest(Request &request);
     void addReview(Review &review);
-    void addSkillListing(SkillListing &listing);
 
     // Functions for dipslay objects in the system's vectors in pretty tabular format, used by admin
     void printMemberTable();
@@ -91,6 +94,9 @@ public:
     void printReviewTable();
     void printSkillListingTable();
 
+    // Function for display information tailored to a specific user
+    void printRequestTableMember();
+
     // Functions for dipslay objects in the system's vectors in pretty tabular format, used by guests
 
     // Functions for searching objects in the system's vectors
@@ -98,6 +104,8 @@ public:
     // This two functions use method from FileHandler.cpp to load data from CSV files to vectors and vice versa
     void loadData(); // Load data from CSV files to vectors
     void saveData(); // Save data from vectors to CSV files
+
+    void automaticallyUpdate(); // Automatically update listing state based on current time, and automatically update member's credit based on listing state, and reject expired requests
 
     // Function to clear all vectors
     void clearData();

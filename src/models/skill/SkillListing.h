@@ -49,7 +49,7 @@ public:
     bool hideListing();
     bool unhideListing();
 
-    int calculateTotalCreds();                       // Calculate total creds for a listing
+    float calculateTotalCreds();                       // Calculate total creds for a listing
     bool isListingAvailable();                       // Check if a listing is available
     bool isListingBooked();                          // Check if a listing is booked
     bool isEligibleToBook(RegularMember &requester); // Check if a member is eligible to book a listing

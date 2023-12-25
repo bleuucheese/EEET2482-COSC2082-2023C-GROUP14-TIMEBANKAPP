@@ -50,12 +50,14 @@ public:
     SkillListing &findListingByID(string listingID);
     bool isSkillIDExistAndOwned(string skillID);
     bool isListingIDExistAndOwned(string listingID);
+    bool isListingIDExistAndNotOwned(string listingID);
+    bool isRequestIDExistAndOwned(string requestID);
 
     void viewProfile();
 
     bool login(const std::string &username, const std::string &password);
     bool isUniqueUsername(string username);
-    bool isBlockedByUsername(string username); //In the database, the current user is in the blockedUsername column, not the blocker
+    
 
     // Functions for admin
     void promptAdminChangePassword();
@@ -63,10 +65,15 @@ public:
     void promptAddSkill();
     void promptAddListing();
     void promptHideListing();
+    void promptUnhideListing();
+    bool promptAddRequest();
+    void addRequestFromPrompt();
 
     void promptTopUp();
     void promptSellCredits();
     void promptBlockMember();
+    void promptUnblockMember();
+    
 
     // Functions for adding new objects to the system's vectors
     void addMember(RegularMember &member);

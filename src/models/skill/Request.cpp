@@ -16,7 +16,14 @@ Request::Request(string requestID, string listingID, std::string requesterName, 
     {
         this->requestID = requestID;
     }
-    this->requestStatus = requestStatus;
+    if (requestStatus.empty())
+    {
+        this->requestStatus = "Pending";
+    }
+    else
+    {
+        this->requestStatus = requestStatus;
+    }
     this->requesterName = requesterName;
     this->receiverName = receiverName;
     this->requestTimeStamp = requestTimeStamp;

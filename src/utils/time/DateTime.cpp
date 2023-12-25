@@ -124,6 +124,11 @@ std::string DateTime::getFormattedTimestamp() const
   return oss.str();
 }
 
+bool DateTime::isBeforeStartDate(const DateTime &other) const
+{
+  return toTimeT() < other.toTimeT();
+}
+
 // int main()
 // {
 //   DateTime dt;

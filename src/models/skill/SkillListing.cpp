@@ -21,8 +21,9 @@ SkillListing::SkillListing(string listingID, string skillID, int consumedCreds, 
     if (!listingID.empty())
     {
         this->listingID = listingID;
-        
-    } else {
+    }
+    else
+    {
         this->listingID = "L" + generateRandomID();
     }
     this->skillID = skillID;
@@ -43,13 +44,107 @@ void SkillListing::displaySkillListing()
 
 bool SkillListing::hideListing()
 {
-    if (this->listingState == 0)
+    if (isListingAvailable())
     {
         this->listingState = 1; // 1 = hidden
         return true;
     }
     else
     {
+        return false;
+    }
+}
+
+bool SkillListing::unhideListing()
+{
+    if (this->listingState == 1)
+    {
+        this->listingState = 0; // 0 = available
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+int SkillListing::calculateTotalCreds()
+{
+    // For cases when the period starts on day one and ends on day two, three, etc.
+    // Assume that max working hours per day is 4 hours
+    /*TODO: implement later*/
+    long duration = this->workingTimeSlot.durationInSeconds(); // get working period in seconds
+    return (this->consumedCredsPerHour) / 3600 * duration;     // credits = credits per sec * duration
+}
+
+bool SkillListing::isListingAvailable()
+{
+    if (this->listingState == 0)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool SkillListing::isListingBooked()
+{
+    if (this->listingState == 2)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool SkillListing::isEligibleToBook(RegularMember &requester)
+{
+    //    Case 1: If the listing is available
+    if (this->listingState == 0)
+    {
+        // Case 1.1: If the requester is not the owner of the listing
+        if (requester.getUsername() != this->supporterName)
+        {
+            // Case 1.2: If the requester has enough credits to book the listing
+            if (requester.getCreditPoints() >= this->calculateTotalCreds())
+            {
+                // Case 1.3: If the requester's host rating score is higher than the minimum rating score of the listing
+                if (requester.getHostRatingScore() >= this->minHostRatingScore)
+                {
+                    // Case 1.4 If the requester's bookings working time slot is not overlapped with the listing's working time slot
+                    for (int i = 0; i < requester.getSkillListings().size(); i++)
+                    {
+                        if (requester.getSkillListings()[i]->isListingBooked())
+                        {
+                            if (requester.getSkillListings()[i]->getWorkingTimeSlot().isOverlappedWith(this->workingTimeSlot))
+                            {
+                                cout << "You can't book this listing because your booking's working time slot is overlapped with this listing's working time slot.\n";
+                                return false;
+                            }
+                        }
+                    }
+                    return true;
+                }
+            }
+            else
+            {
+                cout << "You don't have enough credits to book this listing.\n";
+                return false;
+            }
+        }
+        else
+        {
+            cout << "You can't book your own listing.\n";
+            return false;
+        }
+    }
+    else
+    {
+        cout << "This listing is not available.\n";
         return false;
     }
 }

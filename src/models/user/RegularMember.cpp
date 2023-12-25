@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <fstream>
 #include "./User.h"
 #include "../skill/Review.h"
 #include "../skill/Skill.h"
@@ -258,7 +259,7 @@ void RegularMember::showInfo()
     std::cout << BOLD_BLUE << "Pending Requests:" << RESET << " " << countRequest << "\n";
 
     // Rating scores
-    std::cout << BOLD_BLUE << "Skill Rating Score:" << RESET << " " << getSkillRatingScore()  << "\n";
+    std::cout << BOLD_BLUE << "Skill Rating Score:" << RESET << " " << getSkillRatingScore() << "\n";
     std::cout << BOLD_BLUE << "Supporter Rating Score:" << RESET << " " << getSupporterRatingScore() << "\n";
     std::cout << BOLD_BLUE << "Host Rating Score:" << RESET << " " << getHostRatingScore() << "\n";
 
@@ -343,6 +344,68 @@ bool RegularMember::blockMember(RegularMember &memberToBlock)
     }
     this->blockedMembers.push_back(&memberToBlock);
     return true;
+}
+
+bool RegularMember::unblockMember(RegularMember &memberToUnblock)
+{
+    for (int i = 0; i < this->blockedMembers.size(); i++)
+    {
+        if (this->blockedMembers[i]->getUsername() == memberToUnblock.getUsername())
+        {
+            this->blockedMembers.erase(this->blockedMembers.begin() + i);
+            return true;
+        }
+    }
+    cout << "You have not blocked this member yet!\n";
+    return false;
+}
+
+bool RegularMember::isBlockerOf(string blockedUsn)
+{
+    // Traverse throught the list
+    for (int i = 0; i < this->blockedMembers.size(); i++)
+    {
+        if (this->blockedMembers[i]->getUsername() == blockedUsn)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool RegularMember::isBlockedBy(string blockerUsn)
+{
+    // Loop through the blacklist.csv file in read mode
+    std::fstream blockFile("./databases/blocklist.csv", std::ios::in);
+
+    if (!blockFile.is_open())
+    {
+        std::cout << "Error opening blocklist.csv file\n";
+        return false;
+    }
+    // Read the file line by line
+    std::string line;
+    // Skip the header
+    std::getline(blockFile, line);
+    while (std::getline(blockFile, line))
+    {
+        // get the blocker and blocked username
+        std::string blocker = line.substr(0, line.find(","));
+        std::string blocked = line.substr(line.find(",") + 1, line.length());
+
+        // Check if the other is the blocker
+        if (blocker == blockerUsn)
+        {
+            // Check if current is in the blockedUsername column
+            if (blocked == this->getUsername())
+            {
+                blockFile.close();
+                return true;
+            }
+        }
+    }
+    blockFile.close();
+    return false;
 }
 
 // int main()

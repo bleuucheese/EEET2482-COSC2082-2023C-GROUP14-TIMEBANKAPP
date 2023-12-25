@@ -9,7 +9,7 @@
 using std::cin;
 using std::cout;
 using std::string;
-
+class RegularMember; // Forward declaration to avoid circular dependency
 class SkillListing
 {
 private:
@@ -18,7 +18,7 @@ private:
     string listingID; // Lxxxxxxxx
     int consumedCredsPerHour = 0;
     float minHostRatingScore = -1; // -1 = no minimum rating score, optional
-    int listingState = 0;          // 0 = available, 1 = hidden, 2 = booked, 3 = completed
+    int listingState = 0;          // 0 = available, 1 = hidden, 2 = booked, 3 = ongoing (in progress), 4 = completed
     string supporterName;          // username of the member who created the listing
     string hostName;               // username of the member who booked the listing
     Period workingTimeSlot;
@@ -41,11 +41,18 @@ public:
     void setConsumedCredsPerHour(int consumedCreds) { this->consumedCredsPerHour = consumedCreds; };
     void setMinHostRatingScore(int minHostRatingScore) { this->minHostRatingScore = minHostRatingScore; };
     void setListingState(int listingState) { this->listingState = listingState; };
+    void setSupporterName(string supporterName) { this->supporterName = supporterName; };
+    void setHostName(string hostName) { this->hostName = hostName; };
 
     // Methods
     void displaySkillListing();
-
     bool hideListing();
+    bool unhideListing();
+
+    int calculateTotalCreds();                       // Calculate total creds for a listing
+    bool isListingAvailable();                       // Check if a listing is available
+    bool isListingBooked();                          // Check if a listing is booked
+    bool isEligibleToBook(RegularMember &requester); // Check if a member is eligible to book a listing
 
     friend class TimeBankSystem;
     friend class FileHandler;

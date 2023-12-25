@@ -31,6 +31,10 @@ public:
     static std::string convertSecToDuration(long n);
 
     std::string getFormattedPeriod() const;   
+
+    friend class TimeBankSystem;
+    friend class FileHandler;
+    friend class SkillListing;
 };
 
 #endif // EEET2482_COSC2082_2023C_GROUP14_TIMEBANKAPP_SRC_UTILS_TIME_PERIOD_H

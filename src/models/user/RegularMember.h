@@ -53,6 +53,8 @@ public:
     string getPhoneNumber() { return phoneNumber; };
     string getEmail() { return email; };
     string getCreditCardNumber() { return creditCardNumber; };
+    vector<Skill *> getSkills() { return skills; };
+    vector<SkillListing *> getSkillListings() { return skillListings; };
 
     float getBalance() { return balance; };
 
@@ -88,7 +90,10 @@ public:
     bool sellCredits(int credPoints);
 
     bool blockMember(RegularMember &memberToBlock);
+    bool unblockMember(RegularMember &memberToUnblock);
 
+    bool isBlockerOf(string blockedUsn); // The current user is the blocker
+    bool isBlockedBy(string blockerUsn); // In the database, the current user is in the blockedUsername column, not the blocker column
     friend class Skill;
     friend class SkillListing;
     friend class Request;

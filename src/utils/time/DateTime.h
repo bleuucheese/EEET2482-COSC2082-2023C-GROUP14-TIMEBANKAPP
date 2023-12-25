@@ -42,6 +42,9 @@ public:
 
     std::string getFormattedTimestamp() const;
 
+    bool isBeforeStartDate(const DateTime &other) const;
+
     friend class Period;
+    friend class TimeBankSystem;
 };
 #endif // EEET2482_COSC2082_UTILS_TIME_DATE_HEEEET2482_COSC2082_2023C_GROUP14_TIMEBANKAPP_SRC_UTILS_TIME_DATETIME_H

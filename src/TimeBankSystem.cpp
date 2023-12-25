@@ -54,13 +54,17 @@ void TimeBankSystem::bye()
 void TimeBankSystem::systemMenu()
 {
     cout << "======APPLICATION MENU======\n";
+    cout << "0. Quit\n";
     cout << "1. Login\n";
     cout << "2. Register\n";
     cout << "3. Continue as Guest\n";
-    cout << "4. Exit\n";
 
-    switch (promptAndGetChoice(1, 4))
+    switch (promptAndGetChoice(0, 3))
     {
+    case 0:
+        bye();
+        return;
+        break;
     case 1:
         loginMenu();
         break;
@@ -69,10 +73,6 @@ void TimeBankSystem::systemMenu()
         break;
     case 3:
         guestMenu();
-        break;
-    case 4:
-        bye();
-        return;
         break;
     }
 }
@@ -516,9 +516,10 @@ void TimeBankSystem::listingMenu()
     cout << "1. View Listings\n";
     cout << "2. Add Listing\n";
     cout << "3. Hide Listing\n";
-    cout << "4. Back\n";
+    cout << "4. Unhide Listing\n";
+    cout << "5. Back\n";
 
-    switch (promptAndGetChoice(1, 3))
+    switch (promptAndGetChoice(1, 5))
     {
     case 1:
         // method to view listings
@@ -533,6 +534,11 @@ void TimeBankSystem::listingMenu()
         break;
 
     case 4:
+        // method to unhide listing
+        promptUnhideListing();
+        break;
+
+    case 5:
         regularMemberMenu();
         break;
     }
@@ -552,9 +558,18 @@ void TimeBankSystem::requestMenu()
         break;
     case 2:
         // method to add request: display a list of listings, and then prompt them to get the ID of the listing they want to request
+        if (promptAddRequest())
+        {
+            addRequestFromPrompt();
+        }
+        else
+        {
+            // cout << "Request failed! Please try again.\n";
+            regularMemberMenu();
+        }
         break;
     case 3:
-        return;
+        regularMemberMenu();
         break;
     }
 }
@@ -674,6 +689,18 @@ bool TimeBankSystem::isListingIDExistAndOwned(string listingID)
     return false;
 }
 
+bool TimeBankSystem::isListingIDExistAndNotOwned(string listingID)
+{
+    for (SkillListing &listing : this->skillListingList)
+    {
+        if (listing.listingID == listingID && listing.getSupporterName() != (this->currentMember)->getUsername())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 // Functions to ask user input for adding new objects to the system's vectors
 
 void TimeBankSystem::promptAddSkill()
@@ -764,6 +791,97 @@ void TimeBankSystem::promptHideListing()
     {
         cout << "Listing hide failed! Please try again.\n";
     }
+    regularMemberMenu();
+}
+
+void TimeBankSystem::promptUnhideListing()
+{
+    std::string listingID;
+    // Prompt user to enter listingID until they enter a valid listingID that is owned by them
+    do
+    {
+        listingID = getValidStringInput("Enter listingID to unhide: ");
+        if (!isListingIDExistAndOwned(listingID))
+        {
+            cout << "ListingID not found or not one of your added listings! Please try again.\n";
+        }
+
+    } while ((!isListingIDExistAndOwned(listingID)) || findListingByID(listingID).getListingState() != 1);
+
+    if (findListingByID(listingID).unhideListing())
+    {
+        cout << "Listing unhidden successfully!\n";
+    }
+    else
+    {
+        cout << "Listing unhide failed! Please try again.\n";
+    }
+    regularMemberMenu();
+}
+
+bool TimeBankSystem::promptAddRequest()
+{
+
+    std::string requestID, listingID, requesterName, receiverName, requestStatus = "";
+
+    std::string buffer = "";
+    do
+    {
+        listingID = getValidStringInput("Enter listingID to begin making a request: ");
+        if (!isListingIDExistAndNotOwned(listingID))
+        {
+            cout << "ListingID not found or is one of your added listings! Please try again.\n";
+        }
+    } while (!isListingIDExistAndNotOwned(listingID));
+
+    // cout << "Checking today's date and listing's start date...\n"; // For debugging purpose
+    if (!DateTime().isBeforeStartDate(findListingByID(listingID).getWorkingTimeSlot().getStartDate()))
+    {
+        cout << "You cannot make a request for this listing because today's date is after the listing's start date!\n";
+        return false;
+    }
+
+    requesterName = (this->currentMember)->getUsername();         // host
+    receiverName = findListingByID(listingID).getSupporterName(); // supporter
+    /*Deep check*/
+    // If the supporter is blocked by the host, the host cannot make a request for that supporter
+    if (currentMember->isBlockerOf(receiverName))
+    {
+        cout << "You cannot make a request for this supporter because you have blocked them!\n";
+        return false;
+    }
+    // If the host is blocked by the supporter, the host cannot make a request for that supporter
+    if (currentMember->isBlockedBy(receiverName))
+    {
+        cout << "You cannot make a request for this supporter because they have blocked you :(\n";
+        return false;
+    }
+    // isEligibleForBook method
+    SkillListing listing = findListingByID(listingID);
+    if (!listing.isEligibleToBook(*currentMember))
+    {
+        cout << "You cannot make a request for this listing because you don't meet the requirements!\n";
+        return false;
+    }
+    // Proceed to create a new request when all the above conditions are met
+    return true;
+}
+
+void TimeBankSystem::addRequestFromPrompt()
+{
+    std::string requestID, listingID, requesterName, receiverName, requestStatus = "";
+    listingID = getValidStringInput("Reenter the listingID to confirm: ");
+    requesterName = (this->currentMember)->getUsername();         // host
+    receiverName = findListingByID(listingID).getSupporterName(); // supporter
+
+    Request newRequest(requestID, listingID, requesterName, receiverName, DateTime(), requestStatus);
+    addRequest(newRequest);                                       // Add new request to the system's request list
+    (currentMember->sentreceivedRequests).push_back(&newRequest); // Add new request to the current member's request list
+
+    // Update the listing state to booked and update the host name: not yet, because it is not accepted --> bug
+    // findListingByID(listingID).setListingState(2);
+    // findListingByID(listingID).setHostName(requesterName);
+    cout << "Request added successfully!\n";
     regularMemberMenu();
 }
 

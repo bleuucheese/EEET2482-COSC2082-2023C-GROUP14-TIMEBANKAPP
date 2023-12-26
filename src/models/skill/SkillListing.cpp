@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <cmath>
 #include "SkillListing.h"
 #include "Skill.h"
 #include "../../utils/myUtils.h"
@@ -70,14 +71,15 @@ bool SkillListing::unhideListing()
 
 float SkillListing::calculateTotalCreds()
 {
-    // For cases when the period starts on day one and ends on day two, three, etc.
-    // Assume that max working hours per day is 4 hours
-    /*TODO: implement later*/
-    int duration = this->workingTimeSlot.durationInSeconds(); // get working period in seconds
-    // cout << "Duration: " << duration << " seconds.\n";
-    float credsPerSec = static_cast<float>(this->consumedCredsPerHour) / 3600.0f; // get creds per sec
+    int duration = this->workingTimeSlot.durationInSeconds();
+    float credsPerSec = static_cast<float>(this->consumedCredsPerHour) / 3600.0f;
 
-    return credsPerSec * static_cast<float>(duration); // credits = credits per sec * duration
+    float totalCredits = credsPerSec * static_cast<float>(duration);
+
+    // Round to two decimal places
+    totalCredits = std::round(totalCredits * 100.0) / 100.0;
+
+    return totalCredits;
 }
 
 bool SkillListing::isListingAvailable()

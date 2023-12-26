@@ -22,7 +22,7 @@ public:
     bool isOverlappedWith(const Period &other) const;
 
     // Method to calculate the duration of the period in seconds
-    long durationInSeconds() const;
+    int durationInSeconds() const;
 
     // Method to compare two periods
     bool isSameAs(const Period &other) const;

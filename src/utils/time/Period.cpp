@@ -30,7 +30,7 @@ bool Period::isOverlappedWith(const Period &other) const
 }
 
 // Method to calculate the duration of the period in seconds
-long Period::durationInSeconds() const
+int Period::durationInSeconds() const
 {
     return static_cast<int>(endDate.toTimeT() - startDate.toTimeT());
 }
@@ -55,7 +55,7 @@ std::string Period::convertSecToDuration(long n)
     n %= 60; // get the modulus subtracted from a whole minute
     int seconds = n;
 
-    return "Duration: " + std::to_string(day) + " day(s)," + std::to_string(hour) + " " + "hour(s), " + std::to_string(minutes) + " " + "minute(s), and " + std::to_string(seconds) + " " + "second(s).";
+    return "Duration: " + std::to_string(day) + " day(s), " + std::to_string(hour) + " " + "hour(s), " + std::to_string(minutes) + " " + "min(s), and " + std::to_string(seconds) + " " + "sec(s).";
 }
 
 std::string Period::getFormattedPeriod() const

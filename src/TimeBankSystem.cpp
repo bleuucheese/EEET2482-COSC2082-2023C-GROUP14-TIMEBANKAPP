@@ -306,7 +306,6 @@ void TimeBankSystem::logout()
     {
         this->currentMember->isAuthenticated = false; // Hot fix for logout bug: segmentation fault
     }
-    
 }
 
 RegularMember &TimeBankSystem::findMemberByUsername(string usn)
@@ -539,6 +538,7 @@ void TimeBankSystem::listingMenu()
     {
     case 1:
         // method to view listings
+        printListingTableMember();
         break;
     case 2:
         // method to add listing, but first display a list of user's skills, and then prompt them to get the ID of the skill they want to list
@@ -578,42 +578,38 @@ void TimeBankSystem::requestMenu()
         {
             cout << "Do you want to respond to a request? (Y/N): ";
             cin >> choice;
-            if (choice == 'Y' || choice == 'y')
+
+        } while (choice != 'Y' & choice != 'y' & choice != 'N' & choice != 'n');
+        if (choice == 'Y' || choice == 'y')
+        {
+            cout << "1. Accept Request\n";
+            cout << "2. Reject Request\n";
+            switch (promptAndGetChoice(1, 2))
             {
+            case 1:
+                if (promptRespondRequest())
+                {
+                    respondRequestFromPrompt('A');
+                }
+                else
+                {
+                    cout << "Cannot accept this request. Please try again.\n";
+                    regularMemberMenu();
+                }
+                break;
+            case 2:
+                // method to reject request
+                respondRequestFromPrompt('R');
                 break;
             }
-            else if (choice == 'N' || choice == 'n')
-            {
-                regularMemberMenu();
-            }
-            else
-            {
-                cout << "Invalid input! Please try again.\n";
-            }
-
-        } while (choice != 'Y' || choice != 'y' || choice != 'N' || choice != 'n');
-        cout << "1. Accept Request\n";
-        cout << "2. Reject Request\n";
-        switch (promptAndGetChoice(1, 2))
+        }
+        else if (choice == 'N' || choice == 'n')
         {
-        case 1:
-            if (promptRespondRequest())
-            {
-                respondRequestFromPrompt();
-            }
-            // else
-            // {
-            //     cout << "Cannot accept this request. Please try again.\n";
-            //     regularMemberMenu();
-            // }
-            break;
-        case 2:
-            // method to reject request
-            respondRequestFromPrompt();
+            regularMemberMenu();
             break;
         }
-
         break;
+
     case 2:
         // method to add request: display a list of listings, and then prompt them to get the ID of the listing they want to request
         if (promptAddRequest())
@@ -640,16 +636,18 @@ void TimeBankSystem::reviewMenu()
     cout << "3. Add Review For a Supporter\n";
     cout << "4. Back\n";
 
-    switch (promptAndGetChoice(1, 3))
+    switch (promptAndGetChoice(1, 4))
     {
     case 1:
         // method to view reviews
         break;
     case 2:
         // method for a supporter to add review: #RH type
+        promptHostReview();
         break;
     case 3:
         // method for a host to add review: #RS type
+        promptSupporterReview();
         break;
 
     case 4:
@@ -764,6 +762,30 @@ bool TimeBankSystem::isRequestIDExistAndOwned(string requestID)
     for (Request &request : this->requestList)
     {
         if (request.requestID == requestID && request.getReceiverName() == (this->currentMember)->getUsername())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool TimeBankSystem::isHostReviewGiven(string listingID)
+{
+    for (Review &review : this->reviewList)
+    {
+        if (review.reviewID[1] = 'H' && review.listingID == listingID && review.getReviewer() == (this->currentMember)->getUsername())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool TimeBankSystem::isSupporterReviewGiven(string listingID)
+{
+    for (Review &review : this->reviewList)
+    {
+        if (review.reviewID[1] = 'S' && review.listingID == listingID && review.getReviewer() == (this->currentMember)->getUsername())
         {
             return true;
         }
@@ -955,29 +977,18 @@ void TimeBankSystem::addRequestFromPrompt()
     regularMemberMenu();
 }
 
-void TimeBankSystem::respondRequestFromPrompt()
+void TimeBankSystem::respondRequestFromPrompt(char choice)
 {
-    std::string requestID = getValidStringInput("Reenter requestID to confirm: ");
-    char requestStatus;
+    std::string requestID = getValidStringInput("Enter requestID to confirm: ");
 
-    do
-    {
-        cout << "Enter A/R (A = Accept, R = Reject): ";
-        cin >> requestStatus;
-        if (requestStatus != 'A' && requestStatus != 'R')
-        {
-            cout << "Enter A/R. Please try again.\n";
-        }
-    } while (requestStatus != 'A' && requestStatus != 'R');
-
-    if (requestStatus == 'A')
+    if (choice == 'A')
     {
         findRequestByID(requestID).setRequestStatus("Accepted");
         findListingByID(findRequestByID(requestID).getListingID()).setListingState(2); // Set to book
         findListingByID(findRequestByID(requestID).getListingID()).setHostName(findRequestByID(requestID).getRequesterName());
         cout << "Request accepted successfully!\n";
     }
-    else if (requestStatus == 'R')
+    else if (choice == 'R')
     {
         findRequestByID(requestID).setRequestStatus("Rejected");
         cout << "Request rejected successfully!\n";
@@ -1005,14 +1016,14 @@ bool TimeBankSystem::promptRespondRequest()
     }
 
     // cout << "Checking if the request is already accepted...\n"; // For debugging purpose
-    if (findRequestByID(requestID).getRequestStatus() == "Accepted")
+    else if (findRequestByID(requestID).getRequestStatus() == "Accepted")
     {
         cout << "You cannot respond to this request because it is already accepted!\n";
         return false;
     }
 
     // cout << "Checking if the request is already rejected...\n"; // For debugging purpose
-    if (findRequestByID(requestID).getRequestStatus() == "Rejected")
+    else if (findRequestByID(requestID).getRequestStatus() == "Rejected")
     {
         cout << "You cannot respond to this request because it is already rejected!\n";
         return false;
@@ -1034,6 +1045,131 @@ bool TimeBankSystem::promptRespondRequest()
         }
     }
     return true;
+}
+
+void TimeBankSystem::promptHostReview()
+{
+
+    std::string listingID, reviewID, reviewContent, reviewerName, revieweeName = "";
+    do
+    {
+        listingID = getValidStringInput("Enter listingID to begin making a review: ");
+        if (!isListingIDExistAndOwned(listingID))
+        {
+            cout << "ListingID not found or not one of your added listings! Please try again.\n";
+        }
+        else if (isHostReviewGiven(listingID))
+        {
+            cout << "You have already given a host review for this listing! Please try again.\n";
+        }
+
+    } while (!isListingIDExistAndOwned(listingID) || isHostReviewGiven(listingID));
+
+    // Check if the listing is completed
+    if (findListingByID(listingID).listingState == 4)
+    {
+        reviewerName = (this->currentMember)->getUsername();
+        revieweeName = findListingByID(listingID).getHostName();
+        if (revieweeName == (this->currentMember)->getUsername())
+        {
+            cout << "You cannot review yourself! Please try again.\n";
+            regularMemberMenu();
+        }
+        else if (revieweeName == "@dmin2023")
+        {
+            cout << "You cannot review the admin! Please try again.\n";
+            regularMemberMenu();
+        }
+        else if (currentMember->isBlockedBy(revieweeName))
+        {
+            cout << "You cannot review this host because they have blocked you :(\n";
+            regularMemberMenu();
+        }
+        else if (currentMember->isBlockerOf(revieweeName))
+        {
+            cout << "You cannot review this host because you have blocked them!\n";
+            regularMemberMenu();
+        }
+        else
+        {
+            reviewContent = getValidStringInput("Enter review content: ");
+            int hostRatingScore = getValidInt("Enter host rating score (1-5): ");
+            reviewerName = (this->currentMember)->getUsername();
+            Review newReview(reviewID, listingID, hostRatingScore, reviewContent, reviewerName, revieweeName, DateTime());
+            addReview(newReview);
+            (currentMember->sentreceivedReviews).push_back(&newReview);
+            cout << "Review added successfully!\n";
+            regularMemberMenu();
+        }
+    }
+    else
+    {
+        cout << "You cannot review this listing because it is not completed yet!\n";
+        regularMemberMenu();
+    }
+}
+
+void TimeBankSystem::promptSupporterReview()
+{
+    // Cannot give supporter review if you are the supporter of the listing
+    std::string listingID, reviewID, reviewContent, reviewerName, revieweeName = "";
+    do
+    {
+        listingID = getValidStringInput("Enter listingID to begin making a review: ");
+        if (!isListingIDExistAndNotOwned(listingID))
+        {
+            cout << "ListingID not found or is one of your added listings! Please try again.\n";
+        }
+        else if (isSupporterReviewGiven(listingID))
+        {
+            cout << "You have already given a review for this listing! Please try again.\n";
+        }
+
+    } while (!isListingIDExistAndNotOwned(listingID) || isSupporterReviewGiven(listingID));
+
+    // Check if the listing is completed
+    if (findListingByID(listingID).listingState == 4)
+    {
+        reviewerName = (this->currentMember)->getUsername();
+        revieweeName = findListingByID(listingID).getSupporterName();
+        if (revieweeName == (this->currentMember)->getUsername())
+        {
+            cout << "You cannot review yourself! Please try again.\n";
+            regularMemberMenu();
+        }
+        else if (revieweeName == "@dmin2023")
+        {
+            cout << "You cannot review the admin! Please try again.\n";
+            regularMemberMenu();
+        }
+        else if (currentMember->isBlockedBy(revieweeName))
+        {
+            cout << "You cannot review this supporter because they have blocked you :(\n";
+            regularMemberMenu();
+        }
+        else if (currentMember->isBlockerOf(revieweeName))
+        {
+            cout << "You cannot review this supporter because you have blocked them!\n";
+            regularMemberMenu();
+        }
+        else
+        {
+            reviewContent = getValidStringInput("Enter review content: ");
+            int skillRatingScore = getValidInt("Enter skill rating score (1-5): ");
+            int supporterRatingScore = getValidInt("Enter supporter rating score (1-5): ");
+            reviewerName = (this->currentMember)->getUsername();
+            Review newReview(reviewID, listingID, skillRatingScore, supporterRatingScore, reviewContent, reviewerName, revieweeName, DateTime());
+            addReview(newReview);
+            (currentMember->sentreceivedReviews).push_back(&newReview);
+            cout << "Review added successfully!\n";
+            regularMemberMenu();
+        }
+    }
+    else
+    {
+        cout << "You cannot review this listing because it is not completed yet!\n";
+        regularMemberMenu();
+    }
 }
 
 void TimeBankSystem::promptTopUp()
@@ -1122,7 +1258,7 @@ void TimeBankSystem::promptBlockMember()
 void TimeBankSystem::printRequestTableMember()
 {
 
-    std::cout << std::setw(10) << "Request ID" << std::setw(15) << "Listing ID"
+    std::cout << std::setw(10) << "RequestID" << std::setw(15) << "ListingID"
               << std::setw(15) << "Requester" << std::setw(15) << "Receiver"
               << std::setw(20) << "Timestamp" << std::setw(15) << "Status" << std::endl;
     std::cout << std::setfill('-') << std::setw(90) << "" << std::setfill(' ') << std::endl;
@@ -1139,6 +1275,81 @@ void TimeBankSystem::printRequestTableMember()
                       << std::setw(10) << request->requestStatus << std::endl;
         }
     }
+}
+
+void TimeBankSystem::printListingTableMember()
+{
+    cout << "Here are available listings on the market:\n";
+    int leftColumnWidth = 40;
+    int rightColumnWidth = 85;
+    if (this->skillListingList.size() == 0)
+    {
+        cout << "N/A" << std::endl;
+    }
+    else
+    {
+        for (SkillListing &listing : this->skillListingList)
+        {
+            if (listing.supporterName != this->currentMember->getUsername() && listing.listingState == 0)
+            {
+                RegularMember supporter = findMemberByUsername(listing.supporterName);
+                Skill skill = findSkillByID(listing.skillID);
+                string city = (supporter.city == 24) ? "Hanoi" : "Saigon";
+                int secs = listing.workingTimeSlot.durationInSeconds();
+                double distance = supporter.calculateDistance(*currentMember);
+                string minHostRatingScore = (listing.minHostRatingScore == -1) ? "N/A" : std::to_string(listing.minHostRatingScore);
+                // Draw the top line of the table
+                drawTableLine(leftColumnWidth + rightColumnWidth + 3);
+
+                // Draw the header row
+                drawRow(" Supporter Info", " Listing ID: " + listing.listingID + " - Total Credits Cost: " + std::to_string(listing.calculateTotalCreds()), leftColumnWidth, rightColumnWidth);
+
+                // Draw line after header
+                drawTableLine(leftColumnWidth + rightColumnWidth + 3);
+
+                // Draw rows of the table
+                drawRow("username: " + listing.getSupporterName(), "Skill perform:", leftColumnWidth, rightColumnWidth);
+                drawRow("full name: " + supporter.fullName, "+ Name: " + skill.skillName, leftColumnWidth, rightColumnWidth);
+                drawRow("phone number: " + supporter.phoneNumber, "+ Description: " + skill.description, leftColumnWidth, rightColumnWidth);
+                drawRow("email: " + supporter.email, "+ Efficiency: " + skill.skillEfficiency, leftColumnWidth, rightColumnWidth);
+                drawRow("home address: " + supporter.homeAddress, "Start Date: " + listing.workingTimeSlot.getStartDate().getFormattedTimestamp(), leftColumnWidth, rightColumnWidth);
+                drawRow("city: " + city, "End Date: " + listing.workingTimeSlot.getEndDate().getFormattedTimestamp(), leftColumnWidth, rightColumnWidth);
+                drawRow("hostRatingScore: " + std::to_string(supporter.getHostRatingScore()), listing.workingTimeSlot.convertSecToDuration(secs), leftColumnWidth, rightColumnWidth);
+                drawRow("skillRatingScore: " + std::to_string(supporter.getSkillRatingScore()), "", leftColumnWidth, rightColumnWidth);
+                drawRow("supporterRatingScore: " + std::to_string(supporter.getSupporterRatingScore()), "Minimum hostRatingScore required: " + minHostRatingScore, leftColumnWidth, rightColumnWidth);
+                drawRow("", "Distance from you: " + std::to_string(distance) + " kilometers", leftColumnWidth, rightColumnWidth);
+                // ... add more rows as needed ...
+
+                // Draw the bottom line of the table
+                drawTableLine(leftColumnWidth + rightColumnWidth + 3);
+
+                for (Review &review : this->reviewList)
+                {
+                    if (review.getReviewee() == supporter.getUsername())
+                    {
+                        drawRow2(review.getReviewID() + ": " + review.getReviewer() + " posted on " + review.timestamp.getFormattedTimestamp(), "", rightColumnWidth, leftColumnWidth);
+                        drawRow2("Skill: " + findSkillByID(findListingByID(review.listingID).skillID).skillName, "", rightColumnWidth, leftColumnWidth);
+                        if (review.reviewID[1] == 'H')
+                        {
+                            // cout << review.reviewID[1] << std::endl;
+                            drawRow2("hostRatingScore: " + std::to_string(review.hostRating), "", rightColumnWidth, leftColumnWidth);
+                        }
+                        else if (review.reviewID[1] == 'S')
+                        {
+                            // cout << review.reviewID[1] << std::endl;
+                            drawRow2("skillRatingScore: " + std::to_string(review.skillRating), "", rightColumnWidth, leftColumnWidth);
+                            drawRow2("supporterRatingScore: " + std::to_string(review.supporterRating), "", rightColumnWidth, leftColumnWidth);
+                        }
+                        drawRow2("Comments: " + review.comments, "", leftColumnWidth, rightColumnWidth);
+                        drawTableLine(leftColumnWidth + rightColumnWidth + 3);
+                    }
+                }
+            }
+            cout << std::endl;
+        }
+    }
+
+    listingMenu();
 }
 
 void TimeBankSystem::loadData()
@@ -1252,6 +1463,14 @@ void TimeBankSystem::extractMemberData()
 
 void TimeBankSystem::automaticallyUpdate()
 {
+    // Automatically update the available listing state to hidden when the start date is passed
+    for (SkillListing &listing : this->skillListingList)
+    {
+        if (listing.getListingState() == 0 && listing.getWorkingTimeSlot().getStartDate().isBeforeStartDate(DateTime()))
+        {
+            listing.setListingState(1);
+        }
+    }
     // Automatically update the booked listing state to ongoing when the start date is passed
     for (SkillListing &listing : this->skillListingList)
     {
@@ -1268,14 +1487,14 @@ void TimeBankSystem::automaticallyUpdate()
             listing.setListingState(4);
             // Automatically increment the supporter's credit points when the listing is completed
             int creds = listing.calculateTotalCreds();
-            cout << "Supporter earned " << creds << " credits for completing this listing!\n";
+            // cout << "Supporter earned " << creds << " credits for completing this listing!\n"; // Debugging purpose
             findMemberByUsername(listing.getSupporterName()).creditPoints += listing.calculateTotalCreds();
             // Automatically decrement the host's credit points when the listing is completed
             findMemberByUsername(listing.getHostName()).creditPoints -= listing.calculateTotalCreds();
         }
     }
 
-    // Automatically update the pending request state to rejected when the start date is passed
+    // Automatically update the pending request state to rejected when the start date is passed1
     for (Request &request : this->requestList)
     {
         if (request.getRequestStatus() == "Pending" && findListingByID(request.getListingID()).getWorkingTimeSlot().getStartDate().isBeforeStartDate(DateTime()))

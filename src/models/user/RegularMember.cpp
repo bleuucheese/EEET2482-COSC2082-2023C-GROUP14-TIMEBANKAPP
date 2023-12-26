@@ -75,18 +75,21 @@ float RegularMember::getSkillRatingScore()
     {
         return this->skillRatingScore;
     }
-    this->skillRatingScore = 0; // Reset the skill rating score before calculating
-    int count = 0;              // Count the number of reviews with skill rating score > 0 (1->5)
-    // Calculate the average skill rating score
-    for (int i = 0; i < this->sentreceivedReviews.size(); i++)
+    else
     {
-        if ((this->sentreceivedReviews[i])->getSkillRating() != 0)
+        this->skillRatingScore = 0; // Reset the skill rating score before calculating
+        int count = 0;              // Count the number of reviews with skill rating score > 0 (1->5)
+        // Calculate the average skill rating score
+        for (int i = 0; i < this->sentreceivedReviews.size(); i++)
         {
-            this->skillRatingScore += (this->sentreceivedReviews[i])->getSkillRating();
-            count++;
+            if ((this->sentreceivedReviews[i])->getReviewee() == getUsername() && (this->sentreceivedReviews[i])->getSkillRating() != 0)
+            {
+                this->skillRatingScore += (this->sentreceivedReviews[i])->getSkillRating();
+                count++;
+            }
         }
+        return (float)this->skillRatingScore / count;
     }
-    return (float)this->skillRatingScore / count;
 }
 
 float RegularMember::getSupporterRatingScore()
@@ -95,18 +98,21 @@ float RegularMember::getSupporterRatingScore()
     {
         return this->supporterRatingScore;
     }
-    this->supporterRatingScore = 0; // Reset the supporter rating score before calculating
-    int count = 0;                  // Count the number of reviews with supporter rating score > 0 (1->5)
-    // Calculate the average supporter rating score
-    for (int i = 0; i < this->sentreceivedReviews.size(); i++)
+    else
     {
-        if ((this->sentreceivedReviews[i])->getSupporterRating() != 0)
+        this->supporterRatingScore = 0; // Reset the supporter rating score before calculating
+        int count = 0;                  // Count the number of reviews with supporter rating score > 0 (1->5)
+        // Calculate the average supporter rating score
+        for (int i = 0; i < this->sentreceivedReviews.size(); i++)
         {
-            this->supporterRatingScore += (this->sentreceivedReviews[i])->getSupporterRating();
-            count++;
+            if ((this->sentreceivedReviews[i])->getReviewee() == getUsername() && (this->sentreceivedReviews[i])->getSupporterRating() != 0)
+            {
+                this->supporterRatingScore += (this->sentreceivedReviews[i])->getSupporterRating();
+                count++;
+            }
         }
+        return (float)this->supporterRatingScore / count;
     }
-    return (float)this->supporterRatingScore / count;
 }
 
 float RegularMember::getHostRatingScore()
@@ -115,18 +121,21 @@ float RegularMember::getHostRatingScore()
     {
         return this->hostRatingScore;
     }
-    this->hostRatingScore = 0;
-    int count = 0; // Count the number of reviews with host rating score > 0 (1->5)
-    // Calculate the average host rating score
-    for (int i = 0; i < this->sentreceivedReviews.size(); i++)
+    else
     {
-        if ((this->sentreceivedReviews[i])->getHostRating() != 0)
+        this->hostRatingScore = 0;
+        int count = 0; // Count the number of reviews with host rating score > 0 (1->5)
+        // Calculate the average host rating score if the member has received at least 1 review
+        for (int i = 0; i < this->sentreceivedReviews.size(); i++)
         {
-            this->hostRatingScore += (this->sentreceivedReviews[i])->getHostRating();
-            count++;
+            if ((this->sentreceivedReviews[i])->getReviewee() == getUsername() && (this->sentreceivedReviews[i])->getHostRating() != 0)
+            {
+                this->hostRatingScore += (this->sentreceivedReviews[i])->getHostRating();
+                count++;
+            }
         }
+        return (float)this->hostRatingScore / count;
     }
-    return (float)this->hostRatingScore / count;
 }
 
 // Pay to the system for the registration fee
@@ -158,7 +167,7 @@ double RegularMember::calculateDistance(RegularMember &otherMember)
     double lonDistance = (lon2 - lon1) * M_PI / 180.0;
     double a = sin(latDistance / 2) * sin(latDistance / 2) + cos(lat1 * M_PI / 180.0) * cos(lat2 * M_PI / 180.0) * sin(lonDistance / 2) * sin(lonDistance / 2);
     double c = 2 * atan2(sqrt(a), sqrt(1 - a));
-    return R * c * 1000;
+    return R * c; // in kilometers
 }
 
 void RegularMember::showInfo()

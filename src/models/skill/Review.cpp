@@ -41,6 +41,7 @@ Review::Review(string reviewID, string listingID, int hostRatingScore, std::stri
     {
         this->reviewID = reviewID;
     }
+    this->listingID = listingID;
     this->hostRating = hostRatingScore;
     this->comments = comments;
     this->reviewer = reviewer;
@@ -49,11 +50,10 @@ Review::Review(string reviewID, string listingID, int hostRatingScore, std::stri
 
 void Review::printReview()
 {
-    cout << "Review ID: " << this->reviewID << "\n";
-    cout << "Listing ID: " << this->listingID << "\n";
-    cout << reviewer << " ~ posted on " << this->timestamp.getFormattedTimestamp() << "\n";
-
-    cout << "\n";
+    // cout << "Review ID: " << this->reviewID << "\n";
+    // cout << "Listing ID: " << this->listingID << "\n";
+    // cout << reviewer << " ~ posted on " << this->timestamp.getFormattedTimestamp() << "\n";
+    // cout << "\n";
     if (this->skillRating != 0)
     {
         cout << "Skill Rating: " << this->skillRating << "\n";

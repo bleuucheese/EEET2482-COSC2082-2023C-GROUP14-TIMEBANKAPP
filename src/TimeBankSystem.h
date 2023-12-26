@@ -53,6 +53,8 @@ public:
     bool isListingIDExistAndOwned(string listingID);
     bool isListingIDExistAndNotOwned(string listingID);
     bool isRequestIDExistAndOwned(string requestID);
+    bool isHostReviewGiven(string listingID);
+    bool isSupporterReviewGiven(string listingID);
 
     void viewProfile();
 
@@ -72,12 +74,11 @@ public:
     void promptSupporterReview();
 
     bool promptRespondRequest();
-    void respondRequestFromPrompt();
+    void respondRequestFromPrompt(char choice);
 
     void promptTopUp();
     void promptSellCredits();
     void promptBlockMember();
-    void promptUnblockMember();
 
     // Functions for adding new objects to the system's vectors
     void addMember(RegularMember &member);
@@ -96,6 +97,7 @@ public:
 
     // Function for display information tailored to a specific user
     void printRequestTableMember();
+    void printListingTableMember();
 
     // Functions for dipslay objects in the system's vectors in pretty tabular format, used by guests
 

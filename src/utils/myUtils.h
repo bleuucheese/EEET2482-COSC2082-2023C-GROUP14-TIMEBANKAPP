@@ -30,7 +30,13 @@ double getValidLongitude();                       // only numbers, no spaces
 std::string getValidStringInput(const std::string &prompt); // only letters, numbers, spaces, and hyphens, no commas
 
 // Functions to validate user input when creating a new skill listing
-float getValidFloat(const std::string &prompt); // only numbers, no spaces
-int getValidInt(const std::string &prompt);     // only numbers, no spaces
-std::string getValidTimestamp(const std::string &prompt);                // DD/MM/YYYY HH:MM:SS format, check if the date is valid, and make sure that single-digit dates, months, hours, minutes, and seconds are padded with 0
+float getValidFloat(const std::string &prompt);           // only numbers, no spaces
+int getValidInt(const std::string &prompt);               // only numbers, no spaces
+std::string getValidTimestamp(const std::string &prompt); // DD/MM/YYYY HH:MM:SS format, check if the date is valid, and make sure that single-digit dates, months, hours, minutes, and seconds are padded with 0
+
+// Functions to draw table when printing info
+void drawTableLine(int width);
+void drawRow(const std::string &left, const std::string &right, int leftWidth, int rightWidth);
+void drawRow2(const std::string &left, const std::string &right, int leftWidth, int rightWidth);
+
 #endif // EEET2482_COSC2082_2023C_GROUP14_TIMEBANKAPP_SRC_UTILS_MYUTILS_H

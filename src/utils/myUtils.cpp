@@ -414,3 +414,22 @@ std::string getValidTimestamp(const std::string &prompt)
 
     return input;
 }
+
+void drawTableLine(int width)
+{
+    std::cout << "+";
+    for (int i = 0; i < width; ++i)
+    {
+        std::cout << "-";
+    }
+    std::cout << "+\n";
+}
+
+void drawRow(const std::string &left, const std::string &right, int leftWidth, int rightWidth)
+{
+    std::cout << "| " << std::left << std::setw(leftWidth) << left << "| " << std::setw(rightWidth) << right << "|\n";
+}
+void drawRow2(const std::string &left, const std::string &right, int leftWidth, int rightWidth)
+{
+    std::cout << "  " << std::left << std::setw(leftWidth) << left << "  " << std::setw(rightWidth) << right << " \n";
+}

@@ -111,8 +111,8 @@ bool SkillListing::isEligibleToBook(RegularMember &requester)
     //    Case 1: If the listing is available
     if (this->listingState == 0)
     {
-        // Case 1.1: If the requester is not the owner of the listing
-        if (requester.getUsername() != this->supporterName)
+        // Case 1.1: If the requester is not the owner of the listing, and not get blocked or blocked the owner of the listing
+        if ((requester.getUsername() != this->supporterName) && (!requester.isBlockerOf(this->supporterName)) && (!requester.isBlockedBy(this->supporterName)))
         {
             // Case 1.2: If the requester has enough credits to book the listing
             if (requester.getCreditPoints() >= this->calculateTotalCreds())

@@ -667,12 +667,14 @@ void TimeBankSystem::searchMenu()
     {
     case 1:
         // method to search by username
+        promptSearchMember();
         break;
     case 2:
         // method to search by location, and min host rate, and by current credits: isEligibleForViewingListing()
+        promptSearchListing();
         break;
     case 3:
-        return;
+        regularMemberMenu();
         break;
     }
 }
@@ -948,7 +950,7 @@ bool TimeBankSystem::promptAddRequest()
         cout << "You cannot make a request for this supporter because they have blocked you :(\n";
         return false;
     }
-    // isEligibleForBook method
+    // isEligibleToBook method
     SkillListing listing = findListingByID(listingID);
     if (!listing.isEligibleToBook(*currentMember))
     {
@@ -1172,6 +1174,184 @@ void TimeBankSystem::promptSupporterReview()
     }
 }
 
+void TimeBankSystem::promptSearchMember()
+{
+    std::string username;
+    do
+    {
+        username = getValidStringInput("Enter username to search: ");
+        if (isUniqueUsername(username))
+        {
+            cout << "User not found! Please try again.\n";
+        }
+        else if (username == this->currentMember->getUsername())
+        {
+            cout << "You cannot search yourself! Please try again.\n";
+        }
+        else if (username == "@dmin2023")
+        {
+            cout << "You cannot search the admin! Please try again.\n";
+        }
+    } while (isUniqueUsername(username) || username == currentMember->getUsername() || username == "@dmin2023");
+    RegularMember searchedMember = findMemberByUsername(username);
+    if (currentMember->isBlockedBy(searchedMember.getUsername()))
+    {
+        cout << "Seems like they have blocked you :(\n";
+        regularMemberMenu();
+    }
+    else if (currentMember->isBlockerOf(searchedMember.getUsername()))
+    {
+        cout << "You cannot search this member because you have blocked them!\n";
+        regularMemberMenu();
+    } else {
+        cout << "=============SEARCHED MEMBER INFORMATION=============\n";
+        searchedMember.showRestrictedMemberInfo();
+        regularMemberMenu();
+    }
+}
+
+void TimeBankSystem::promptSearchListing()
+{
+    std::string startDay, endDay, city;
+    // This method will filter the listings based on the city, start date, end date
+    // The displayed listings will be based on if the current member is eligible to view them
+
+    // Prompt user to enter the city
+    city = getValidCity();
+    fflush(stdin); // Clear input buffer
+    vector<SkillListing> saigonListings;
+    vector<SkillListing> hanoiListings;
+
+    for (SkillListing &listing : this->skillListingList)
+    {
+        if (listing.getSupporterName() != this->currentMember->getUsername() && listing.listingState == 0)
+        {
+            if (listing.isEligibleToBook(*currentMember))
+            {
+                if (findMemberByUsername(listing.getSupporterName()).city == 24)
+                {
+                    hanoiListings.push_back(listing);
+                }
+                else if (findMemberByUsername(listing.getSupporterName()).city == 28)
+                {
+                    saigonListings.push_back(listing);
+                }
+            }
+        }
+    }
+
+    // Ask for start date and end date
+    startDay = getValidTimestamp("Enter start date in DD/MM/YYYY HH:MM:SS format: ");
+    cout << "Choose intervals: 1. Within 6 hours  2. Within 1 day  3. Within 1 week  4. Not specified\n";
+
+    Period timeSlot1, timeSlot2, timeSlot3;
+    switch (promptAndGetChoice(1, 4))
+    {
+        cout << "=============SEARCHED LISTING INFORMATION=============\n";
+    case 1:
+        endDay = DateTime(startDay).addTimePeriod(0, 6, 0, 0).getFormattedTimestamp();
+        cout << endDay << std::endl;
+        timeSlot1 = Period(DateTime(startDay), DateTime(endDay));
+        if (city == "Hanoi")
+        {
+            for (SkillListing &listing : hanoiListings)
+            {
+                if (listing.getWorkingTimeSlot().isOverlappedWith(timeSlot1))
+                {
+                    printSkillListingTable(listing);
+                }
+            }
+        }
+        else if (city == "Saigon")
+        {
+            for (SkillListing &listing : saigonListings)
+            {
+                if (listing.getWorkingTimeSlot().isOverlappedWith(timeSlot1))
+                {
+                    printSkillListingTable(listing);
+                }
+            }
+        }
+        break;
+    case 2:
+        endDay = DateTime(startDay).addTimePeriod(1, 0, 0, 0).getFormattedTimestamp();
+        cout << endDay << std::endl;
+        timeSlot2 = Period(DateTime(startDay), DateTime(endDay));
+        if (city == "Hanoi")
+        {
+            for (SkillListing &listing : hanoiListings)
+            {
+                if (listing.getWorkingTimeSlot().isOverlappedWith(timeSlot2))
+                {
+                    printSkillListingTable(listing);
+                }
+            }
+        }
+        else if (city == "Saigon")
+        {
+            for (SkillListing &listing : saigonListings)
+            {
+                if (listing.getWorkingTimeSlot().isOverlappedWith(timeSlot2))
+                {
+                    printSkillListingTable(listing);
+                }
+            }
+        }
+        break;
+    case 3:
+        endDay = DateTime(startDay).addTimePeriod(7, 0, 0, 0).getFormattedTimestamp();
+        cout << endDay << std::endl;
+        timeSlot3 = Period(DateTime(startDay), DateTime(endDay));
+
+        if (city == "Hanoi")
+        {
+            for (SkillListing &listing : hanoiListings)
+            {
+                if (listing.getWorkingTimeSlot().isOverlappedWith(timeSlot3))
+                {
+                    printSkillListingTable(listing);
+                }
+            }
+        }
+        else if (city == "Saigon")
+        {
+            for (SkillListing &listing : saigonListings)
+            {
+                if (listing.getWorkingTimeSlot().isOverlappedWith(timeSlot3))
+                {
+                    printSkillListingTable(listing);
+                }
+            }
+        }
+        break;
+    case 4:
+        if (city == "Hanoi")
+        {
+            for (SkillListing &listing : hanoiListings)
+            {
+                if (!listing.getWorkingTimeSlot().getStartDate().isBeforeStartDate(DateTime(startDay)))
+                {
+                    printSkillListingTable(listing);
+                }
+            }
+        }
+        else if (city == "Saigon")
+        {
+
+            for (SkillListing &listing : saigonListings)
+            {
+                if (!listing.getWorkingTimeSlot().getStartDate().isBeforeStartDate(DateTime(startDay)))
+                {
+                    printSkillListingTable(listing);
+                }
+            }
+        }
+        break;
+    }
+
+    regularMemberMenu();
+}
+
 void TimeBankSystem::promptTopUp()
 {
     int amount = getValidInt("Enter amount of credit to top up: ");
@@ -1341,6 +1521,7 @@ void TimeBankSystem::printListingTableMember()
                             drawRow2("supporterRatingScore: " + std::to_string(review.supporterRating), "", rightColumnWidth, leftColumnWidth);
                         }
                         drawRow2("Comments: " + review.comments, "", leftColumnWidth, rightColumnWidth);
+                        drawRow2("", "", rightColumnWidth, leftColumnWidth);
                         drawTableLine(leftColumnWidth + rightColumnWidth + 3);
                     }
                 }
@@ -1350,6 +1531,66 @@ void TimeBankSystem::printListingTableMember()
     }
 
     listingMenu();
+}
+
+void TimeBankSystem::printSkillListingTable(SkillListing &listing)
+{
+    int leftColumnWidth = 40;
+    int rightColumnWidth = 85;
+    RegularMember supporter = findMemberByUsername(listing.supporterName);
+    Skill skill = findSkillByID(listing.skillID);
+    string city = (supporter.city == 24) ? "Hanoi" : "Saigon";
+    int secs = listing.workingTimeSlot.durationInSeconds();
+    double distance = supporter.calculateDistance(*currentMember);
+    string minHostRatingScore = (listing.minHostRatingScore == -1) ? "N/A" : std::to_string(listing.minHostRatingScore);
+    // Draw the top line of the table
+    drawTableLine(leftColumnWidth + rightColumnWidth + 3);
+
+    // Draw the header row
+    drawRow(" Supporter Info", " Listing ID: " + listing.listingID + " - Total Credits Cost: " + std::to_string(listing.calculateTotalCreds()), leftColumnWidth, rightColumnWidth);
+
+    // Draw line after header
+    drawTableLine(leftColumnWidth + rightColumnWidth + 3);
+
+    // Draw rows of the table
+    drawRow("username: " + listing.getSupporterName(), "Skill perform:", leftColumnWidth, rightColumnWidth);
+    drawRow("full name: " + supporter.fullName, "+ Name: " + skill.skillName, leftColumnWidth, rightColumnWidth);
+    drawRow("phone number: " + supporter.phoneNumber, "+ Description: " + skill.description, leftColumnWidth, rightColumnWidth);
+    drawRow("email: " + supporter.email, "+ Efficiency: " + skill.skillEfficiency, leftColumnWidth, rightColumnWidth);
+    drawRow("home address: " + supporter.homeAddress, "Start Date: " + listing.workingTimeSlot.getStartDate().getFormattedTimestamp(), leftColumnWidth, rightColumnWidth);
+    drawRow("city: " + city, "End Date: " + listing.workingTimeSlot.getEndDate().getFormattedTimestamp(), leftColumnWidth, rightColumnWidth);
+    drawRow("hostRatingScore: " + std::to_string(supporter.getHostRatingScore()), listing.workingTimeSlot.convertSecToDuration(secs), leftColumnWidth, rightColumnWidth);
+    drawRow("skillRatingScore: " + std::to_string(supporter.getSkillRatingScore()), "", leftColumnWidth, rightColumnWidth);
+    drawRow("supporterRatingScore: " + std::to_string(supporter.getSupporterRatingScore()), "Minimum hostRatingScore required: " + minHostRatingScore, leftColumnWidth, rightColumnWidth);
+    drawRow("", "Distance from you: " + std::to_string(distance) + " kilometers", leftColumnWidth, rightColumnWidth);
+    // ... add more rows as needed ...
+
+    // Draw the bottom line of the table
+    drawTableLine(leftColumnWidth + rightColumnWidth + 3);
+
+    for (Review &review : this->reviewList)
+    {
+        if (review.getReviewee() == supporter.getUsername())
+        {
+            drawRow2(review.getReviewID() + ": " + review.getReviewer() + " posted on " + review.timestamp.getFormattedTimestamp(), "", rightColumnWidth, leftColumnWidth);
+            drawRow2("Skill: " + findSkillByID(findListingByID(review.listingID).skillID).skillName, "", rightColumnWidth, leftColumnWidth);
+            if (review.reviewID[1] == 'H')
+            {
+                // cout << review.reviewID[1] << std::endl;
+                drawRow2("hostRatingScore: " + std::to_string(review.hostRating), "", rightColumnWidth, leftColumnWidth);
+            }
+            else if (review.reviewID[1] == 'S')
+            {
+                // cout << review.reviewID[1] << std::endl;
+                drawRow2("skillRatingScore: " + std::to_string(review.skillRating), "", rightColumnWidth, leftColumnWidth);
+                drawRow2("supporterRatingScore: " + std::to_string(review.supporterRating), "", rightColumnWidth, leftColumnWidth);
+            }
+            drawRow2("Comments: " + review.comments, "", leftColumnWidth, rightColumnWidth);
+            drawRow2("", "", rightColumnWidth, leftColumnWidth);
+            drawTableLine(leftColumnWidth + rightColumnWidth + 3);
+        }
+        
+    }
 }
 
 void TimeBankSystem::loadData()

@@ -76,6 +76,9 @@ public:
     bool promptRespondRequest();
     void respondRequestFromPrompt(char choice);
 
+    void promptSearchMember();
+    void promptSearchListing();
+
     void promptTopUp();
     void promptSellCredits();
     void promptBlockMember();
@@ -93,7 +96,7 @@ public:
     void printListingTable();
     void printRequestTable();
     void printReviewTable();
-    void printSkillListingTable();
+    void printSkillListingTable(SkillListing &listing);
 
     // Function for display information tailored to a specific user
     void printRequestTableMember();

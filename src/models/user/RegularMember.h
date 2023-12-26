@@ -84,7 +84,8 @@ public:
     bool payRegistrationFee();
     double calculateDistance(RegularMember &otherMember);
     void showInfo();
-    void printRestrictedMemberInfo();
+
+    void showRestrictedMemberInfo();
     bool topUp(int credPoints);
 
     bool sellCredits(int credPoints);

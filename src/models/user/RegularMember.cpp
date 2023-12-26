@@ -194,7 +194,6 @@ void RegularMember::showInfo()
     {
         std::cout << "Saigon\n";
     }
-    std::cout << BOLD_BLUE << "Balance:" << RESET << " " << balance << "\n";
 
     // Print skills added by the member
     std::cout << BOLD_BLUE << "Skills:" << RESET << " ";
@@ -276,27 +275,53 @@ void RegularMember::showInfo()
     std::cout << "\n";
 }
 
-void RegularMember::printRestrictedMemberInfo()
+void RegularMember::showRestrictedMemberInfo()
 {
-    cout << "Username: " << this->getUsername() << "\n";
-    cout << "Credit points: " << this->creditPoints << "\n"; // 20 credit points for each new member
-    cout << "Phone number: " << this->phoneNumber << "\n";
-    cout << "Email: " << this->email << "\n";
-    cout << "Home address: " << this->homeAddress << "\n";
-    cout << "City: ";
-    if ((this->city) == 24)
+    // Define ANSI escape codes for bold and blue text
+    const std::string BOLD_BLUE = "\033[1;34m"; // Bold Blue
+
+    std::cout << BOLD_BLUE << "Username:" << RESET << " " << getUsername() << "\n";
+    std::cout << BOLD_BLUE << "Full Name:" << RESET << " " << fullName << "\n";
+    std::cout << BOLD_BLUE << "Phone Number:" << RESET << " " << phoneNumber << "\n";
+    std::cout << BOLD_BLUE << "Email:" << RESET << " " << email << "\n";
+    std::cout << BOLD_BLUE << "Home Address:" << RESET << " " << homeAddress << "\n";
+    std::cout << BOLD_BLUE << "City:" << RESET << " ";
+    if (city == Hanoi)
     {
-        cout << "Hanoi"
-             << "\n";
+        std::cout << "Hanoi\n";
     }
     else
     {
-        cout << "Saigon"
-             << "\n";
-    };
-    cout << "Skills: ";
-    printSkills();
-    cout << "\n";
+        std::cout << "Saigon\n";
+    }
+
+    // Print listings created by the member
+    std::cout << BOLD_BLUE << "Listings:" << RESET << " ";
+    if (skillListings.empty())
+    {
+        std::cout << "N/A";
+    }
+    else
+    {
+        for (size_t i = 0; i < skillListings.size(); ++i)
+        {
+
+            std::cout << skillListings[i]->getListingID();
+            if (i != skillListings.size() - 1)
+            {
+                std::cout << ", ";
+            }
+        }
+    }
+    std::cout << "\n";
+
+    // Rating scores
+    std::cout << BOLD_BLUE << "Skill Rating Score:" << RESET << " " << getSkillRatingScore() << "\n";
+    std::cout << BOLD_BLUE << "Supporter Rating Score:" << RESET << " " << getSupporterRatingScore() << "\n";
+    std::cout << BOLD_BLUE << "Host Rating Score:" << RESET << " " << getHostRatingScore() << "\n";
+
+    // End with an empty line
+    std::cout << "\n";
 }
 
 bool RegularMember::topUp(int credPoints)

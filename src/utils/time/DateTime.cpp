@@ -33,13 +33,18 @@ int DateTime::daysInMonth(int month, int year)
   }
 }
 
-void DateTime::addTimePeriod(int days, int hours, int minutes, int seconds)
+DateTime DateTime::addTimePeriod(int days, int hours, int minutes, int seconds)
 {
   tm.tm_mday += days;
   tm.tm_hour += hours;
   tm.tm_min += minutes;
   tm.tm_sec += seconds;
-  mktime(&tm); // Return DateTime object with normalized values
+
+  // Handle overflow and normalize
+  mktime(&tm);
+
+  // Return DateTime object with normalized values
+  return *this; // Assuming DateTime is a class with a suitable constructor
 }
 
 DateTime DateTime::calculateEndDate(int days, int hours, int minutes, int seconds)
@@ -127,6 +132,11 @@ std::string DateTime::getFormattedTimestamp() const
 bool DateTime::isBeforeStartDate(const DateTime &other) const
 {
   return toTimeT() < other.toTimeT();
+}
+
+bool DateTime::isStartDate(const DateTime &other) const
+{
+  return toTimeT() == other.toTimeT();
 }
 
 // int main()

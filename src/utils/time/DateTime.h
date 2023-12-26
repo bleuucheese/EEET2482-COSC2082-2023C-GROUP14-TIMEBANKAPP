@@ -35,7 +35,7 @@ public:
     int getMinute() const { return tm.tm_min; }
     int getSecond() const { return tm.tm_sec; }
 
-    void addTimePeriod(int days, int hours, int minutes, int seconds);
+    DateTime addTimePeriod(int days, int hours, int minutes, int seconds);
     DateTime calculateEndDate(int days, int hours, int minutes, int seconds);
 
     std::time_t toTimeT() const;
@@ -43,6 +43,7 @@ public:
     std::string getFormattedTimestamp() const;
 
     bool isBeforeStartDate(const DateTime &other) const;
+    bool isStartDate(const DateTime &other) const;
 
     friend class Period;
     friend class TimeBankSystem;

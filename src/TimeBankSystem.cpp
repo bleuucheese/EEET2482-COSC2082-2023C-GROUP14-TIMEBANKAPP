@@ -118,20 +118,25 @@ void TimeBankSystem::registerMenu()
 void TimeBankSystem::guestMenu()
 {
     cout << "======GUEST MENU======\n";
-    cout << "1. View all skill listings available\n";
-    cout << "2. View all but be aware that you won't be able to view their reviews!\n";
-    cout << "2. Register as Regular Member\n";
-    cout << "3. Back\n";
+    cout << "1. View all of our members\n";
+    cout << "2. View all listings available, but be aware that you won't be able to view their reviews!\n";
+    cout << "3. Register as Regular Member\n";
+    cout << "4. Back\n";
 
-    switch (promptAndGetChoice(1, 3))
+    switch (promptAndGetChoice(1, 4))
     {
     case 1:
-        // method to list all skill listings
+        // view all members
+        printMemberTable(2);
         break;
     case 2:
-        promptRegister();
+        // method to list all skill listings
+        printListingTable(2);
         break;
     case 3:
+        promptRegister();
+        break;
+    case 4:
         systemMenu();
         break;
     }
@@ -141,23 +146,34 @@ void TimeBankSystem::adminMenu()
 {
     cout << "========ADMIN MENU=========\n";
     cout << "1. View All Members\n";
-    cout << "2. View Sales Figures and Statistics\n"; // Revenue, number of members, number of skills, number of skill listings, number of requests, number of reviews
+    cout << "2. View All Listings\n";
     cout << "3. Reset Password for a particular Member\n";
-    cout << "4. Sign Out\n";
+    cout << "4. View Sales Figures and Statistics\n"; // Revenue, number of members, number of skills, number of skill listings
+    cout << "5. Sign Out\n";
 
-    switch (promptAndGetChoice(1, 4))
+    switch (promptAndGetChoice(1, 5))
     {
     case 1:
         // method to view all members
-        printMemberTable();
+        printMemberTable(1);
         break;
     case 2:
-        // method to view sales figures and statistics
+        // method to view all listings
+        printListingTable(1);
         break;
     case 3:
         promptAdminChangePassword();
         break;
     case 4:
+        // method to view sales figures and statistics
+        cout << "==========SALES FIGURES AND STATISTICS==========\n";
+        cout << "Revenue: " << admin.revenue << "$\n";
+        cout << "Number of members: " << memberList.size() << "\n";
+        cout << "Number of skills: " << skillList.size() << "\n";
+        cout << "Number of skill listings: " << skillListingList.size() << "\n";
+        adminMenu();
+        break;
+    case 5:
         logout();
         systemMenu();
         break;
@@ -296,14 +312,7 @@ void TimeBankSystem::logout()
     {
         admin.isAuthenticated = false;
     }
-    // for (auto &user : this->memberList)
-    // {
-    //     if (user.isAuthenticated)
-    //     {
-    //         user.isAuthenticated = false;
-    //     }
-    // }
-    if (this->currentMember != nullptr)
+    else if (this->currentMember != nullptr)
     {
         this->currentMember->isAuthenticated = false; // Hot fix for logout bug: segmentation fault
     }
@@ -330,7 +339,7 @@ Skill &TimeBankSystem::findSkillByID(string skillID)
             return skill;
         }
     }
-    // throw std::runtime_error("Skill not found!");
+    throw std::runtime_error("Skill not found!");
 }
 
 SkillListing &TimeBankSystem::findListingByID(string listingID)
@@ -422,7 +431,7 @@ void TimeBankSystem::promptRegister()
 {
     std::string username, password, fullName, phoneNumber, email, homeAddress, creditCardNumber, city;
     double latitude, longitude;
-    float balance = 400; // Assume member has 200$ in their bank account when they type their credit card number
+    float balance = 400; // Assume member has 400$ in their bank account when they type their credit card number
     float skillRatingScore = 0;
     float supporterRatingScore = 0;
     float hostRatingScore = 0;
@@ -515,7 +524,7 @@ void TimeBankSystem::skillMenu()
     {
     case 1:
         // method to view skills of the current members
-
+        printOwnedSkill();
         break;
     case 2:
         promptAddSkill();
@@ -528,34 +537,39 @@ void TimeBankSystem::skillMenu()
 
 void TimeBankSystem::listingMenu()
 {
-    cout << "======LISTING MENU======\n";
-    cout << "1. View Listings\n";
-    cout << "2. Add Listing\n";
-    cout << "3. Hide Listing\n";
-    cout << "4. Unhide Listing\n";
-    cout << "5. Back\n";
+    cout << "======LISTINGS MENU======\n";
+    cout << "1. View Your Listed Skills\n";
+    cout << "2. View Listings\n";
+    cout << "3. Add Listing\n";
+    cout << "4. Hide Listing\n";
+    cout << "5. Unhide Listing\n";
+    cout << "6. Back\n";
 
-    switch (promptAndGetChoice(1, 5))
+    switch (promptAndGetChoice(1, 6))
     {
     case 1:
+        // method to view skills of the current members
+        printOwnedListing();
+        break;
+    case 2:
         // method to view listings
         printListingTableMember();
         break;
-    case 2:
+    case 3:
         // method to add listing, but first display a list of user's skills, and then prompt them to get the ID of the skill they want to list
         promptAddListing();
         break;
-    case 3:
+    case 4:
         // method to hide listing
         promptHideListing();
         break;
 
-    case 4:
+    case 5:
         // method to unhide listing
         promptUnhideListing();
         break;
 
-    case 5:
+    case 6:
         regularMemberMenu();
         break;
     }
@@ -573,7 +587,6 @@ void TimeBankSystem::requestMenu()
     case 1:
         // method to view requests, and prompt them to get the ID of the request they want to respond.
         printRequestTableMember();
-        cout << std::endl;
         char choice;
         do
         {
@@ -672,7 +685,7 @@ void TimeBankSystem::searchMenu()
         promptSearchMember();
         break;
     case 2:
-        // method to search by location, and min host rate, and by current credits: isEligibleForViewingListing()
+        // method to search by location, and min host rate, and by current credits: isEligibleToView()
         promptSearchListing();
         break;
     case 3:
@@ -1010,14 +1023,17 @@ void TimeBankSystem::respondRequestFromPrompt(char choice)
 bool TimeBankSystem::promptRespondRequest()
 {
     std::string requestID;
+    bool isValidRequest;
     do
     {
         requestID = getValidStringInput("Enter requestID to respond: ");
-        if (!isRequestIDExistAndOwned(requestID))
+        isValidRequest = isRequestIDExistAndOwned(requestID);
+
+        if (!isValidRequest)
         {
-            cout << "RequestID not found or not one of your incomming requests! Please try again.\n";
+            cout << "RequestID not found or not one of your incoming requests! Please try again.\n";
         }
-    } while (!isRequestIDExistAndOwned(requestID));
+    } while (!isValidRequest);
 
     // cout << "Checking today's date and listing's start date...\n"; // For debugging purpose
     if (!DateTime().isBeforeStartDate(findListingByID(findRequestByID(requestID).getListingID()).getWorkingTimeSlot().getStartDate()))
@@ -1110,7 +1126,7 @@ void TimeBankSystem::promptHostReview()
             addReview(newReview);
             (currentMember->sentreceivedReviews).push_back(&newReview);
             // Also add to the reviewee's review list
-            findMemberByUsername(revieweeName).sentreceivedReviews.push_back(&newReview);
+            // findMemberByUsername(revieweeName).sentreceivedReviews.push_back(&newReview);
             cout << "Review added successfully!\n";
             regularMemberMenu();
         }
@@ -1175,7 +1191,7 @@ void TimeBankSystem::promptSupporterReview()
             addReview(newReview);
             (currentMember->sentreceivedReviews).push_back(&newReview);
             // Also add to the reviewee's review list
-            findMemberByUsername(revieweeName).sentreceivedReviews.push_back(&newReview);
+            // findMemberByUsername(revieweeName).sentreceivedReviews.push_back(&newReview);
             cout << "Review added successfully!\n";
             regularMemberMenu();
         }
@@ -1241,7 +1257,7 @@ void TimeBankSystem::promptSearchListing()
     {
         if (listing.getSupporterName() != this->currentMember->getUsername() && listing.listingState == 0)
         {
-            if (listing.isEligibleToBook(*currentMember))
+            if (listing.isEligibleToView(*currentMember))
             {
                 if (findMemberByUsername(listing.getSupporterName()).city == 24)
                 {
@@ -1470,13 +1486,67 @@ void TimeBankSystem::printRequestTableMember()
                       << std::setw(10) << request->requestStatus << std::endl;
         }
     }
+    cout << "\nPotential Hosts' Information: \n";
+
+    for (const auto &request : this->currentMember->sentreceivedRequests)
+    {
+        if (request->getReceiverName() == (this->currentMember)->getUsername())
+        {
+            findMemberByUsername(request->getRequesterName()).showRestrictedMemberInfo();
+        }
+    }
+}
+
+void TimeBankSystem::printOwnedListing()
+{
+    std::cout << std::setw(12) << "ListingID" << std::setw(12) << "SkillID"
+              << std::setw(7) << "Cost" << std::setw(15) << "MinHostRating"
+              << std::setw(7) << "State" << std::setw(15) << "Supporter"
+              << std::setw(15) << "Host" << std::setw(30) << "WorkingTimeSlot" << std::endl;
+    std::cout << std::setfill('-') << std::setw(113) << "" << std::setfill(' ') << std::endl;
+
+    for (auto &listing : this->skillListingList) // Assuming skillListings is a collection of SkillListing objects
+    {
+        if (listing.getSupporterName() == this->currentMember->getUsername())
+        {
+            std::string workingTime = listing.getWorkingTimeSlot().getFormattedPeriod(); // Assuming a method to get formatted time slot
+
+            std::cout << std::setw(12) << listing.getListingID()
+                      << std::setw(12) << listing.getSkillID()
+                      << std::setw(7) << listing.calculateTotalCreds()
+                      << std::setw(15) << listing.getMinHostRatingScore()
+                      << std::setw(7) << listing.getListingState()
+                      << std::setw(15) << listing.getSupporterName()
+                      << std::setw(15) << listing.getHostName()
+                      << std::setw(30) << workingTime << std::endl;
+        }
+    }
+
+    listingMenu();
+}
+
+void TimeBankSystem::printOwnedSkill()
+{
+    std::cout << std::setw(12) << "SkillID" << std::setw(20) << "SkillName"
+              << std::setw(50) << "SkillDescription" << std::setw(20) << "SkillEfficiency"
+              << std::endl;
+    std::cout << std::setfill('-') << std::setw(102) << "" << std::setfill(' ') << std::endl;
+
+    for (const auto &skill : this->currentMember->skills) // Assuming skillListings is a collection of SkillListing objects
+    {
+        std::cout << std::setw(12) << skill->getSkillID()
+                  << std::setw(20) << skill->getSkillName()
+                  << std::setw(50) << skill->getDescription()
+                  << std::setw(20) << skill->getSkillEfficiency()
+                  << std::endl;
+    }
+    skillMenu();
 }
 
 void TimeBankSystem::printListingTableMember()
 {
+    // print all listings on the market
     cout << "Here are available listings on the market:\n";
-    int leftColumnWidth = 40;
-    int rightColumnWidth = 85;
     if (this->skillListingList.size() == 0)
     {
         cout << "N/A" << std::endl;
@@ -1487,59 +1557,7 @@ void TimeBankSystem::printListingTableMember()
         {
             if (listing.supporterName != this->currentMember->getUsername() && listing.listingState == 0)
             {
-                RegularMember supporter = findMemberByUsername(listing.supporterName);
-                Skill skill = findSkillByID(listing.skillID);
-                string city = (supporter.city == 24) ? "Hanoi" : "Saigon";
-                int secs = listing.workingTimeSlot.durationInSeconds();
-                double distance = supporter.calculateDistance(*currentMember);
-                string minHostRatingScore = (listing.minHostRatingScore == -1) ? "N/A" : std::to_string(listing.minHostRatingScore);
-                // Draw the top line of the table
-                drawTableLine(leftColumnWidth + rightColumnWidth + 3);
-
-                // Draw the header row
-                drawRow(" Supporter Info", " Listing ID: " + listing.listingID + " - Total Credits Cost: " + std::to_string(listing.calculateTotalCreds()), leftColumnWidth, rightColumnWidth);
-
-                // Draw line after header
-                drawTableLine(leftColumnWidth + rightColumnWidth + 3);
-
-                // Draw rows of the table
-                drawRow("username: " + listing.getSupporterName(), "Skill perform:", leftColumnWidth, rightColumnWidth);
-                drawRow("full name: " + supporter.fullName, "+ Name: " + skill.skillName, leftColumnWidth, rightColumnWidth);
-                drawRow("phone number: " + supporter.phoneNumber, "+ Description: " + skill.description, leftColumnWidth, rightColumnWidth);
-                drawRow("email: " + supporter.email, "+ Efficiency: " + skill.skillEfficiency, leftColumnWidth, rightColumnWidth);
-                drawRow("home address: " + supporter.homeAddress, "Start Date: " + listing.workingTimeSlot.getStartDate().getFormattedTimestamp(), leftColumnWidth, rightColumnWidth);
-                drawRow("city: " + city, "End Date: " + listing.workingTimeSlot.getEndDate().getFormattedTimestamp(), leftColumnWidth, rightColumnWidth);
-                drawRow("hostRatingScore: " + std::to_string(supporter.getHostRatingScore()), listing.workingTimeSlot.convertSecToDuration(secs), leftColumnWidth, rightColumnWidth);
-                drawRow("skillRatingScore: " + std::to_string(supporter.getSkillRatingScore()), "", leftColumnWidth, rightColumnWidth);
-                drawRow("supporterRatingScore: " + std::to_string(supporter.getSupporterRatingScore()), "Minimum hostRatingScore required: " + minHostRatingScore, leftColumnWidth, rightColumnWidth);
-                drawRow("", "Distance from you: " + std::to_string(distance) + " kilometers", leftColumnWidth, rightColumnWidth);
-                // ... add more rows as needed ...
-
-                // Draw the bottom line of the table
-                drawTableLine(leftColumnWidth + rightColumnWidth + 3);
-
-                for (Review &review : this->reviewList)
-                {
-                    if (review.getReviewee() == supporter.getUsername())
-                    {
-                        drawRow2(review.getReviewID() + ": " + review.getReviewer() + " posted on " + review.timestamp.getFormattedTimestamp(), "", rightColumnWidth, leftColumnWidth);
-                        drawRow2("Skill: " + findSkillByID(findListingByID(review.listingID).skillID).skillName, "", rightColumnWidth, leftColumnWidth);
-                        if (review.reviewID[1] == 'H')
-                        {
-                            // cout << review.reviewID[1] << std::endl;
-                            drawRow2("hostRatingScore: " + std::to_string(review.hostRating), "", rightColumnWidth, leftColumnWidth);
-                        }
-                        else if (review.reviewID[1] == 'S')
-                        {
-                            // cout << review.reviewID[1] << std::endl;
-                            drawRow2("skillRatingScore: " + std::to_string(review.skillRating), "", rightColumnWidth, leftColumnWidth);
-                            drawRow2("supporterRatingScore: " + std::to_string(review.supporterRating), "", rightColumnWidth, leftColumnWidth);
-                        }
-                        drawRow2("Comments: " + review.comments, "", leftColumnWidth, rightColumnWidth);
-                        drawRow2("", "", rightColumnWidth, leftColumnWidth);
-                        drawTableLine(leftColumnWidth + rightColumnWidth + 3);
-                    }
-                }
+                printSkillListingTable(listing);
             }
             cout << std::endl;
         }
@@ -1550,19 +1568,29 @@ void TimeBankSystem::printListingTableMember()
 
 void TimeBankSystem::printSkillListingTable(SkillListing &listing)
 {
+    // print a single listing
     int leftColumnWidth = 40;
     int rightColumnWidth = 85;
     RegularMember supporter = findMemberByUsername(listing.supporterName);
     Skill skill = findSkillByID(listing.skillID);
     string city = (supporter.city == 24) ? "Hanoi" : "Saigon";
     int secs = listing.workingTimeSlot.durationInSeconds();
-    double distance = supporter.calculateDistance(*currentMember);
+    string distance = (supporter.calculateDistance(*currentMember) > 10000) ? "~" : std::to_string(supporter.calculateDistance(*currentMember));
     string minHostRatingScore = (listing.minHostRatingScore == -1) ? "N/A" : std::to_string(listing.minHostRatingScore);
+    string listingStatus = (listing.listingState == 0) ? "Available" : (listing.listingState == 1) ? "Hidden"
+                                                                   : (listing.listingState == 2)   ? "Booked"
+                                                                   : (listing.listingState == 3)   ? "Ongoing"
+                                                                                                   : "Completed";
     // Draw the top line of the table
     drawTableLine(leftColumnWidth + rightColumnWidth + 3);
+    const std::string colorCode = "\e[1;93m"; // Yellow color code
+    const std::string colorCode2 = "\e[38;5;213m";
+    const std::string colorReset = "\033[0m"; // Reset color code
+    int colorCodeLength = colorCode.length() + colorReset.length();
+    int colorCodeLength2 = colorCode2.length() + colorReset.length();
 
     // Draw the header row
-    drawRow(" Supporter Info", " Listing ID: " + listing.listingID + " - Total Credits Cost: " + std::to_string(listing.calculateTotalCreds()), leftColumnWidth, rightColumnWidth);
+    drawRow("Supporter Info", "\e[1;93mListing ID: " + listing.listingID + "\033[0m" + " - Total Credits Cost: " + std::to_string(listing.calculateTotalCreds()), leftColumnWidth, rightColumnWidth + colorCodeLength);
 
     // Draw line after header
     drawTableLine(leftColumnWidth + rightColumnWidth + 3);
@@ -1575,9 +1603,9 @@ void TimeBankSystem::printSkillListingTable(SkillListing &listing)
     drawRow("home address: " + supporter.homeAddress, "Start Date: " + listing.workingTimeSlot.getStartDate().getFormattedTimestamp(), leftColumnWidth, rightColumnWidth);
     drawRow("city: " + city, "End Date: " + listing.workingTimeSlot.getEndDate().getFormattedTimestamp(), leftColumnWidth, rightColumnWidth);
     drawRow("hostRatingScore: " + std::to_string(supporter.getHostRatingScore()), listing.workingTimeSlot.convertSecToDuration(secs), leftColumnWidth, rightColumnWidth);
-    drawRow("skillRatingScore: " + std::to_string(supporter.getSkillRatingScore()), "", leftColumnWidth, rightColumnWidth);
+    drawRow("skillRatingScore: " + std::to_string(supporter.getSkillRatingScore()), "Status: " + listingStatus, leftColumnWidth, rightColumnWidth);
     drawRow("supporterRatingScore: " + std::to_string(supporter.getSupporterRatingScore()), "Minimum hostRatingScore required: " + minHostRatingScore, leftColumnWidth, rightColumnWidth);
-    drawRow("", "Distance from you: " + std::to_string(distance) + " kilometers", leftColumnWidth, rightColumnWidth);
+    drawRow("", "Distance from you: \e[38;5;213m" + distance + " kilometers\033[0m", leftColumnWidth, rightColumnWidth + colorCodeLength2);
     // ... add more rows as needed ...
 
     // Draw the bottom line of the table
@@ -1607,13 +1635,90 @@ void TimeBankSystem::printSkillListingTable(SkillListing &listing)
     }
 }
 
-void TimeBankSystem::printMemberTable()
+void TimeBankSystem::printListingNoReviews(SkillListing &listing)
 {
-    for (RegularMember &mem : this->memberList)
+    // print a single listing
+    int leftColumnWidth = 40;
+    int rightColumnWidth = 85;
+    RegularMember supporter = findMemberByUsername(listing.supporterName);
+    Skill skill = findSkillByID(listing.skillID);
+    string city = (supporter.city == 24) ? "Hanoi" : "Saigon";
+    int secs = listing.workingTimeSlot.durationInSeconds();
+    // double distance = supporter.calculateDistance(*currentMember);
+    string minHostRatingScore = (listing.minHostRatingScore == -1) ? "N/A" : std::to_string(listing.minHostRatingScore);
+    string listingStatus = (listing.listingState == 0) ? "Available" : (listing.listingState == 1) ? "Hidden"
+                                                                   : (listing.listingState == 2)   ? "Booked"
+                                                                   : (listing.listingState == 3)   ? "Ongoing"
+                                                                                                   : "Completed";
+    // Draw the top line of the table
+    drawTableLine(leftColumnWidth + rightColumnWidth + 3);
+
+    // Draw the header row
+    drawRow(" Supporter Info", " Listing ID: " + listing.listingID + " - Total Credits Cost: " + std::to_string(listing.calculateTotalCreds()), leftColumnWidth, rightColumnWidth);
+
+    // Draw line after header
+    drawTableLine(leftColumnWidth + rightColumnWidth + 3);
+
+    // Draw rows of the table
+    drawRow("username: " + listing.getSupporterName(), "Skill perform:", leftColumnWidth, rightColumnWidth);
+    drawRow("full name: " + supporter.fullName, "+ Name: " + skill.skillName, leftColumnWidth, rightColumnWidth);
+    drawRow("phone number: " + supporter.phoneNumber, "+ Description: " + skill.description, leftColumnWidth, rightColumnWidth);
+    drawRow("email: " + supporter.email, "+ Efficiency: " + skill.skillEfficiency, leftColumnWidth, rightColumnWidth);
+    drawRow("home address: " + supporter.homeAddress, "Start Date: " + listing.workingTimeSlot.getStartDate().getFormattedTimestamp(), leftColumnWidth, rightColumnWidth);
+    drawRow("city: " + city, "End Date: " + listing.workingTimeSlot.getEndDate().getFormattedTimestamp(), leftColumnWidth, rightColumnWidth);
+    drawRow("hostRatingScore: " + std::to_string(supporter.getHostRatingScore()), listing.workingTimeSlot.convertSecToDuration(secs), leftColumnWidth, rightColumnWidth);
+    drawRow("skillRatingScore: " + std::to_string(supporter.getSkillRatingScore()), "Status: " + listingStatus, leftColumnWidth, rightColumnWidth);
+    drawRow("supporterRatingScore: " + std::to_string(supporter.getSupporterRatingScore()), "Minimum hostRatingScore required: " + minHostRatingScore, leftColumnWidth, rightColumnWidth);
+    // drawRow("", "Distance from you: " + std::to_string(distance) + " kilometers", leftColumnWidth, rightColumnWidth);
+    // ... add more rows as needed ...
+
+    // Draw the bottom line of the table
+    drawTableLine(leftColumnWidth + rightColumnWidth + 3);
+}
+
+void TimeBankSystem::printMemberTable(int mode)
+{
+    // Mode 1 print for admin, mode 2 for guests
+    if (mode == 1)
     {
-        mem.showInfo();
+        for (RegularMember &mem : this->memberList)
+        {
+            mem.showRestrictedMemberInfo();
+        }
+        adminMenu();
     }
-    adminMenu();
+    else if (mode == 2)
+    {
+        for (RegularMember &mem : this->memberList)
+        {
+            mem.showRestrictedMemberInfo();
+        }
+        guestMenu();
+    }
+}
+
+void TimeBankSystem::printListingTable(int mode)
+{
+    // Admin mode can view comments and all modes
+    if (mode == 1)
+    {
+        for (SkillListing &listing : this->skillListingList)
+        {
+            printSkillListingTable(listing);
+        }
+        adminMenu();
+    }
+    else if (mode == 2) // Guests mode cannot view comments, and only see the available ones
+    {
+        for (SkillListing &listing : this->skillListingList)
+        {
+            if (listing.listingState == 0)
+            {
+                printListingNoReviews(listing);
+            }
+        }
+        guestMenu();
+    }
 }
 
 void TimeBankSystem::loadData()
@@ -1647,6 +1752,8 @@ void TimeBankSystem::extractMemberData()
     (this->currentMember)->sentreceivedRequests.clear();
     (this->currentMember)->sentreceivedReviews.clear();
     (this->currentMember)->blockedMembers.clear();
+    (this->currentMember)->receivedHostReviews.clear();
+    (this->currentMember)->receivedSupporterReviews.clear();
 
     // Extract data from skillList, skillListingList, requestList, reviewList to current user's skillListings, requests, reviews vectors of pointers
     /*skill*/

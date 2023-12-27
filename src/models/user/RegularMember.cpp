@@ -39,6 +39,34 @@ RegularMember::RegularMember(string username, string password, string fullName, 
     this->hostRatingScore = hostRatingScore;
 }
 
+vector<Review *> RegularMember::getReceivedHostReviews()
+{
+    // Clear the vector before populating it
+    this->receivedHostReviews.clear();
+    for (Review *review : this->sentreceivedReviews)
+    {
+        if (review->getReviewee() == this->getUsername() && review->getReviewID()[1] == 'H')
+        {
+            this->receivedHostReviews.push_back(review);
+        }
+    }
+    return this->receivedHostReviews;
+}
+
+vector<Review *> RegularMember::getReceivedSupporterReviews()
+{
+    // Clear the vector before populating it
+    this->receivedSupporterReviews.clear();
+    for (Review *review : this->sentreceivedReviews)
+    {
+        if (review->getReviewee() == this->getUsername() && review->getReviewID()[1] == 'S')
+        {
+            this->receivedSupporterReviews.push_back(review);
+        }
+    }
+    return this->receivedSupporterReviews;
+}
+
 void RegularMember::printReviews()
 {
     if (this->sentreceivedReviews.size() == 0)
@@ -76,7 +104,8 @@ void RegularMember::printSkills()
 
 float RegularMember::getSkillRatingScore()
 {
-    if (this->sentreceivedReviews.empty())
+
+    if (this->getReceivedSupporterReviews().empty())
     {
         return this->skillRatingScore;
     }
@@ -85,7 +114,7 @@ float RegularMember::getSkillRatingScore()
         this->skillRatingScore = 0.0f;
         int count = 0; // Initialize count to 1 to avoid division by zero
         // Calculate the average skill rating score
-        for (const auto &review : this->sentreceivedReviews)
+        for (const auto &review : this->receivedSupporterReviews)
         {
             if (review->getReviewee() == getUsername() && review->getSkillRating() != 0)
             {
@@ -99,7 +128,7 @@ float RegularMember::getSkillRatingScore()
 
 float RegularMember::getSupporterRatingScore()
 {
-    if (this->sentreceivedReviews.empty())
+    if (this->getReceivedSupporterReviews().empty())
     {
         return this->supporterRatingScore;
     }
@@ -108,7 +137,7 @@ float RegularMember::getSupporterRatingScore()
         this->supporterRatingScore = 0.0f;
         int count = 0; // Initialize count to 1 to avoid division by zero
         // Calculate the average supporter rating score
-        for (const auto &review : this->sentreceivedReviews)
+        for (const auto &review : this->receivedSupporterReviews)
         {
             if (review->getReviewee() == getUsername() && review->getSupporterRating() != 0)
             {
@@ -122,7 +151,7 @@ float RegularMember::getSupporterRatingScore()
 
 float RegularMember::getHostRatingScore()
 {
-    if (this->sentreceivedReviews.empty())
+    if (this->getReceivedHostReviews().empty())
     {
         return this->hostRatingScore;
     }
@@ -131,7 +160,7 @@ float RegularMember::getHostRatingScore()
         this->hostRatingScore = 0.0f;
         int count = 0; // Initialize count to 1 to avoid division by zero
         // Calculate the average host rating score
-        for (const auto &review : this->sentreceivedReviews)
+        for (const auto &review : this->receivedHostReviews)
         {
             if (review->getReviewee() == getUsername() && review->getHostRating() != 0)
             {
@@ -139,6 +168,7 @@ float RegularMember::getHostRatingScore()
                 count++;
             }
         }
+        cout << "count: " << count << "\n";
         return this->hostRatingScore / static_cast<float>(count);
     }
 }
@@ -299,27 +329,6 @@ void RegularMember::showRestrictedMemberInfo()
     {
         std::cout << "Saigon\n";
     }
-
-    // Print listings created by the member
-    std::cout << BOLD_BLUE << "Listings:" << RESET << " ";
-    if (skillListings.empty())
-    {
-        std::cout << "N/A";
-    }
-    else
-    {
-        for (size_t i = 0; i < skillListings.size(); ++i)
-        {
-
-            std::cout << skillListings[i]->getListingID();
-            if (i != skillListings.size() - 1)
-            {
-                std::cout << ", ";
-            }
-        }
-    }
-    std::cout << "\n";
-
     // Rating scores
     std::cout << BOLD_BLUE << "Skill Rating Score:" << RESET << " " << getSkillRatingScore() << "\n";
     std::cout << BOLD_BLUE << "Supporter Rating Score:" << RESET << " " << getSupporterRatingScore() << "\n";

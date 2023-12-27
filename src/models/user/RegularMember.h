@@ -38,11 +38,13 @@ private:
     float skillRatingScore;
     float supporterRatingScore;
     float hostRatingScore;
-    vector<Skill *> skills;
-    vector<SkillListing *> skillListings;
-    vector<Review *> sentreceivedReviews;
-    vector<Request *> sentreceivedRequests;
-    vector<RegularMember *> blockedMembers;
+    vector<Skill *> skills = {};
+    vector<SkillListing *> skillListings = {};
+    vector<Review *> sentreceivedReviews = {};
+    vector<Review *> receivedHostReviews = {};
+    vector<Review *> receivedSupporterReviews = {};
+    vector<Request *> sentreceivedRequests = {};
+    vector<RegularMember *> blockedMembers = {};
 
 public:
     // Constructor
@@ -55,6 +57,10 @@ public:
     string getCreditCardNumber() { return creditCardNumber; };
     vector<Skill *> getSkills() { return skills; };
     vector<SkillListing *> getSkillListings() { return skillListings; };
+
+    // Push back from the original sentreceivedReviews vector
+    vector<Review *> getReceivedHostReviews();      // get RH type reviews, reviewee - usn
+    vector<Review *> getReceivedSupporterReviews(); // get RS type reviews, reviewee - usn
 
     float getBalance() { return balance; };
 

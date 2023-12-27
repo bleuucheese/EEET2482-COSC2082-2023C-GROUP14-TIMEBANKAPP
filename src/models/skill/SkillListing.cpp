@@ -148,11 +148,61 @@ bool SkillListing::isEligibleToBook(RegularMember &requester)
         }
         else
         {
-            cout << "You cannot book your own listing\n";
+            cout << "You cannot book your own listing or you two block one another :D\n";
             return false;
         }
-    } else {
+    }
+    else
+    {
         cout << "This listing is not available.\n";
+        return false;
+    }
+}
+
+bool SkillListing::isEligibleToView(RegularMember &searcher)
+{
+    //    Case 1: If the listing is available
+    if (this->listingState == 0)
+    {
+        // Case 1.1: If the requester is not the owner of the listing, and not get blocked or blocked the owner of the listing
+        if ((searcher.getUsername() != this->supporterName) && (!searcher.isBlockerOf(this->supporterName)) && (!searcher.isBlockedBy(this->supporterName)))
+        {
+            // Case 1.2: If the requester has enough credits to book the listing
+            if (searcher.getCreditPoints() >= this->calculateTotalCreds())
+            {
+                // Case 1.3: If the requester's host rating score is higher than the minimum rating score of the listing
+                if (searcher.getHostRatingScore() >= this->minHostRatingScore)
+                {
+                    // Case 1.4 If the requester's bookings working time slot is not overlapped with the listing's working time slot
+                    for (int i = 0; i < searcher.getSkillListings().size(); i++)
+                    {
+                        if (searcher.getSkillListings()[i]->isListingBooked())
+                        {
+                            if (searcher.getSkillListings()[i]->getWorkingTimeSlot().isOverlappedWith(this->workingTimeSlot))
+                            {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
+    {
         return false;
     }
 }

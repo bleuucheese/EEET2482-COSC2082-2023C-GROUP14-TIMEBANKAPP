@@ -70,9 +70,6 @@ RegularMember FileHandler::parseCSVLine(const std::string &csvLine)
     float skillRatingScore = std::stof(fields[14]);
     float supporterRatingScore = std::stof(fields[15]);
     float hostRatingScore = std::stof(fields[16]);
-    
-
-    cout << creditPoints << std::endl;
 
     allowedCities city = (cityCode == "24") ? Hanoi : Saigon;
 

@@ -45,10 +45,6 @@ public:
     void logout();
     void promptRegister();
 
-    RegularMember &findMemberByUsername(string username);
-    Skill &findSkillByID(string skillID);
-    SkillListing &findListingByID(string listingID);
-    Request &findRequestByID(string requestID);
     bool isSkillIDExistAndOwned(string skillID);
     bool isListingIDExistAndOwned(string listingID);
     bool isListingIDExistAndNotOwned(string listingID);
@@ -91,21 +87,24 @@ public:
     void addRequest(Request &request);
     void addReview(Review &review);
 
-    // Functions for dipslay objects in the system's vectors in pretty tabular format, used by admin
-    void printMemberTable();
+    // Functions for dipslay objects in the system's vectors in pretty tabular format, used by admin or guests based on mode
+    void printMemberTable(int mode);
     void printSkillTable();
-    void printListingTable();
-    void printRequestTable();
-    void printReviewTable();
+    void printListingTable(int mode);
     void printSkillListingTable(SkillListing &listing);
+    void printListingNoReviews(SkillListing &listing);
 
     // Function for display information tailored to a specific user
     void printRequestTableMember();
-    void printListingTableMember();
-
-    // Functions for dipslay objects in the system's vectors in pretty tabular format, used by guests
+    void printListingTableMember(); // print other supporters listing
+    void printOwnedListing();
+    void printOwnedSkill();
 
     // Functions for searching objects in the system's vectors
+    RegularMember &findMemberByUsername(string username);
+    Skill &findSkillByID(string skillID);
+    SkillListing &findListingByID(string listingID);
+    Request &findRequestByID(string requestID);
 
     // This two functions use method from FileHandler.cpp to load data from CSV files to vectors and vice versa
     void loadData(); // Load data from CSV files to vectors

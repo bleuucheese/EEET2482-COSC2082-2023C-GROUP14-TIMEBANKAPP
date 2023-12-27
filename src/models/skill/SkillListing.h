@@ -49,10 +49,11 @@ public:
     bool hideListing();
     bool unhideListing();
 
-    float calculateTotalCreds();                       // Calculate total creds for a listing
+    float calculateTotalCreds();                     // Calculate total creds for a listing
     bool isListingAvailable();                       // Check if a listing is available
     bool isListingBooked();                          // Check if a listing is booked
     bool isEligibleToBook(RegularMember &requester); // Check if a member is eligible to book a listing
+    bool isEligibleToView(RegularMember &searcher); // Check if a member is eligible to rview a listing in search
 
     friend class TimeBankSystem;
     friend class FileHandler;

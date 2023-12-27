@@ -149,6 +149,7 @@ void TimeBankSystem::adminMenu()
     {
     case 1:
         // method to view all members
+        printMemberTable();
         break;
     case 2:
         // method to view sales figures and statistics
@@ -640,6 +641,7 @@ void TimeBankSystem::reviewMenu()
     {
     case 1:
         // method to view reviews
+        viewReviews();
         break;
     case 2:
         // method for a supporter to add review: #RH type
@@ -695,6 +697,13 @@ void TimeBankSystem::viewProfile()
     cout << "=============YOUR INFORMATION=============\n";
     (this->currentMember)->showInfo();
     profileMenu();
+}
+
+void TimeBankSystem::viewReviews()
+{
+    cout << "=============YOUR REVIEWS=============\n";
+    this->currentMember->printReviews();
+    reviewMenu();
 }
 
 void TimeBankSystem::promptAdminChangePassword()
@@ -775,7 +784,7 @@ bool TimeBankSystem::isHostReviewGiven(string listingID)
 {
     for (Review &review : this->reviewList)
     {
-        if (review.reviewID[1] = 'H' && review.listingID == listingID && review.getReviewer() == (this->currentMember)->getUsername())
+        if (review.reviewID[1] == 'H' && review.listingID == listingID && review.getReviewer() == (this->currentMember)->getUsername())
         {
             return true;
         }
@@ -787,7 +796,7 @@ bool TimeBankSystem::isSupporterReviewGiven(string listingID)
 {
     for (Review &review : this->reviewList)
     {
-        if (review.reviewID[1] = 'S' && review.listingID == listingID && review.getReviewer() == (this->currentMember)->getUsername())
+        if (review.reviewID[1] == 'S' && review.listingID == listingID && review.getReviewer() == (this->currentMember)->getUsername())
         {
             return true;
         }
@@ -1097,9 +1106,11 @@ void TimeBankSystem::promptHostReview()
             reviewContent = getValidStringInput("Enter review content: ");
             int hostRatingScore = getValidInt("Enter host rating score (1-5): ");
             reviewerName = (this->currentMember)->getUsername();
-            Review newReview(reviewID, listingID, hostRatingScore, reviewContent, reviewerName, revieweeName, DateTime());
+            Review newReview(reviewID, listingID, reviewContent, reviewerName, revieweeName, DateTime(), hostRatingScore);
             addReview(newReview);
             (currentMember->sentreceivedReviews).push_back(&newReview);
+            // Also add to the reviewee's review list
+            findMemberByUsername(revieweeName).sentreceivedReviews.push_back(&newReview);
             cout << "Review added successfully!\n";
             regularMemberMenu();
         }
@@ -1163,6 +1174,8 @@ void TimeBankSystem::promptSupporterReview()
             Review newReview(reviewID, listingID, skillRatingScore, supporterRatingScore, reviewContent, reviewerName, revieweeName, DateTime());
             addReview(newReview);
             (currentMember->sentreceivedReviews).push_back(&newReview);
+            // Also add to the reviewee's review list
+            findMemberByUsername(revieweeName).sentreceivedReviews.push_back(&newReview);
             cout << "Review added successfully!\n";
             regularMemberMenu();
         }
@@ -1203,7 +1216,9 @@ void TimeBankSystem::promptSearchMember()
     {
         cout << "You cannot search this member because you have blocked them!\n";
         regularMemberMenu();
-    } else {
+    }
+    else
+    {
         cout << "=============SEARCHED MEMBER INFORMATION=============\n";
         searchedMember.showRestrictedMemberInfo();
         regularMemberMenu();
@@ -1247,9 +1262,9 @@ void TimeBankSystem::promptSearchListing()
     Period timeSlot1, timeSlot2, timeSlot3;
     switch (promptAndGetChoice(1, 4))
     {
-        cout << "=============SEARCHED LISTING INFORMATION=============\n";
     case 1:
         endDay = DateTime(startDay).addTimePeriod(0, 6, 0, 0).getFormattedTimestamp();
+        cout << startDay << std::endl;
         cout << endDay << std::endl;
         timeSlot1 = Period(DateTime(startDay), DateTime(endDay));
         if (city == "Hanoi")
@@ -1589,8 +1604,16 @@ void TimeBankSystem::printSkillListingTable(SkillListing &listing)
             drawRow2("", "", rightColumnWidth, leftColumnWidth);
             drawTableLine(leftColumnWidth + rightColumnWidth + 3);
         }
-        
     }
+}
+
+void TimeBankSystem::printMemberTable()
+{
+    for (RegularMember &mem : this->memberList)
+    {
+        mem.showInfo();
+    }
+    adminMenu();
 }
 
 void TimeBankSystem::loadData()
@@ -1759,6 +1782,15 @@ void TimeBankSystem::automaticallyUpdate()
             request.setRequestStatus("Rejected");
         }
     }
+}
+
+void TimeBankSystem::clearData()
+{
+    this->memberList.clear();
+    this->skillList.clear();
+    this->skillListingList.clear();
+    this->requestList.clear();
+    this->reviewList.clear();
 }
 
 // int main()

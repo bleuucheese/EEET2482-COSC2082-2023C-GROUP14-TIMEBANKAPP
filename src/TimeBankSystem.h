@@ -57,6 +57,7 @@ public:
     bool isSupporterReviewGiven(string listingID);
 
     void viewProfile();
+    void viewReviews();
 
     bool login(const std::string &username, const std::string &password);
     bool isUniqueUsername(string username);

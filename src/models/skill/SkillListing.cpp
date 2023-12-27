@@ -131,24 +131,27 @@ bool SkillListing::isEligibleToBook(RegularMember &requester)
                                 return false;
                             }
                         }
+                        return true;
                     }
-                    return true;
+                }
+                else
+                {
+                    cout << "You don't have enough hostRatingScore to book this listing.\n";
+                    return false;
                 }
             }
             else
             {
-                cout << "You don't have enough credits to book this listing.\n";
+                cout << "You don't have enough credits.\n";
                 return false;
             }
         }
         else
         {
-            cout << "You can't book your own listing.\n";
+            cout << "You cannot book your own listing\n";
             return false;
         }
-    }
-    else
-    {
+    } else {
         cout << "This listing is not available.\n";
         return false;
     }

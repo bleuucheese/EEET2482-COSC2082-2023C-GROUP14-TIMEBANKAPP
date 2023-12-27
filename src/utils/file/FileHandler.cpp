@@ -66,10 +66,13 @@ RegularMember FileHandler::parseCSVLine(const std::string &csvLine)
     double longitude = std::stod(fields[10]);
     std::string creditCardNumber = fields[11];
     float balance = std::stof(fields[12]);
-    float skillRatingScore = std::stof(fields[13]);
-    float supporterRatingScore = std::stof(fields[14]);
-    float hostRatingScore = std::stof(fields[15]);
-    int creditPoints = std::stoi(fields[16]);
+    int creditPoints = std::stoi(fields[13]);
+    float skillRatingScore = std::stof(fields[14]);
+    float supporterRatingScore = std::stof(fields[15]);
+    float hostRatingScore = std::stof(fields[16]);
+    
+
+    cout << creditPoints << std::endl;
 
     allowedCities city = (cityCode == "24") ? Hanoi : Saigon;
 
@@ -78,11 +81,11 @@ RegularMember FileHandler::parseCSVLine(const std::string &csvLine)
     {
         if (cityCode == "24")
         {
-            return RegularMember(username, password, fullName, phoneNumber, email, homeAddress, Hanoi, latitude, longitude, creditCardNumber, balance, skillRatingScore, supporterRatingScore, hostRatingScore);
+            return RegularMember(username, password, fullName, phoneNumber, email, homeAddress, Hanoi, latitude, longitude, creditCardNumber, balance, creditPoints, skillRatingScore, supporterRatingScore, hostRatingScore);
         }
         else if (cityCode == "28")
         {
-            return RegularMember(username, password, fullName, phoneNumber, email, homeAddress, Saigon, latitude, longitude, creditCardNumber, balance, skillRatingScore, supporterRatingScore, hostRatingScore);
+            return RegularMember(username, password, fullName, phoneNumber, email, homeAddress, Saigon, latitude, longitude, creditCardNumber, balance, creditPoints, skillRatingScore, supporterRatingScore, hostRatingScore);
         }
     }
 }
@@ -375,7 +378,7 @@ std::vector<Review> FileHandler::loadReviews(const std::string &filename)
         }
         else if (reviewID[1] == 'H')
         {
-            reviews.push_back(Review(reviewID, listingID, hostRating, comments, reviewer, reviewee, timeStamp));
+            reviews.push_back(Review(reviewID, listingID, comments, reviewer, reviewee, timeStamp, hostRating));
         }
         else
         {

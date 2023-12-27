@@ -10,7 +10,7 @@ using std::cout;
 using std::string;
 
 // Constructor for review by host
-Review::Review(string reviewID, string listingID, int skillRatingScore, int supporterRatingScore, std::string comments, string reviewer, string reviewee, DateTime timestamp)
+Review::Review(string reviewID, string listingID, int skillRating, int supporterRating, std::string comments, string reviewer, string reviewee, DateTime timestamp)
 {
     this->timestamp = timestamp;
     if (reviewID == "")
@@ -22,15 +22,15 @@ Review::Review(string reviewID, string listingID, int skillRatingScore, int supp
         this->reviewID = reviewID;
     }
     this->listingID = listingID;
-    this->skillRating = skillRatingScore;
-    this->supporterRating = supporterRatingScore;
+    this->skillRating = skillRating;
+    this->supporterRating = supporterRating;
     this->comments = comments;
     this->reviewer = reviewer;
     this->reviewee = reviewee;
 }
 
 // Constructor for review by supporter
-Review::Review(string reviewID, string listingID, int hostRatingScore, std::string comments, string reviewer, string reviewee, DateTime timestamp)
+Review::Review(string reviewID, string listingID, std::string comments, string reviewer, string reviewee, DateTime timestamp, int hostRating)
 {
     this->timestamp = timestamp;
     if (reviewID == "")
@@ -42,7 +42,7 @@ Review::Review(string reviewID, string listingID, int hostRatingScore, std::stri
         this->reviewID = reviewID;
     }
     this->listingID = listingID;
-    this->hostRating = hostRatingScore;
+    this->hostRating = hostRating;
     this->comments = comments;
     this->reviewer = reviewer;
     this->reviewee = reviewee;
@@ -50,10 +50,9 @@ Review::Review(string reviewID, string listingID, int hostRatingScore, std::stri
 
 void Review::printReview()
 {
-    // cout << "Review ID: " << this->reviewID << "\n";
-    // cout << "Listing ID: " << this->listingID << "\n";
-    // cout << reviewer << " ~ posted on " << this->timestamp.getFormattedTimestamp() << "\n";
-    // cout << "\n";
+    cout << "Review ID: " << this->reviewID << "\n";
+    cout << "Listing ID: " << this->listingID << "\n";
+    cout << reviewer << " --> " << reviewee << " ~ posted on " << this->timestamp.getFormattedTimestamp() << "\n";
     if (this->skillRating != 0)
     {
         cout << "Skill Rating: " << this->skillRating << "\n";

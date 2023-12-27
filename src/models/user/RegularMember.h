@@ -76,7 +76,7 @@ public:
     void setBlockedMembers(vector<RegularMember *> blockedMembers) { this->blockedMembers = blockedMembers; };
 
     // Member functions
-    void printReceivedReviews();
+    void printReviews();
     void printSkills();
     float getSkillRatingScore();
     float getSupporterRatingScore();

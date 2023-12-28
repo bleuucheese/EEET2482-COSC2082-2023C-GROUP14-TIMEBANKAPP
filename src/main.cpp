@@ -11,8 +11,8 @@ int main()
     sys.automaticallyUpdate();
     sys.welcomeScreen();
     sys.systemMenu();
-    // sys.logout();
     sys.saveData();
+    sys.clearData();
 
     return 0;
 }

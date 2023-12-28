@@ -112,7 +112,7 @@ float RegularMember::getSkillRatingScore()
     else
     {
         this->skillRatingScore = 0.0f;
-        int count = 0; // Initialize count to 1 to avoid division by zero
+        int count = 0; // Initialize count to 1 to avoid division by zero: nan problem
         // Calculate the average skill rating score
         for (const auto &review : this->receivedSupporterReviews)
         {
@@ -168,7 +168,7 @@ float RegularMember::getHostRatingScore()
                 count++;
             }
         }
-        cout << "count: " << count << "\n";
+        // cout << "count: " << count << "\n";
         return this->hostRatingScore / static_cast<float>(count);
     }
 }

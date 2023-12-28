@@ -1,8 +1,8 @@
 username,password,role,isAuthenticated,fullname,phoneNumber,email,homeAddress,city,latitude,longitude,creditCardNumber,balance,creditPoints,skillRatingScore,supporterRatingScore,hostRatingScore
 testing1,123456789,RegularMember,False,Test,0910000000,test@gmail.com,278 Real Street,24,10.8273,106.993,6011000990139424,10,170,5,5,0
-cplusplus,123456789,RegularMember,False,C Plus Plus,0919140888,cpp@gmail.com,RMIT University VietNam,28,10.7292,106.696,5425233430109903,280,120,0,0,0
+cplusplus,newpassword,RegularMember,False,C Plus Plus,0919140888,cpp@gmail.com,RMIT University VietNam,28,10.7292,106.696,5425233430109903,280,120,0,0,0
 testing2,123456789,RegularMember,False,Trinh Nguyen Ha,0912951555,ha@gmail.com,T2 Masteri Thao Dien,28,10.444,106.898,4347699988887777,180,82,5,3,5
-testing3,123456789,RegularMember,False,Nguyen Ha,0909090909,nha@gmail.com,123 Fake Street,24,10.22,106.222,4001919257537193,370,27,0,0,5
+testing3,123456789,RegularMember,False,Nguyen Ha,0909090909,nha@gmail.com,123 Fake Street,24,10.22,106.222,4001919257537193,347,50,0,0,5
 testing4,123456789,RegularMember,False,Ha Trinh,0909090090,ha2@gmail.com,182 Imagination Blv,28,10.3333,106.229,6034883265619896,295,100,0,0,0
 testing5,123456789,RegularMember,False,Nguyen Ha,0987654321,ha3@gmail.com,7387 Surreal Building,24,10.3722,106.838,3566000020000410,380,20,0,0,0
 testing6,123456789,RegularMember,False,Tester Six,0913456789,tester@gmail.com,9283 Void,24,10.283,106.222,4001919257537193,380,23,5,4,0

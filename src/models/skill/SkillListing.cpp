@@ -58,7 +58,8 @@ bool SkillListing::hideListing()
 
 bool SkillListing::unhideListing()
 {
-    if (this->listingState == 1)
+    // Can only unhide listing if the listing is hidden and the listing's start date is in the future
+    if ((this->listingState == 1) && (DateTime().isBeforeStartDate(this->workingTimeSlot.getStartDate())))
     {
         this->listingState = 0; // 0 = available
         return true;

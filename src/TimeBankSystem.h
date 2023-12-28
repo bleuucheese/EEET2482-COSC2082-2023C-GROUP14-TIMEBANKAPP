@@ -1,5 +1,5 @@
-#ifndef TIMEBANKSYSTEM_H
-#define TIMEBANKSYSTEM_H
+#ifndef EEET2482_COSC2082_2023C_GROUP14_TIMEBANKAPP_SRC_TIMEBANKSYSTEM_H
+#define EEET2482_COSC2082_2023C_GROUP14_TIMEBANKAPP_SRC_TIMEBANKSYSTEM_H
 
 #include <iostream>
 #include <vector>
@@ -96,6 +96,7 @@ public:
 
     // Function for display information tailored to a specific user
     void printRequestTableMember();
+    void printOutgoingRequestTableMember();
     void printListingTableMember(); // print other supporters listing
     void printOwnedListing();
     void printOwnedSkill();
@@ -122,4 +123,4 @@ public:
     int promptAndGetChoice(unsigned min, unsigned max);
 };
 
-#endif // TIMEBANKSYSTEM_H
+#endif // EEET2482_COSC2082_2023C_GROUP14_TIMEBANKAPP_SRC_TIMEBANKSYSTEM_H

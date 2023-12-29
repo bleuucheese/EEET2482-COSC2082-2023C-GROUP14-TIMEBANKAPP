@@ -37,7 +37,6 @@ public:
     Period getWorkingTimeSlot() const { return workingTimeSlot; };
 
     // Setters
-
     void setConsumedCredsPerHour(int consumedCreds) { this->consumedCredsPerHour = consumedCreds; };
     void setMinHostRatingScore(int minHostRatingScore) { this->minHostRatingScore = minHostRatingScore; };
     void setListingState(int listingState) { this->listingState = listingState; };
@@ -48,12 +47,11 @@ public:
     void displaySkillListing();
     bool hideListing();
     bool unhideListing();
-
     float calculateTotalCreds();                     // Calculate total creds for a listing
     bool isListingAvailable();                       // Check if a listing is available
     bool isListingBooked();                          // Check if a listing is booked
     bool isEligibleToBook(RegularMember &requester); // Check if a member is eligible to book a listing
-    bool isEligibleToView(RegularMember &searcher); // Check if a member is eligible to rview a listing in search
+    bool isEligibleToView(RegularMember &searcher); // Check if a member is eligible to view a listing in search
 
     friend class TimeBankSystem;
     friend class FileHandler;

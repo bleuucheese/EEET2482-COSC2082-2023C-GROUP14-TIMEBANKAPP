@@ -21,7 +21,7 @@ using std::cout;
 using std::string;
 
 // Constructor
-RegularMember::RegularMember(string username, string password, string fullName, string phoneNumber, string email, string homeAddress, allowedCities city, double latitude, double longitude, string creditCardNumber, float balance, int creditPoints, float skillRatingScore, float supporterRatingScore, float hostRatingScore) : User(username, password, "RegularMember")
+RegularMember::RegularMember(string username, string password, string fullName, string phoneNumber, string email, string homeAddress, allowedCities city, double latitude, double longitude, string creditCardNumber, float balance, float creditPoints, float skillRatingScore, float supporterRatingScore, float hostRatingScore) : User(username, password, "RegularMember")
 {
 
     this->fullName = fullName;
@@ -386,7 +386,7 @@ bool RegularMember::blockMember(RegularMember &memberToBlock)
     {
         if (this->blockedMembers[i]->getUsername() == memberToBlock.getUsername())
         {
-            cout << "You have already blocked this member! Try again later.\n";
+            cout << "You have already blocked this member :D\n";
             return false;
         }
     }

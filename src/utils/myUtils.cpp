@@ -428,3 +428,69 @@ void drawRow2(const std::string &left, const std::string &right, int leftWidth, 
 {
     std::cout << "  " << std::left << std::setw(leftWidth) << left << "  " << std::setw(rightWidth) << right << " \n";
 }
+
+bool deleteLine(const std::string &filename, int lineNumber)
+{
+    std::ifstream file(filename);
+    if (!file.is_open())
+    {
+        std::cerr << "Failed to open the file." << std::endl;
+        return false;
+    }
+
+    std::vector<std::string> lines;
+    std::string line;
+    while (std::getline(file, line))
+    {
+        lines.push_back(line);
+    }
+    file.close();
+
+    if (lineNumber < 1 || lineNumber > lines.size())
+    {
+        std::cerr << "Line number is out of range." << std::endl;
+        return false;
+    }
+
+    // Delete the specified line
+    lines.erase(lines.begin() + lineNumber - 1);
+
+    // Write the modified data back to the file
+    std::ofstream outFile(filename);
+    if (!outFile.is_open())
+    {
+        std::cerr << "Failed to open the file for writing." << std::endl;
+        return false;
+    }
+
+    for (const auto &l : lines)
+    {
+        outFile << l << "\n";
+    }
+
+    outFile.close();
+    return true;
+}
+
+void printMenuLabel(const std::string &labelName)
+{
+    const int totalLength = 88;
+
+    // 10 accounts for "=====" on both sides
+    int equalsCount = totalLength - labelName.length() - 10;
+
+    // Adjust the number of '=' characters if equalsCount is odd
+    int leftEqualsCount = equalsCount / 2;
+    int rightEqualsCount = equalsCount / 2;
+    if (equalsCount % 2 != 0)
+    {
+        rightEqualsCount++;
+    }
+
+    // Print the label with escape color code
+    std::cout << "\e[38;5;229m"
+              << std::string(leftEqualsCount, '=') << "====="
+              << labelName << "====="
+              << std::string(rightEqualsCount, '=')
+              << "\e[0m" << std::endl;
+}

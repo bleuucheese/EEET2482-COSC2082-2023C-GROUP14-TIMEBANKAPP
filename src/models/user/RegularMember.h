@@ -26,7 +26,7 @@ class RegularMember : public User
 
 private:
     string fullName;
-    int creditPoints;
+    float creditPoints;
     string phoneNumber;
     string email;
     string homeAddress;
@@ -48,38 +48,31 @@ private:
 
 public:
     // Constructor
-    RegularMember(string username = "", string password = "", string fullName = "", string phoneNumber = "", string email = "", string homeAddress = "", allowedCities city = Hanoi, double latitude = 0, double longitude = 0, string creditCardNumber = "", float balance = 0, int creditPoints = 20, float skillRatingScore = 0, float supporterRatingScore = 0, float hostRatingScore = 0);
+    RegularMember(string username = "", string password = "", string fullName = "", string phoneNumber = "", string email = "", string homeAddress = "", allowedCities city = Hanoi, double latitude = 0, double longitude = 0, string creditCardNumber = "", float balance = 0, float creditPoints = 20, float skillRatingScore = 0, float supporterRatingScore = 0, float hostRatingScore = 0);
 
     // Getters and Setters
-    int getCreditPoints() { return creditPoints; };
+    float getCreditPoints() { return creditPoints; };
+    float getBalance() { return balance; };
     string getPhoneNumber() { return phoneNumber; };
     string getEmail() { return email; };
     string getCreditCardNumber() { return creditCardNumber; };
     vector<Skill *> getSkills() { return skills; };
     vector<SkillListing *> getSkillListings() { return skillListings; };
-
-    // Push back from the original sentreceivedReviews vector
-    vector<Review *> getReceivedHostReviews();      // get RH type reviews, reviewee - usn
-    vector<Review *> getReceivedSupporterReviews(); // get RS type reviews, reviewee - usn
-
-    float getBalance() { return balance; };
-
-    // vector<Review> getReceivedReviews() { return receivedReviews; };
-    // vector<Request> getReceivedRequests() { return receivedRequests; };
     vector<RegularMember *> getBlockedMembers() { return blockedMembers; };
 
-    void setCreditPoints(int creditPoints) { this->creditPoints = creditPoints; };
+    void setCreditPoints(float creditPoints) { this->creditPoints = creditPoints; };
     void setPhoneNumber(string phoneNumber) { this->phoneNumber = phoneNumber; };
     void setEmail(string email) { this->email = email; };
-
     void setCreditCardNumber(string creditCardNumber) { this->creditCardNumber = creditCardNumber; };
-
     void setBalance(float balance) { this->balance = balance; };
-
     void setSkillRating(float skillRatingScore) { this->skillRatingScore = skillRatingScore; };
     void setSupporterRating(float supporterRatingScore) { this->supporterRatingScore = supporterRatingScore; };
     void setHostRating(float hostRatingScore) { this->hostRatingScore = hostRatingScore; };
     void setBlockedMembers(vector<RegularMember *> blockedMembers) { this->blockedMembers = blockedMembers; };
+
+    // Push back from the original sentreceivedReviews vector
+    vector<Review *> getReceivedHostReviews();      // get RH type reviews, reviewee - usn
+    vector<Review *> getReceivedSupporterReviews(); // get RS type reviews, reviewee - usn
 
     // Member functions
     void printReviews();
@@ -90,10 +83,9 @@ public:
     bool payRegistrationFee();
     double calculateDistance(RegularMember &otherMember);
     void showInfo();
-
     void showRestrictedMemberInfo();
-    bool topUp(int credPoints);
 
+    bool topUp(int credPoints);
     bool sellCredits(int credPoints);
 
     bool blockMember(RegularMember &memberToBlock);

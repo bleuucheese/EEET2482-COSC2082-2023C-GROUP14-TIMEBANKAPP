@@ -66,7 +66,7 @@ RegularMember FileHandler::parseCSVLine(const std::string &csvLine)
     double longitude = std::stod(fields[10]);
     std::string creditCardNumber = fields[11];
     float balance = std::stof(fields[12]);
-    int creditPoints = std::stoi(fields[13]);
+    float creditPoints = std::stoi(fields[13]);
     float skillRatingScore = std::stof(fields[14]);
     float supporterRatingScore = std::stof(fields[15]);
     float hostRatingScore = std::stof(fields[16]);

@@ -39,4 +39,10 @@ void drawTableLine(int width);
 void drawRow(const std::string &left, const std::string &right, int leftWidth, int rightWidth);
 void drawRow2(const std::string &left, const std::string &right, int leftWidth, int rightWidth);
 
+// Function to delete a line from a file
+bool deleteLine(const std::string &filename, int lineNumber);
+
+// Function to print the menu label
+void printMenuLabel(const std::string &labelName);
+
 #endif // EEET2482_COSC2082_2023C_GROUP14_TIMEBANKAPP_SRC_UTILS_MYUTILS_H

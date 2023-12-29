@@ -79,6 +79,7 @@ public:
     void promptTopUp();
     void promptSellCredits();
     void promptBlockMember();
+    void promptUnblockMember();
 
     // Functions for adding new objects to the system's vectors
     void addMember(RegularMember &member);

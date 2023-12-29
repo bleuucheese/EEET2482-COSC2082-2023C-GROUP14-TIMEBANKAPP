@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <unordered_set>
 
 #include "TimeBankSystem.h"
 #include "./models/user/Admin.h"
@@ -53,7 +54,7 @@ void TimeBankSystem::bye()
 
 void TimeBankSystem::systemMenu()
 {
-    cout << "======APPLICATION MENU======\n";
+    printMenuLabel("APPLICATION MENU");
     cout << "0. Quit\n";
     cout << "1. Login\n";
     cout << "2. Register\n";
@@ -79,7 +80,7 @@ void TimeBankSystem::systemMenu()
 
 void TimeBankSystem::loginMenu()
 {
-    cout << "======LOGIN MENU======\n";
+    printMenuLabel("LOGIN MENU");
     cout << "1. Login as Admin\n";
     cout << "2. Login as Regular Member\n";
     cout << "3. Back\n";
@@ -100,7 +101,7 @@ void TimeBankSystem::loginMenu()
 
 void TimeBankSystem::registerMenu()
 {
-    cout << "======REGISTER MENU======\n";
+    printMenuLabel("REGISTER MENU");
     cout << "1. Register as Regular Member\n";
     cout << "2. Back\n";
 
@@ -117,7 +118,7 @@ void TimeBankSystem::registerMenu()
 
 void TimeBankSystem::guestMenu()
 {
-    cout << "======GUEST MENU======\n";
+    printMenuLabel("GUEST MENU");
     cout << "1. View all of our members\n";
     cout << "2. View all listings available, but be aware that you won't be able to view their reviews!\n";
     cout << "3. Register as Regular Member\n";
@@ -144,7 +145,7 @@ void TimeBankSystem::guestMenu()
 
 void TimeBankSystem::adminMenu()
 {
-    cout << "========ADMIN MENU=========\n";
+    printMenuLabel("ADMIN MENU");
     cout << "1. View All Members\n";
     cout << "2. View All Listings\n";
     cout << "3. Reset Password for a particular Member\n";
@@ -182,7 +183,7 @@ void TimeBankSystem::adminMenu()
 
 void TimeBankSystem::regularMemberMenu()
 {
-    cout << "===========MEMBER MENU=============\n";
+    printMenuLabel("MEMBER MENU");
     cout << "1. Manage Personal Account\n";
     cout << "2. Manage Skills\n";
     cout << "3. Manage Listings\n";
@@ -485,14 +486,15 @@ void TimeBankSystem::promptRegister()
 
 void TimeBankSystem::profileMenu()
 {
-    cout << "======PROFILE MENU======\n";
+    printMenuLabel("PROFILE MENU");
     cout << "1. View Profile\n";
     cout << "2. Top Up Credits\n";
     cout << "3. Sell Credits\n";
     cout << "4. Block a Member\n";
-    cout << "5. Back\n";
+    cout << "5. Unblock a Member\n";
+    cout << "6. Back\n";
 
-    switch (promptAndGetChoice(1, 5))
+    switch (promptAndGetChoice(1, 6))
     {
     case 1:
         viewProfile(); // can view blocked members' usernames
@@ -508,6 +510,9 @@ void TimeBankSystem::profileMenu()
         break;
 
     case 5:
+        promptUnblockMember();
+        break;
+    case 6:
         regularMemberMenu();
         break;
     }
@@ -515,7 +520,7 @@ void TimeBankSystem::profileMenu()
 
 void TimeBankSystem::skillMenu()
 {
-    cout << "======SKILLS MENU======\n";
+    printMenuLabel("SKILLS MENU");
     cout << "1. View Skills\n";
     cout << "2. Add Skill\n";
     cout << "3. Back\n";
@@ -538,7 +543,7 @@ void TimeBankSystem::skillMenu()
 
 void TimeBankSystem::listingMenu()
 {
-    cout << "======LISTINGS MENU======\n";
+    printMenuLabel("LISTINGS MENU");
     cout << "1. View Your Listed Skills\n";
     cout << "2. View Listings On Market\n";
     cout << "3. Add Listing\n";
@@ -551,6 +556,7 @@ void TimeBankSystem::listingMenu()
     case 1:
         // method to view owned listings of the current members
         printOwnedListing();
+        listingMenu();
         break;
     case 2:
         // method to view others listings
@@ -562,11 +568,13 @@ void TimeBankSystem::listingMenu()
         break;
     case 4:
         // method to hide listing
+        printOwnedListing();
         promptHideListing();
         break;
 
     case 5:
         // method to unhide listing
+        printOwnedListing();
         promptUnhideListing();
         break;
 
@@ -578,10 +586,10 @@ void TimeBankSystem::listingMenu()
 
 void TimeBankSystem::requestMenu()
 {
-    cout << "======REQUESTS MENU======\n";
+    printMenuLabel("REQUESTS MENU");
     cout << "1. View Incoming Requests\n";
     cout << "2. View Outgoing Requests\n";
-    cout << "3. Add Request\n";
+    cout << "3. Add Request for a Listing\n";
     cout << "4. Back\n";
 
     switch (promptAndGetChoice(1, 4))
@@ -630,7 +638,7 @@ void TimeBankSystem::requestMenu()
         printOutgoingRequestTableMember();
         break;
     case 3:
-        // method to add request: display a list of listings, and then prompt them to get the ID of the listing they want to request
+        // method to add request: prompt them to get the ID of the listing they want to request
         if (promptAddRequest())
         {
             addRequestFromPrompt();
@@ -649,7 +657,7 @@ void TimeBankSystem::requestMenu()
 
 void TimeBankSystem::reviewMenu()
 {
-    cout << "======REVIEWS MENU======\n";
+    printMenuLabel("REVIEWS MENU");
     cout << "1. View Review History\n";
     cout << "2. Add Review For a Host\n";
     cout << "3. Add Review For a Supporter\n";
@@ -678,7 +686,7 @@ void TimeBankSystem::reviewMenu()
 
 void TimeBankSystem::searchMenu()
 {
-    cout << "======SEARCH MENU======\n";
+    printMenuLabel("SEARCH MENU");
     cout << "1. Search for a Member\n";
     cout << "2. Search for a listing\n";
     cout << "3. Back\n";
@@ -840,7 +848,6 @@ void TimeBankSystem::promptAddSkill()
 
 void TimeBankSystem::promptAddListing()
 {
-    cout << "Here are your skills:\n";
     printOwnedSkill();
     cout << std::endl;
     std::string listingID, startDate, endDate, buffer = "";
@@ -905,7 +912,7 @@ void TimeBankSystem::promptHideListing()
             cout << "ListingID not found or not one of your added listings! Please try again.\n";
         }
 
-    } while ((!isListingIDExistAndOwned(listingID)) || findListingByID(listingID).getListingState() != 0);
+    } while ((!isListingIDExistAndOwned(listingID)));
 
     if (findListingByID(listingID).hideListing())
     {
@@ -975,16 +982,46 @@ bool TimeBankSystem::promptAddRequest()
         return false;
     }
     // If the host is blocked by the supporter, the host cannot make a request for that supporter
-    if (currentMember->isBlockedBy(receiverName))
+    else if (currentMember->isBlockedBy(receiverName))
     {
         cout << "You cannot make a request for this supporter because they have blocked you :(\n";
         return false;
     }
+
+    // If the supporter is not available at the time the host wants to book, the host cannot make a request for that supporter
+    for (Request *request : currentMember->sentreceivedRequests)
+    {
+        if (request->getRequestStatus() == "Accepted")
+        {
+            if (findListingByID(request->getListingID()).getSupporterName() == findListingByID(listingID).getSupporterName())
+            {
+                if (findListingByID(request->getListingID()).getWorkingTimeSlot().isOverlappedWith(findListingByID(listingID).getWorkingTimeSlot()))
+                {
+                    cout << "You cannot make a request for this supporter because they are not available at that time!\n";
+                    return false;
+                }
+            }
+        }
+    }
+
+    // If the host has already made a request for that listing, the host cannot make another one when the previous one is still pending
+    for (Request *request : currentMember->sentreceivedRequests)
+    {
+        if (request->getRequestStatus() == "Pending")
+        {
+            if (request->getListingID() == listingID)
+            {
+                cout << "You cannot make a request because you have already done one for this listing!\n";
+                return false;
+            }
+        }
+    }
+
     // isEligibleToBook method
     SkillListing listing = findListingByID(listingID);
     if (!listing.isEligibleToBook(*currentMember))
     {
-        cout << "You cannot make a request for this listing because you don't meet the requirements!\n";
+        cout << "You cannot make a request for this listing because some of the requirements are not met!\n";
         return false;
     }
     // Proceed to create a new request when all the above conditions are met
@@ -1002,9 +1039,6 @@ void TimeBankSystem::addRequestFromPrompt()
     addRequest(newRequest);                                       // Add new request to the system's request list
     (currentMember->sentreceivedRequests).push_back(&newRequest); // Add new request to the current member's request list
 
-    // Update the listing state to booked and update the host name: not yet, because it is not accepted --> bug
-    // findListingByID(listingID).setListingState(2);
-    // findListingByID(listingID).setHostName(requesterName);
     cout << "Request added successfully!\n";
     regularMemberMenu();
 }
@@ -1475,8 +1509,7 @@ void TimeBankSystem::promptBlockMember()
         cout << "Block successful!\n";
         // Write the blocked member directly to the file
         blockFile << currentMember->getUsername() << "," << username << "\n";
-        // Update the blocked member list of the currently logged in user
-        // currentMember->blockedMembers.push_back(&blockedMember);
+        blockFile.close(); // Close the file
     }
     else
     {
@@ -1485,33 +1518,116 @@ void TimeBankSystem::promptBlockMember()
     regularMemberMenu();
 }
 
+void TimeBankSystem::promptUnblockMember()
+{
+
+    if (currentMember->blockedMembers.size() == 0)
+    {
+        cout << "You have not blocked anyone yet!\n";
+    }
+    else
+    {
+        cout << "=============YOUR BLOCKED MEMBERS=============\n";
+        for (RegularMember *member : currentMember->blockedMembers)
+        {
+            cout << member->getUsername() << std::endl;
+        }
+        cout << "==============================================\n";
+    }
+    string username;
+    std::fstream blockFile("./databases/blocklist.csv", std::ios::app);
+
+    do
+    {
+        cout << "Enter the username of the member you want to unblock: ";
+        cin >> username;
+        if (isUniqueUsername(username))
+        {
+            cout << "User not found! Please try again.\n";
+        }
+        else if (username == this->currentMember->getUsername())
+        {
+            cout << "You cannot unblock yourself! Please try again.\n";
+        }
+        else if (username == "@dmin2023")
+        {
+            cout << "You cannot unblock the admin! Please try again.\n";
+        }
+
+    } while (isUniqueUsername(username) || username == currentMember->getUsername() || username == "@dmin2023");
+    RegularMember unblockedMember = findMemberByUsername(username);
+    if (currentMember->unblockMember(unblockedMember))
+    {
+        // cout << "Unblock successful!\n";
+        // Delete the unblocked member directly from the file by finding the info line, then delete that line
+        std::string line;
+        std::ifstream blockFile("./databases/blocklist.csv");
+        int lineCount = 0;
+        while (getline(blockFile, line))
+        {
+            lineCount++;
+            if (line.find(currentMember->getUsername() + "," + username) != std::string::npos)
+            {
+                break;
+            }
+        }
+        cout << "Line count: " << lineCount << std::endl;
+
+        blockFile.close();
+        if (deleteLine("./databases/blocklist.csv", lineCount))
+        {
+            cout << "Unblock successful!\n";
+
+        }
+        else
+        {
+            cout << "Unblock failed! Please try again.\n";
+        }
+    }
+    else
+    {
+        cout << "Unblock failed! Please try again.\n";
+    }
+    regularMemberMenu();
+}
+
 void TimeBankSystem::printRequestTableMember()
 {
 
-    std::cout << std::setw(10) << "RequestID" << std::setw(15) << "ListingID"
+    std::cout << std::setw(12) << "RequestID" << std::setw(15) << "ListingID"
               << std::setw(15) << "Requester" << std::setw(15) << "Receiver"
-              << std::setw(20) << "Timestamp" << std::setw(15) << "Status" << std::endl;
-    std::cout << std::setfill('-') << std::setw(90) << "" << std::setfill(' ') << std::endl;
+              << std::setw(25) << "Timestamp" << std::setw(15) << "Status" << std::endl;
+    std::cout << std::setfill('-') << std::setw(94) << "" << std::setfill(' ') << std::endl;
 
     for (const auto &request : this->currentMember->sentreceivedRequests)
     {
         if (request->getReceiverName() == (this->currentMember)->getUsername())
         {
-            std::cout << std::setw(10) << request->requestID
+            std::cout << std::setw(12) << request->requestID
                       << std::setw(15) << request->listingID
                       << std::setw(15) << request->requesterName
                       << std::setw(15) << request->receiverName
                       << std::setw(25) << request->requestTimeStamp.getFormattedTimestamp()
-                      << std::setw(10) << request->requestStatus << std::endl;
+                      << std::setw(15) << request->requestStatus << std::endl;
         }
     }
     cout << "\nPotential Hosts' Information: \n";
+
+    // Create a set to store processed usernames
+    std::unordered_set<std::string> processedUsernames;
 
     for (const auto &request : this->currentMember->sentreceivedRequests)
     {
         if (request->getReceiverName() == (this->currentMember)->getUsername())
         {
-            findMemberByUsername(request->getRequesterName()).showRestrictedMemberInfo();
+            // Check if the username has been processed
+            const std::string requesterName = request->getRequesterName();
+            if (processedUsernames.find(requesterName) == processedUsernames.end())
+            {
+                // Print information and mark as processed
+                findMemberByUsername(requesterName).showRestrictedMemberInfo();
+                processedUsernames.insert(requesterName);
+            }
         }
     }
 }
@@ -1550,53 +1666,66 @@ void TimeBankSystem::printOutgoingRequestTableMember()
 
 void TimeBankSystem::printOwnedListing()
 {
-    std::cout << std::setw(12) << "ListingID" << std::setw(12) << "SkillID"
-              << std::setw(7) << "Cost" << std::setw(15) << "MinHostRating"
-              << std::setw(7) << "State" << std::setw(15) << "Supporter"
-              << std::setw(15) << "Host" << std::setw(40) << "WorkingTimeSlot" << std::endl;
-    std::cout << std::setfill('-') << std::setw(123) << "" << std::setfill(' ') << std::endl;
-
-    for (auto &listing : this->skillListingList) // Assuming skillListings is a collection of SkillListing objects
+    if (this->currentMember->skillListings.size() == 0)
     {
-        if (listing.getSupporterName() == this->currentMember->getUsername())
-        {
-            std::string workingTime = listing.getWorkingTimeSlot().getFormattedPeriod(); // Assuming a method to get formatted time slot
+        cout << "You have not added any listings yet" << std::endl;
+    }
+    else
+    {
+        cout << "Here are your added listings:\n";
+        std::cout << std::setw(12) << "ListingID" << std::setw(12) << "SkillID"
+                  << std::setw(7) << "Cost" << std::setw(15) << "MinHostRating"
+                  << std::setw(7) << "State" << std::setw(15) << "Supporter"
+                  << std::setw(15) << "Host" << std::setw(50) << "WorkingTimeSlot" << std::endl;
+        std::cout << std::setfill('-') << std::setw(133) << "" << std::setfill(' ') << std::endl;
 
-            std::cout << std::setw(12) << listing.getListingID()
-                      << std::setw(12) << listing.getSkillID()
-                      << std::setw(7) << listing.calculateTotalCreds()
-                      << std::setw(15) << listing.getMinHostRatingScore()
-                      << std::setw(7) << listing.getListingState()
-                      << std::setw(15) << listing.getSupporterName()
-                      << std::setw(15) << listing.getHostName()
-                      << std::setw(40) << workingTime << std::endl;
+        for (const auto &listing : this->currentMember->skillListings) // Assuming skillListings is a collection of SkillListing objects
+        {
+            std::string workingTime = listing->getWorkingTimeSlot().getFormattedPeriod(); // Assuming a method to get formatted time slot
+
+            std::cout << std::setw(12) << listing->getListingID()
+                      << std::setw(12) << listing->getSkillID()
+                      << std::setw(7) << listing->calculateTotalCreds()
+                      << std::setw(15) << listing->getMinHostRatingScore()
+                      << std::setw(7) << listing->getListingState()
+                      << std::setw(15) << listing->getSupporterName()
+                      << std::setw(15) << listing->getHostName()
+                      << std::setw(50) << workingTime << std::endl;
         }
     }
-
-    listingMenu();
+    // listingMenu();
 }
 
 void TimeBankSystem::printOwnedSkill()
 {
-    std::cout << std::setw(12) << "SkillID" << std::setw(25) << "SkillName"
-              << std::setw(60) << "SkillDescription" << std::setw(20) << "SkillEfficiency"
-              << std::endl;
-    std::cout << std::setfill('-') << std::setw(117) << "" << std::setfill(' ') << std::endl;
-
-    for (const auto &skill : this->currentMember->skills) // Assuming skillListings is a collection of SkillListing objects
+    if (this->currentMember->skills.size() == 0)
     {
-        std::cout << std::setw(12) << skill->getSkillID()
-                  << std::setw(25) << skill->getSkillName()
-                  << std::setw(60) << skill->getDescription()
-                  << std::setw(20) << skill->getSkillEfficiency()
-                  << std::endl;
+        cout << "You have not added any skills yet" << std::endl;
     }
+    else
+    {
+        cout << "Here are your added skills:\n";
+        std::cout << std::setw(12) << "SkillID" << std::setw(25) << "SkillName"
+                  << std::setw(80) << "SkillDescription" << std::setw(20) << "SkillEfficiency"
+                  << std::endl;
+        std::cout << std::setfill('-') << std::setw(137) << "" << std::setfill(' ') << std::endl;
+
+        for (const auto &skill : this->currentMember->skills) // Assuming skillListings is a collection of SkillListing objects
+        {
+            std::cout << std::setw(12) << skill->getSkillID()
+                      << std::setw(25) << skill->getSkillName()
+                      << std::setw(80) << skill->getDescription()
+                      << std::setw(20) << skill->getSkillEfficiency()
+                      << std::endl;
+        }
+    }
+
     // skillMenu();
 }
 
 void TimeBankSystem::printListingTableMember()
 {
-    // print all listings on the market
+    // print all listings on the market, make sure the current member is not the supporter of the listing, and they are
     cout << "Here are available listings on the market:\n";
     if (this->skillListingList.size() == 0)
     {
@@ -1606,15 +1735,38 @@ void TimeBankSystem::printListingTableMember()
     {
         for (SkillListing &listing : this->skillListingList)
         {
-            if (listing.supporterName != this->currentMember->getUsername() && listing.listingState == 0)
+            if (listing.supporterName != this->currentMember->getUsername() && listing.listingState == 0 && listing.isEligibleToView(*currentMember))
             {
                 printSkillListingTable(listing);
+                cout << std::endl;
             }
-            cout << std::endl;
         }
     }
 
-    listingMenu();
+    char choice;
+    do
+    {
+        cout << "Do you want to book a listing? (Y/N): ";
+        cin >> choice;
+
+    } while (choice != 'Y' & choice != 'y' & choice != 'N' & choice != 'n');
+    fflush(stdin); // Clear input buffer
+    if (choice == 'Y' || choice == 'y')
+    {
+        if (promptAddRequest())
+        {
+            addRequestFromPrompt();
+        }
+        else
+        {
+            // cout << "Request failed! Please try again.\n";
+            listingMenu();
+        }
+    }
+    else if (choice == 'N' || choice == 'n')
+    {
+        listingMenu();
+    }
 }
 
 void TimeBankSystem::printSkillListingTable(SkillListing &listing)
@@ -1627,16 +1779,16 @@ void TimeBankSystem::printSkillListingTable(SkillListing &listing)
     string city = (supporter.city == 24) ? "Hanoi" : "Saigon";
     int secs = listing.workingTimeSlot.durationInSeconds();
     string distance = (supporter.calculateDistance(*currentMember) > 10000) ? "~" : std::to_string(supporter.calculateDistance(*currentMember));
-    string minHostRatingScore = (listing.minHostRatingScore == -1) ? "N/A" : std::to_string(listing.minHostRatingScore);
+    string minHostRatingScore = (listing.minHostRatingScore == -1) ? "Any" : std::to_string(listing.minHostRatingScore);
     string listingStatus = (listing.listingState == 0) ? "Available" : (listing.listingState == 1) ? "Hidden"
                                                                    : (listing.listingState == 2)   ? "Booked"
                                                                    : (listing.listingState == 3)   ? "Ongoing"
                                                                                                    : "Completed";
     // Draw the top line of the table
     drawTableLine(leftColumnWidth + rightColumnWidth + 3);
-    const std::string colorCode = "\e[1;93m"; // Yellow color code
-    const std::string colorCode2 = "\e[38;5;213m";
-    const std::string colorReset = "\033[0m"; // Reset color code
+    const std::string colorCode = "\e[1;93m";      // Yellow color code
+    const std::string colorCode2 = "\e[38;5;213m"; // Pink color code
+    const std::string colorReset = "\033[0m";      // Reset color code
     int colorCodeLength = colorCode.length() + colorReset.length();
     int colorCodeLength2 = colorCode2.length() + colorReset.length();
 
@@ -1893,6 +2045,28 @@ void TimeBankSystem::automaticallyUpdate()
             listing.setListingState(1);
         }
     }
+    // Automatically update the available listing state to hidden when the the supporter timeslot is not available
+    // Loop through the supporter's skill listings, check for booked and ongoing ones
+    // If the working timeslot of any of those listings is overlapped with the currently available listing's working timeslot, hide it
+    for (SkillListing &listing : this->skillListingList)
+    {
+        if (listing.getListingState() == 0)
+        {
+            for (SkillListing &listing2 : this->skillListingList)
+            {
+                if (listing2.getListingState() == 2 || listing2.getListingState() == 3)
+                {
+                    if (listing.getSupporterName() == listing2.getSupporterName())
+                    {
+                        if (listing.getWorkingTimeSlot().isOverlappedWith(listing2.getWorkingTimeSlot()))
+                        {
+                            listing.setListingState(1);
+                        }
+                    }
+                }
+            }
+        }
+    }
     // Automatically update the booked listing state to ongoing when the start date is passed
     for (SkillListing &listing : this->skillListingList)
     {
@@ -1908,7 +2082,7 @@ void TimeBankSystem::automaticallyUpdate()
         {
             listing.setListingState(4);
             // Automatically increment the supporter's credit points when the listing is completed
-            int creds = listing.calculateTotalCreds();
+            float creds = listing.calculateTotalCreds();
             // cout << "Supporter earned " << creds << " credits for completing this listing!\n"; // Debugging purpose
             findMemberByUsername(listing.getSupporterName()).creditPoints += listing.calculateTotalCreds();
             // Automatically decrement the host's credit points when the listing is completed
@@ -1916,7 +2090,7 @@ void TimeBankSystem::automaticallyUpdate()
         }
     }
 
-    // Automatically update the pending request state to rejected when the start date is passed1
+    // Automatically update the pending request state to rejected when the start date is passed
     for (Request &request : this->requestList)
     {
         if (request.getRequestStatus() == "Pending" && findListingByID(request.getListingID()).getWorkingTimeSlot().getStartDate().isBeforeStartDate(DateTime()))
@@ -1938,6 +2112,17 @@ void TimeBankSystem::automaticallyUpdate()
         if (request.getRequestStatus() == "Pending" && (findListingByID(request.getListingID()).getListingState() == 2 || findListingByID(request.getListingID()).getListingState() == 3))
         {
             request.setRequestStatus("Rejected");
+        }
+    }
+    // Automatically update the pending request state to rejected when one member blocks another member or vice versa
+    for (Request &request : this->requestList)
+    {
+        if (request.getRequestStatus() == "Pending")
+        {
+            if (findMemberByUsername(request.getRequesterName()).isBlockedBy(request.getReceiverName()) || findMemberByUsername(request.getReceiverName()).isBlockedBy(request.getRequesterName()))
+            {
+                request.setRequestStatus("Rejected");
+            }
         }
     }
 }

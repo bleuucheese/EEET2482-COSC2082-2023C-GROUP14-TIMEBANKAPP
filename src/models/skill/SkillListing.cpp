@@ -52,6 +52,7 @@ bool SkillListing::hideListing()
     }
     else
     {
+        cout <<"This listing is not available to hide or already hidden.\n";
         return false;
     }
 }
@@ -66,6 +67,7 @@ bool SkillListing::unhideListing()
     }
     else
     {
+        cout << "This listing is not available to unhide or already unhidden.\n";
         return false;
     }
 }

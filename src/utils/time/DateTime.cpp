@@ -106,8 +106,7 @@ DateTime::DateTime(const std::string &timestamp)
   if (!isValidFormat(timestamp))
   {
     throw std::invalid_argument("Invalid date format");
-  }
-  if (!isValidDate())
+  } else if (!isValidDate())
   {
     throw std::invalid_argument("Invalid date");
   }
@@ -138,14 +137,3 @@ bool DateTime::isStartDate(const DateTime &other) const
 {
   return toTimeT() == other.toTimeT();
 }
-
-// int main()
-// {
-//   DateTime dt;
-//   cout << dt.getFormattedTimestamp() << "\n";
-//   DateTime dt1("12/12/2023 23:59:59");
-//   cout << dt1.getFormattedTimestamp();
-//   dt.addTimePeriod(0, 36, 0, 0);
-//   cout << dt.getFormattedTimestamp() << "\n";
-//   return 0;
-// }

@@ -467,17 +467,3 @@ void FileHandler::saveRequests(const std::string &filename, const std::vector<Re
              << request.getRequestStatus() << std::endl;
     }
 }
-
-// int main()
-// {
-//     FileHandler fileHandler;
-//     std::vector<RegularMember> memberList = fileHandler.loadUsers("../../databases/users.csv");
-//     for (RegularMember &member : memberList)
-//     {
-//         member.showInfo();
-//     }
-//     RegularMember newMember("test", "test", "test", "test", "test", "test", Hanoi, 0, 0, "test", 0, 20, 0, 0, 0);
-//     memberList.push_back(newMember);
-//     fileHandler.saveUsers("../../databases/users.csv", memberList);
-//     return 0;
-// }

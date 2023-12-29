@@ -29,10 +29,3 @@ void Skill::showInfo()
     cout << "Description: " << this->description << "\n";
     cout << "Skill Efficiency: " << this->skillEfficiency << "\n";
 }
-
-// int main()
-// {
-//     Skill skill("Cooking", "Cooking food", "5");
-//     skill.showInfo();
-//     return 0;
-// }

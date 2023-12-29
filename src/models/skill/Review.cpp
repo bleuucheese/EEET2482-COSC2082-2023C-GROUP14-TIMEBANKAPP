@@ -65,11 +65,3 @@ void Review::printReview()
     cout << "Description: " << this->comments << "\n";
     cout << std::endl;
 }
-
-// int main()
-// {
-//     Review review("L0000001", 5, 4, "Smart supporter", "user1", "user2");
-//     Review review2("L0000001", 5, "Generous host", "user2", "user1");
-//     review.printReview();
-//     return 0;
-// }

@@ -62,19 +62,3 @@ std::string Period::getFormattedPeriod() const
 {
     return startDate.getFormattedTimestamp() + " - " + endDate.getFormattedTimestamp();
 }
-// int main()
-// {
-//     DateTime start("21/12/2023 23:49:00");
-//     DateTime end("20/01/2024 23:59:00");
-//     Period period(start, end);
-
-//     Period period2(DateTime("20/01/2024 23:59:01"), DateTime("21/01/2024 23:59:00"));
-//     std::cout << Period::convertSecToDuration(period.durationInSeconds()) << std::endl;
-//     std::cout << period.isOverlappedWith(period2) << std::endl;
-
-//     Period period1;
-//     std::cout << period1.getStartDate().getFormattedTimestamp() << std::endl;
-//     std::cout << period1.getEndDate().getFormattedTimestamp() << std::endl;
-//     std::cout << Period::convertSecToDuration(period1.durationInSeconds()) << std::endl;
-//     return 0;
-// }

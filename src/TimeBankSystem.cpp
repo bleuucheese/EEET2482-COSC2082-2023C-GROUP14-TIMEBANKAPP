@@ -40,7 +40,7 @@ void TimeBankSystem::welcomeScreen()
     std::cout << " Chau Chan Thien (s3975010)                      \n";
     std::cout << " Chau Chan Bang (s3975015)                       \n";
     std::cout << " Tran Manon Ophelie (s3968993)                   \n";
-    std::cout << "\033[1;34m========================================================================================\033[0m \n";
+    std::cout << "\033[\e[38;5;16m----------------------------------------------------------------------------------------\033[0m\n";
     std::cout << "Note: Currently supporting hosts and supporters residing in \033[1;31mHanoi\033[0m and \033[1;31mSaigon\033[0m only.                    \n";
     std::cout << "\033[\e[38;5;16m----------------------------------------------------------------------------------------\033[0m\n";
 }
@@ -1593,7 +1593,7 @@ void TimeBankSystem::promptUnblockMember()
 
 void TimeBankSystem::printRequestTableMember()
 {
-
+    // Check if there is any incoming request
     std::cout << std::setw(12) << "RequestID" << std::setw(15) << "ListingID"
               << std::setw(15) << "Requester" << std::setw(15) << "Receiver"
               << std::setw(25) << "Timestamp" << std::setw(15) << "Status" << std::endl;

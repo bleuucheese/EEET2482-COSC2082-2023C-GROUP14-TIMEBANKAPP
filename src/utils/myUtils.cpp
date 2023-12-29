@@ -472,8 +472,7 @@ bool deleteLine(const std::string &filename, int lineNumber)
     return true;
 }
 
-void printMenuLabel(const std::string &labelName)
-{
+void printMenuLabel(const std::string &labelName) {
     const int totalLength = 88;
 
     // 10 accounts for "=====" on both sides
@@ -482,15 +481,14 @@ void printMenuLabel(const std::string &labelName)
     // Adjust the number of '=' characters if equalsCount is odd
     int leftEqualsCount = equalsCount / 2;
     int rightEqualsCount = equalsCount / 2;
-    if (equalsCount % 2 != 0)
-    {
+    if (equalsCount % 2 != 0) {
         rightEqualsCount++;
     }
 
-    // Print the label with escape color code
-    std::cout << "\e[38;5;229m"
-              << std::string(leftEqualsCount, '=') << "====="
-              << labelName << "====="
-              << std::string(rightEqualsCount, '=')
-              << "\e[0m" << std::endl;
+    // Print the label with escape color code for bold and specific color
+    std::cout << "\e[38;5;24m" // Navy Color for '=' parts
+              << std::string(leftEqualsCount, '=') << "=====\e[1m\e[38;5;208m" // Bold and orang colored label start
+              << labelName << "\e[0m\e[38;5;24m=====" // Bold and orang colored label end
+              << "" << std::string(rightEqualsCount, '=')
+              << "\e[0m" << std::endl; // Reset to default formatting
 }

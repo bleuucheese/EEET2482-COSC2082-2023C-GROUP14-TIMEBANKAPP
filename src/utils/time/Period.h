@@ -27,7 +27,7 @@ public:
     // Method to compare two periods
     bool isSameAs(const Period &other) const;
 
-    // Add more methods as required
+    // Convert seconds to duration format (e.g. 1d 2h 3m 4s)
     static std::string convertSecToDuration(long n);
 
     std::string getFormattedPeriod() const;   

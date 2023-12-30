@@ -15,6 +15,7 @@ class Skill;        // Forward declaration to avoid circular dependency
 class SkillListing; // Forward declaration to avoid circular dependency
 class Request;      // Forward declaration to avoid circular dependency
 class Review;       // Forward declaration to avoid circular dependency
+class Period;       // Forward declaration to avoid circular dependency
 
 enum allowedCities
 {
@@ -45,6 +46,7 @@ private:
     vector<Review *> receivedSupporterReviews = {};
     vector<Request *> sentreceivedRequests = {};
     vector<RegularMember *> blockedMembers = {};
+    vector<Period *> timeTable = {};
 
 public:
     // Constructor
@@ -59,7 +61,8 @@ public:
     vector<Skill *> getSkills() { return skills; };
     vector<SkillListing *> getSkillListings() { return skillListings; };
     vector<RegularMember *> getBlockedMembers() { return blockedMembers; };
-
+    vector<Period *> getTimeTable() { return timeTable; };
+    
     void setCreditPoints(float creditPoints) { this->creditPoints = creditPoints; };
     void setPhoneNumber(string phoneNumber) { this->phoneNumber = phoneNumber; };
     void setEmail(string email) { this->email = email; };
@@ -77,6 +80,7 @@ public:
     // Member functions
     void printReviews();
     void printSkills();
+    void printTimeTable();
     float getSkillRatingScore();
     float getSupporterRatingScore();
     float getHostRatingScore();

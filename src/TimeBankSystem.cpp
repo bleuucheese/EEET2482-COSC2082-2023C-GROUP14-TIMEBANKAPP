@@ -167,7 +167,7 @@ void TimeBankSystem::adminMenu()
         break;
     case 4:
         // method to view sales figures and statistics
-        cout << "==========SALES FIGURES AND STATISTICS==========\n";
+        cout << "SALES FIGURES AND STATISTICS\n";
         cout << "Revenue: " << admin.revenue << "$\n";
         cout << "Number of members: " << memberList.size() << "\n";
         cout << "Number of skills: " << skillList.size() << "\n";
@@ -436,7 +436,7 @@ void TimeBankSystem::promptRegister()
     float skillRatingScore = 0;
     float supporterRatingScore = 0;
     float hostRatingScore = 0;
-    int creditPoints = 20; // Default value, pay to system 20$ to get 20 credit points
+    float creditPoints = 20; // Default value, pay to system 20$ to get 20 credit points
     do
     {
         username = getValidUsername();
@@ -492,9 +492,10 @@ void TimeBankSystem::profileMenu()
     cout << "3. Sell Credits\n";
     cout << "4. Block a Member\n";
     cout << "5. Unblock a Member\n";
-    cout << "6. Back\n";
+    cout << "6. View Timetable\n";
+    cout << "7. Back\n";
 
-    switch (promptAndGetChoice(1, 6))
+    switch (promptAndGetChoice(1, 7))
     {
     case 1:
         viewProfile(); // can view blocked members' usernames
@@ -513,6 +514,9 @@ void TimeBankSystem::profileMenu()
         promptUnblockMember();
         break;
     case 6:
+        viewTimeTable();
+        break;
+    case 7:
         regularMemberMenu();
         break;
     }
@@ -720,16 +724,22 @@ void TimeBankSystem::viewProfile()
         }
     }*/
 
-    cout << "=============YOUR INFORMATION=============\n";
+    cout << "YOUR INFORMATION\n";
     (this->currentMember)->showInfo();
     profileMenu();
 }
 
 void TimeBankSystem::viewReviews()
 {
-    cout << "=============YOUR REVIEWS=============\n";
+    cout << "YOUR REVIEWS\n";
     this->currentMember->printReviews();
     reviewMenu();
+}
+
+void TimeBankSystem::viewTimeTable()
+{
+    this->currentMember->printTimeTable();
+    profileMenu();
 }
 
 void TimeBankSystem::promptAdminChangePassword()
@@ -1288,7 +1298,7 @@ void TimeBankSystem::promptSearchMember()
     }
     else
     {
-        cout << "=============SEARCHED MEMBER INFORMATION=============\n";
+        cout << "SEARCHED MEMBER INFORMATION\n";
         searchedMember.showRestrictedMemberInfo();
         regularMemberMenu();
     }
@@ -1333,8 +1343,7 @@ void TimeBankSystem::promptSearchListing()
     {
     case 1:
         endDay = DateTime(startDay).addTimePeriod(0, 6, 0, 0).getFormattedTimestamp();
-        cout << startDay << std::endl;
-        cout << endDay << std::endl;
+        cout << "Estimated end date: " << endDay << std::endl;
         timeSlot1 = Period(DateTime(startDay), DateTime(endDay));
         if (city == "Hanoi")
         {
@@ -1359,7 +1368,7 @@ void TimeBankSystem::promptSearchListing()
         break;
     case 2:
         endDay = DateTime(startDay).addTimePeriod(1, 0, 0, 0).getFormattedTimestamp();
-        cout << endDay << std::endl;
+        cout << "Estimated end date: " << endDay << std::endl;
         timeSlot2 = Period(DateTime(startDay), DateTime(endDay));
         if (city == "Hanoi")
         {
@@ -1384,7 +1393,7 @@ void TimeBankSystem::promptSearchListing()
         break;
     case 3:
         endDay = DateTime(startDay).addTimePeriod(7, 0, 0, 0).getFormattedTimestamp();
-        cout << endDay << std::endl;
+        cout << "Estimated end date: " << endDay << std::endl;
         timeSlot3 = Period(DateTime(startDay), DateTime(endDay));
 
         if (city == "Hanoi")
@@ -1409,6 +1418,7 @@ void TimeBankSystem::promptSearchListing()
         }
         break;
     case 4:
+        cout << "Estimated end date: ~" << std::endl;
         if (city == "Hanoi")
         {
             for (SkillListing &listing : hanoiListings)
@@ -1438,7 +1448,7 @@ void TimeBankSystem::promptSearchListing()
 
 void TimeBankSystem::promptTopUp()
 {
-    int amount = getValidInt("Enter amount of credit to top up: ");
+    float amount = getValidFloat("Enter amount of credit to top up: ");
     // Authorize the payment by get the user to enter their password to confirm
     string password;
     do
@@ -1467,7 +1477,7 @@ void TimeBankSystem::promptTopUp()
 void TimeBankSystem::promptSellCredits()
 {
     // This will transfer 90% value of the amount of credits to the member's bank account from the system's revenue
-    int amount = getValidInt("Enter amount of credit to sell: ");
+    float amount = getValidFloat("Enter amount of credit to sell: ");
     if (currentMember->sellCredits(amount))
     {
         cout << "Sell credits successful! Added $" << amount * 0.9 << " to your account.\n";
@@ -1577,7 +1587,6 @@ void TimeBankSystem::promptUnblockMember()
         if (deleteLine("./databases/blocklist.csv", lineCount))
         {
             cout << "Unblock successful!\n";
-
         }
         else
         {
@@ -1957,6 +1966,7 @@ void TimeBankSystem::extractMemberData()
     (this->currentMember)->blockedMembers.clear();
     (this->currentMember)->receivedHostReviews.clear();
     (this->currentMember)->receivedSupporterReviews.clear();
+    (this->currentMember)->timeTable.clear();
 
     // Extract data from skillList, skillListingList, requestList, reviewList to current user's skillListings, requests, reviews vectors of pointers
     /*skill*/
@@ -2033,6 +2043,33 @@ void TimeBankSystem::extractMemberData()
             }
         }
     }
+    // Get the current member's timetable, check 2 and 3 state of the listing of that user and push back the time slot to the timetable
+    for (SkillListing &listing : this->skillListingList)
+    {
+        if (listing.getSupporterName() == (this->currentMember)->getUsername())
+        {
+            if (listing.getListingState() == 2 || listing.getListingState() == 3)
+            {
+                (this->currentMember)->timeTable.push_back(&(listing.workingTimeSlot));
+            }
+        }
+    }
+
+    // Automatically update the pending request state to rejected when when the supporter timetable conflicts with the requested listing time slot.
+    for (Request &request : this->requestList)
+    {
+        if (request.getRequestStatus() == "Pending" && request.receiverName == (this->currentMember)->getUsername())
+        {
+
+            for (Period *slot : this->currentMember->timeTable)
+            {
+                if (slot->isOverlappedWith(findListingByID(request.getListingID()).getWorkingTimeSlot()))
+                {
+                    request.setRequestStatus("Rejected");
+                }
+            }
+        }
+    }
 }
 
 void TimeBankSystem::automaticallyUpdate()
@@ -2045,9 +2082,9 @@ void TimeBankSystem::automaticallyUpdate()
             listing.setListingState(1);
         }
     }
-    // Automatically update the available listing state to hidden when the the supporter timeslot is not available
+    // Automatically update the available listing state to hidden when the the supporter time slot is not available
     // Loop through the supporter's skill listings, check for booked and ongoing ones
-    // If the working timeslot of any of those listings is overlapped with the currently available listing's working timeslot, hide it
+    // If the working timeslot of any of those listings overlaps with the currently available listing's working time slot, hide it
     for (SkillListing &listing : this->skillListingList)
     {
         if (listing.getListingState() == 0)

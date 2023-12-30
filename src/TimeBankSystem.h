@@ -52,9 +52,6 @@ public:
     bool isHostReviewGiven(string listingID);
     bool isSupporterReviewGiven(string listingID);
 
-    void viewProfile();
-    void viewReviews();
-
     bool login(const std::string &username, const std::string &password);
     bool isUniqueUsername(string username);
 
@@ -89,9 +86,8 @@ public:
     void addReview(Review &review);
 
     // Functions for dipslay objects in the system's vectors in pretty tabular format, used by admin or guests based on mode
-    void printMemberTable(int mode);
-    void printSkillTable();
-    void printListingTable(int mode);
+    void printMemberTable(int mode);  // mode = 1 for admin, mode = 2 for guest
+    void printListingTable(int mode); // mode = 1 for admin, mode = 2 for guest
     void printSkillListingTable(SkillListing &listing);
     void printListingNoReviews(SkillListing &listing);
 
@@ -101,6 +97,9 @@ public:
     void printListingTableMember(); // print other supporters listing
     void printOwnedListing();
     void printOwnedSkill();
+    void viewProfile();
+    void viewReviews();
+    void viewTimeTable();
 
     // Functions for searching objects in the system's vectors
     RegularMember &findMemberByUsername(string username);

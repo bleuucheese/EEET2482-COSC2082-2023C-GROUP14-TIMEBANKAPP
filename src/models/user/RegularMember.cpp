@@ -102,6 +102,24 @@ void RegularMember::printSkills()
     }
 }
 
+void RegularMember::printTimeTable()
+{
+    if (this->timeTable.size() == 0)
+    {
+        cout << "You have not added any time slots yet!\n";
+        return;
+    }
+    else
+    {
+        cout << "Occupied time slots:\n";
+        for (int i = 0; i < this->timeTable.size(); i++)
+        {
+            cout << (this->timeTable[i])->getFormattedPeriod();
+            cout << "\n";
+        }
+    }
+}
+
 float RegularMember::getSkillRatingScore()
 {
 

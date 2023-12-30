@@ -52,7 +52,7 @@ bool SkillListing::hideListing()
     }
     else
     {
-        cout <<"This listing is not available to hide or already hidden.\n";
+        cout << "This listing is not available to hide or already hidden.\n";
         return false;
     }
 }
@@ -134,8 +134,8 @@ bool SkillListing::isEligibleToBook(RegularMember &requester)
                                 return false;
                             }
                         }
-                        return true;
                     }
+                    return true;
                 }
                 else
                 {
@@ -186,8 +186,8 @@ bool SkillListing::isEligibleToView(RegularMember &searcher)
                                 return false;
                             }
                         }
-                        return true;
                     }
+                    return true;
                 }
                 else
                 {

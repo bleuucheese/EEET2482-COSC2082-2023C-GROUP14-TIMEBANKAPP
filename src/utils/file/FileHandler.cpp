@@ -19,14 +19,7 @@ using std::cout;
 using std::string;
 using std::vector;
 
-FileHandler::FileHandler()
-{
-    userFile = "../../databases/users.csv";
-    skillFile = "src/databases/skills.csv";
-    listingFile = "src/databases/listings.csv";
-    reviewFile = "src/databases/reviews.csv";
-    requestFile = "src/databases/requests.csv";
-}
+FileHandler::FileHandler() {}
 
 // Function to split a string into tokens based on a delimiter
 std::vector<std::string> FileHandler::splitString(const std::string &input, char delimiter)
@@ -66,7 +59,7 @@ RegularMember FileHandler::parseCSVLine(const std::string &csvLine)
     double longitude = std::stod(fields[10]);
     std::string creditCardNumber = fields[11];
     float balance = std::stof(fields[12]);
-    float creditPoints = std::stoi(fields[13]);
+    float creditPoints = std::stof(fields[13]);
     float skillRatingScore = std::stof(fields[14]);
     float supporterRatingScore = std::stof(fields[15]);
     float hostRatingScore = std::stof(fields[16]);
@@ -84,6 +77,8 @@ RegularMember FileHandler::parseCSVLine(const std::string &csvLine)
         {
             return RegularMember(username, password, fullName, phoneNumber, email, homeAddress, Saigon, latitude, longitude, creditCardNumber, balance, creditPoints, skillRatingScore, supporterRatingScore, hostRatingScore);
         }
+    } else {
+        throw std::runtime_error("Invalid role: " + role);
     }
 }
 

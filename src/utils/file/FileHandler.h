@@ -21,14 +21,6 @@ using std::string;
 
 class FileHandler
 {
-
-private:
-    string userFile;
-    string skillFile;
-    string listingFile;
-    string reviewFile;
-    string requestFile;
-
 public:
     FileHandler();
     std::vector<std::string> splitString(const std::string &input, char delimiter);

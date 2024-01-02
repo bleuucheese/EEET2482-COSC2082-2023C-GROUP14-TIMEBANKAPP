@@ -1,3 +1,14 @@
+/*
+  RMIT University Vietnam
+  Course: EEET2482/COSC2082 Advanced Programming Techniques
+  Semester: 2023-3
+  Assignment: Final Group Project
+  Author: Trinh Nguyen Ha (s3981134)
+  Compiler used: g++ (MinGW.org GCC-6.3.0-1) 6.3.0
+  Created date: 23/12/2023
+  Acknowledgement: https://stackoverflow.com/questions/70380743/deleting-a-line-in-a-txt-file-without-using-another-file-or-array-in-c
+*/
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -77,7 +88,9 @@ RegularMember FileHandler::parseCSVLine(const std::string &csvLine)
         {
             return RegularMember(username, password, fullName, phoneNumber, email, homeAddress, Saigon, latitude, longitude, creditCardNumber, balance, creditPoints, skillRatingScore, supporterRatingScore, hostRatingScore);
         }
-    } else {
+    }
+    else
+    {
         throw std::runtime_error("Invalid role: " + role);
     }
 }

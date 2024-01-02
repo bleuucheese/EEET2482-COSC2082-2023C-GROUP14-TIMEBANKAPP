@@ -1,3 +1,16 @@
+/*
+  RMIT University Vietnam
+  Course: EEET2482/COSC2082 Advanced Programming Techniques
+  Semester: 2023-3
+  Assignment: Final Group Project
+  Author: Trinh Nguyen Ha (s3981134)
+  Compiler used: g++ (MinGW.org GCC-6.3.0-1) 6.3.0
+  Created date: 22/12/2023
+  Acknowledgement:
+  https://patorjk.com/software/taag/#p=display&f=Big%20Money-nw&t=TIME%20BANK
+  https://gist.github.com/JBlond/2fea43a3049b38287e5e9cefc87b2124
+*/
+
 #include <iostream>
 #include <string>
 #include <unordered_set>
@@ -548,7 +561,7 @@ void TimeBankSystem::skillMenu()
 void TimeBankSystem::listingMenu()
 {
     printMenuLabel("LISTINGS MENU");
-    cout << "1. View Your Listed Skills\n";
+    cout << "1. View Your Listed Services\n";
     cout << "2. View Listings On Market\n";
     cout << "3. Add Listing\n";
     cout << "4. Hide Listing\n";
@@ -1139,18 +1152,41 @@ bool TimeBankSystem::promptRespondRequest()
 
 void TimeBankSystem::promptHostReview()
 {
+    // Print a table of completed listings that wasn't given a host review yet
+    cout << "UNREVIEWED LISTINGS: \n";
+    for (SkillListing &listing : this->skillListingList)
+    {
+        if (listing.listingState == 4 && listing.getSupporterName() == (this->currentMember)->getUsername())
+        {
+            if (!isHostReviewGiven(listing.listingID))
+            {
+                printSkillListingTable(listing);
+            }
+        }
+    }
 
     std::string listingID, reviewID, reviewContent, reviewerName, revieweeName = "";
+    int wrongAttempts = 0; // Counter for wrong attempts
+    // Exit the loop after 2 wrong attempts
     do
     {
         listingID = getValidStringInput("Enter listingID to begin making a review: ");
         if (!isListingIDExistAndOwned(listingID))
         {
             cout << "ListingID not found or not one of your added listings! Please try again.\n";
+            wrongAttempts++;
         }
         else if (isHostReviewGiven(listingID))
         {
             cout << "You have already given a host review for this listing! Please try again.\n";
+            wrongAttempts++;
+        }
+
+        if (wrongAttempts == 2) // Check if wrong attempts have reached 2
+        {
+            cout << "Maximum attempts reached. Returning to the menu.\n";
+            regularMemberMenu();
+            return; // Exit the method
         }
 
     } while (!isListingIDExistAndOwned(listingID) || isHostReviewGiven(listingID));
@@ -1204,17 +1240,40 @@ void TimeBankSystem::promptHostReview()
 void TimeBankSystem::promptSupporterReview()
 {
     // Cannot give supporter review if you are the supporter of the listing
+    // Print a table of completed listings that wasn't given a host review yet
+    cout << "UNREVIEWED LISTINGS: \n";
+    for (SkillListing &listing : this->skillListingList)
+    {
+        if (listing.listingState == 4 && listing.getHostName() == (this->currentMember)->getUsername())
+        {
+            if (!isSupporterReviewGiven(listing.listingID))
+            {
+                printSkillListingTable(listing);
+            }
+        }
+    }
     std::string listingID, reviewID, reviewContent, reviewerName, revieweeName = "";
+    int wrongAttempts = 0; // Counter for wrong attempts
+    // Exit the loop after 2 wrong attempts
     do
     {
         listingID = getValidStringInput("Enter listingID to begin making a review: ");
         if (!isListingIDExistAndNotOwned(listingID))
         {
             cout << "ListingID not found or is one of your added listings! Please try again.\n";
+            wrongAttempts++;
         }
         else if (isSupporterReviewGiven(listingID))
         {
             cout << "You have already given a review for this listing! Please try again.\n";
+            wrongAttempts++;
+        }
+
+        if (wrongAttempts == 2) // Check if wrong attempts have reached 2
+        {
+            cout << "Maximum attempts reached. Returning to the menu.\n";
+            regularMemberMenu();
+            return; // Exit the method
         }
 
     } while (!isListingIDExistAndNotOwned(listingID) || isSupporterReviewGiven(listingID));

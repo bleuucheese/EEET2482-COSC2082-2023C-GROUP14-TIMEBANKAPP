@@ -1,3 +1,14 @@
+/*
+  RMIT University Vietnam
+  Course: EEET2482/COSC2082 Advanced Programming Techniques
+  Semester: 2023-3
+  Assignment: Final Group Project
+  Author: Trinh Nguyen Ha (s3981134)
+  Compiler used: g++ (MinGW.org GCC-6.3.0-1) 6.3.0
+  Created date: 22/12/2023
+  Acknowledgement: https://stackoverflow.com/questions/1650715/is-there-a-standard-date-time-class-in-c
+*/
+
 #include <iostream>
 #include <time.h>
 #include <ctime>
@@ -106,7 +117,8 @@ DateTime::DateTime(const std::string &timestamp)
   if (!isValidFormat(timestamp))
   {
     throw std::invalid_argument("Invalid date format");
-  } else if (!isValidDate())
+  }
+  else if (!isValidDate())
   {
     throw std::invalid_argument("Invalid date");
   }

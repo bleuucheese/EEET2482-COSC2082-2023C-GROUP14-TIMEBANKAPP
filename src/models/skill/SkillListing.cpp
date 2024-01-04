@@ -34,10 +34,10 @@ SkillListing::SkillListing(string listingID, string skillID, int consumedCreds, 
 void SkillListing::displaySkillListing()
 {
     cout << "Listing ID: " << this->listingID << "\n";
-    cout << "Skill Perform: " << this->skillID << "\n";
+    // cout << "Skill Perform: " << this->skillID << "\n";
     cout << "Cost: " << this->consumedCredsPerHour << "\n";
-    cout << "Minimum Host Rating Score: " << this->minHostRatingScore << "\n";
-    cout << "Listing State: " << this->listingState << "\n";
+    // cout << "Minimum Host Rating Score: " << this->minHostRatingScore << "\n";
+    // cout << "Listing State: " << this->listingState << "\n";
     cout << "Owner: " << this->supporterName << "\n";
     cout << "Host: " << this->hostName << "\n";
     cout << "Working Time Slot: " << this->workingTimeSlot.getFormattedPeriod() << "\n";

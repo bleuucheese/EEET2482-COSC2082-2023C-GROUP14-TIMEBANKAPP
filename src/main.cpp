@@ -50,6 +50,7 @@ int main()
     sys.automaticallyUpdate();
     sys.welcomeScreen();
     sys.systemMenu();
+    sys.updateRatings();
     sys.saveData();
     sys.clearData();
 

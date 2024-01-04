@@ -445,7 +445,7 @@ void TimeBankSystem::promptRegister()
 {
     std::string username, password, fullName, phoneNumber, email, homeAddress, creditCardNumber, city;
     double latitude, longitude;
-    float balance = 400; // Assume member has 400$ in their bank account when they type their credit card number
+    float balance = 1000; // Assume member has 1000$ in their bank account when they type their credit card number
     float skillRatingScore = 0;
     float supporterRatingScore = 0;
     float hostRatingScore = 0;
@@ -913,7 +913,25 @@ void TimeBankSystem::promptAddListing()
     std::string supporterName = (this->currentMember)->getUsername();
     std::string hostName = ""; // Host name is empty when listing is created, will be updated when the listing is booked by that host
     startDate = getValidTimestamp("Enter start date in DD/MM/YYYY HH:MM:SS format: ");
+
+    // Improve algorithm to make sure that the start date is after today's date
+    DateTime checkStartDate(startDate);
+    while (!DateTime().isBeforeStartDate(checkStartDate))
+    {
+        cout << "Start date cannot be before today's date! Please try again.\n";
+        startDate = getValidTimestamp("Enter start date in DD/MM/YYYY HH:MM:SS format: ");
+        checkStartDate = DateTime(startDate);
+    }
+
+    // Improve algorithm to make sure that the end date is after start date
     endDate = getValidTimestamp("Enter end date in DD/MM/YYYY HH:MM:SS format: ");
+    DateTime checkEndDate(endDate);
+    while (!checkStartDate.isBeforeStartDate(checkEndDate))
+    {
+        cout << "End date cannot be before start date! Please try again.\n";
+        endDate = getValidTimestamp("Enter end date in DD/MM/YYYY HH:MM:SS format: ");
+        checkEndDate = DateTime(endDate);
+    }
     workingTimeSlot = Period(DateTime(startDate), DateTime(endDate));
     SkillListing newListing(listingID, skillID, consumedCredsPerHour, minHostRatingScore, listingState, supporterName, hostName, workingTimeSlot);
     addListing(newListing);
@@ -1086,6 +1104,11 @@ void TimeBankSystem::respondRequestFromPrompt(char choice)
         findRequestByID(requestID).setRequestStatus("Accepted");
         findListingByID(findRequestByID(requestID).getListingID()).setListingState(2); // Set to book
         findListingByID(findRequestByID(requestID).getListingID()).setHostName(findRequestByID(requestID).getRequesterName());
+        // Add timeslot to occupied timetable
+        DateTime date1(findListingByID(findRequestByID(requestID).getListingID()).workingTimeSlot.getStartDate());
+        DateTime date2(findListingByID(findRequestByID(requestID).getListingID()).workingTimeSlot.getEndDate());
+        Period period(date1, date2);
+        this->currentMember->timeTable.push_back(&period);
         cout << "Request accepted successfully!\n";
     }
     else if (choice == 'R')
@@ -1100,6 +1123,8 @@ bool TimeBankSystem::promptRespondRequest()
 {
     std::string requestID;
     bool isValidRequest;
+    int wrongAttempts = 0; // Counter for wrong attempts
+
     do
     {
         requestID = getValidStringInput("Enter requestID to check: ");
@@ -1107,7 +1132,14 @@ bool TimeBankSystem::promptRespondRequest()
 
         if (!isValidRequest)
         {
+            wrongAttempts++; // Increment the wrong attempts
             cout << "RequestID not found or not one of your incoming requests! Please try again.\n";
+
+            if (wrongAttempts >= 2)
+            {
+                cout << "You've reached the maximum number of wrong attempts. Exiting...\n";
+                return false;
+            }
         }
     } while (!isValidRequest);
 
@@ -1129,6 +1161,13 @@ bool TimeBankSystem::promptRespondRequest()
     else if (findRequestByID(requestID).getRequestStatus() == "Rejected")
     {
         cout << "You cannot respond to this request because it is already rejected!\n";
+        return false;
+    }
+
+    // Check if the listingID has already been booked
+    if (findListingByID(findRequestByID(requestID).listingID).isListingBooked())
+    {
+        cout << "You cannot respond to this request because the listingID is not available anymore.\n";
         return false;
     }
 
@@ -1160,7 +1199,9 @@ void TimeBankSystem::promptHostReview()
         {
             if (!isHostReviewGiven(listing.listingID))
             {
-                printSkillListingTable(listing);
+                findSkillByID(listing.skillID).showInfo();
+                listing.displaySkillListing();
+                cout << std::endl;
             }
         }
     }
@@ -1686,7 +1727,7 @@ void TimeBankSystem::printRequestTableMember()
 
     for (const auto &request : this->currentMember->sentreceivedRequests)
     {
-        if (request->getReceiverName() == (this->currentMember)->getUsername())
+        if (request->getReceiverName() == (this->currentMember)->getUsername() && request->requestStatus == "Pending")
         {
             // Check if the username has been processed
             const std::string requesterName = request->getRequesterName();
@@ -2220,6 +2261,17 @@ void TimeBankSystem::automaticallyUpdate()
                 request.setRequestStatus("Rejected");
             }
         }
+    }
+}
+
+void TimeBankSystem::updateRatings() {
+    for (RegularMember& mem: this->memberList) {
+        this->currentMember = &mem;
+        extractMemberData();
+        mem.hostRatingScore = mem.getHostRatingScore();
+        mem.skillRatingScore = mem.getSkillRatingScore();
+        mem.supporterRatingScore = mem.getSupporterRatingScore();
+        this->currentMember = nullptr; // Reset the current member pointer
     }
 }
 

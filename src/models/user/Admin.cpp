@@ -14,7 +14,7 @@ Admin::Admin(float revenue) : User("@dmin2023", "aptfinalproject", "Admin")
 
 void Admin::showInfo()
 {
-    cout << "Username: " << this->getUsername() << "\n";
+    User::showInfo();
     cout << "Role: " << this->getRole() << "\n";
     cout << "Revenue of Time Bank company: " << this->revenue << "\n";
 }

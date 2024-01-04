@@ -111,8 +111,8 @@ public:
     void loadData(); // Load data from CSV files to vectors
     void saveData(); // Save data from vectors to CSV files
 
-    void automaticallyUpdate(); // Automatically update listing state based on current time, and automatically update member's credit based on listing state, and reject expired requests
-
+    void automaticallyUpdate(); // Automatically update listing state based on current time, and automatically update member's credit based on listing state, and reject expired requests on start
+    void updateRatings(); // When the program ends, traverse the review vector and extract each user's rating once more.
     // Function to clear all vectors
     void clearData();
 

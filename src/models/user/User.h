@@ -29,6 +29,8 @@ public:
     void setRole(string role) { this->role = role; };
     void setIsAuthenticated(bool isAuthenticated) { this->isAuthenticated = isAuthenticated; };
 
+    virtual void showInfo();
+
     friend class TimeBankSystem;
     friend class FileHandler;
 };

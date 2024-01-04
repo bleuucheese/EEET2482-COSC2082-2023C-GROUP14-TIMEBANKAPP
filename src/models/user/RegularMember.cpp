@@ -140,7 +140,8 @@ float RegularMember::getSkillRatingScore()
                 count++;
             }
         }
-        return this->skillRatingScore / static_cast<float>(count);
+        this->skillRatingScore = this->skillRatingScore / static_cast<float>(count);
+        return this->skillRatingScore;
     }
 }
 
@@ -163,7 +164,8 @@ float RegularMember::getSupporterRatingScore()
                 count++;
             }
         }
-        return this->supporterRatingScore / static_cast<float>(count);
+        this->supporterRatingScore = this->supporterRatingScore / static_cast<float>(count);
+        return this->supporterRatingScore;
     }
 }
 
@@ -187,7 +189,8 @@ float RegularMember::getHostRatingScore()
             }
         }
         // cout << "count: " << count << "\n";
-        return this->hostRatingScore / static_cast<float>(count);
+        this->hostRatingScore = this->hostRatingScore / static_cast<float>(count);
+        return this->hostRatingScore;
     }
 }
 

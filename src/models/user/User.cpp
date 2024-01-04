@@ -1,7 +1,7 @@
 #include <iostream>
 #include "User.h"
-using std::cout;
 using std::cin;
+using std::cout;
 
 // Constructor
 User::User(string usn = "", string pwd = "", string role = "NA")
@@ -12,3 +12,8 @@ User::User(string usn = "", string pwd = "", string role = "NA")
     this->isAuthenticated = isAuthenticated;
 };
 
+void User::showInfo()
+{
+    cout << "Username: " << username << std::endl;
+    cout << "Password: " << password << std::endl;
+}

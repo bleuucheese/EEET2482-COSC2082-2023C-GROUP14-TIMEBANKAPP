@@ -25,9 +25,6 @@ private:
 public:
     Request(std::string requestID = "", std::string listingID = "", std::string requesterName = "", std::string receiverName = "", DateTime requestTimeStamp = DateTime(), std::string requestStatus = "Pending");
 
-    // SkillListing *getPSkillListing();
-    // void setPSkillListing(SkillListing *pSkillListing);
-
     // Getters
     string getRequestID() const { return requestID; };
     string getListingID() const { return listingID; };
@@ -43,8 +40,6 @@ public:
     void setRequestTimeStamp(DateTime requestTimeStamp) { this->requestTimeStamp = requestTimeStamp; };
     void setRequesterName(std::string requesterName) { this->requesterName = requesterName; };
     void setReceiverName(std::string receiverName) { this->receiverName = receiverName; };
-
-    void showInfo();
 
     friend class TimeBankSystem;
     friend class FileHandler;

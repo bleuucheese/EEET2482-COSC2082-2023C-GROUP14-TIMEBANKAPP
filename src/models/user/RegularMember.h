@@ -35,7 +35,7 @@ private:
     double latitude;
     double longitude;
     string creditCardNumber;
-    float balance; // Assume that the balance is in USD, and each card has 100 USD
+    float balance; // Assume that the balance is in USD, and each card has 1000 USD
     float skillRatingScore;
     float supporterRatingScore;
     float hostRatingScore;

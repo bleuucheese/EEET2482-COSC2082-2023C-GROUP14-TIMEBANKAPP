@@ -181,7 +181,7 @@ void TimeBankSystem::adminMenu()
     case 4:
         // method to view sales figures and statistics
         cout << "SALES FIGURES AND STATISTICS\n";
-        cout << "Revenue: " << admin.revenue << "$\n";
+        cout << "Revenue: $" << admin.revenue << "\n";
         cout << "Number of members: " << memberList.size() << "\n";
         cout << "Number of skills: " << skillList.size() << "\n";
         cout << "Number of skill listings: " << skillListingList.size() << "\n";
@@ -758,17 +758,29 @@ void TimeBankSystem::viewTimeTable()
 void TimeBankSystem::promptAdminChangePassword()
 {
     string username, newPassword;
+    int attempts = 0; // Initialize the attempts counter
+
     do
     {
-        cout << "Enter the username of the member you want to reset password: ";
+        cout << "Enter the username of the member you want to reset the password: ";
         cin >> username;
+
         if (isUniqueUsername(username))
         {
             cout << "User not found! Please try again.\n";
+            attempts++;
         }
         else if (username == "@dmin2023")
         {
             cout << "You cannot reset your own password! Please try again.\n";
+            attempts++;
+        }
+
+        if (attempts >= 3) // Check if the maximum number of attempts (3) has been reached
+        {
+            cout << "Maximum number of attempts reached. Exiting...\n";
+            adminMenu();
+            return; // Exit the function
         }
 
     } while (isUniqueUsername(username) || username == "@dmin2023");
@@ -933,12 +945,12 @@ void TimeBankSystem::promptAddListing()
         checkEndDate = DateTime(endDate);
     }
     workingTimeSlot = Period(DateTime(startDate), DateTime(endDate));
-    SkillListing newListing(listingID, skillID, consumedCredsPerHour, minHostRatingScore, listingState, supporterName, hostName, workingTimeSlot);
+    SkillListing newListing = SkillListing(listingID, skillID, consumedCredsPerHour, minHostRatingScore, listingState, supporterName, hostName, workingTimeSlot);
     addListing(newListing);
-    (currentMember->skillListings).push_back(&newListing);
-
+    // (currentMember->skillListings).push_back(&newListing); // Bug: dangling pointer because of a shallow copy and the object is destroyed after the function ends
+    (currentMember->skillListings).push_back(&findListingByID(newListing.listingID)); // Hot fix: push back the pointer to the listing in the system's vector
     cout << "Listing added successfully!\n";
-    regularMemberMenu();
+    listingMenu();
 }
 
 void TimeBankSystem::promptHideListing()
@@ -1078,7 +1090,7 @@ void TimeBankSystem::addRequestFromPrompt()
 
     Request newRequest(requestID, listingID, requesterName, receiverName, DateTime(), requestStatus);
     addRequest(newRequest);                                       // Add new request to the system's request list
-    (currentMember->sentreceivedRequests).push_back(&newRequest); // Add new request to the current member's request list
+    (currentMember->sentreceivedRequests).push_back(&findRequestByID(newRequest.requestID)); // Add new request to the current member's request list
 
     cout << "Request added successfully!\n";
     regularMemberMenu();
@@ -1135,7 +1147,7 @@ bool TimeBankSystem::promptRespondRequest()
             wrongAttempts++; // Increment the wrong attempts
             cout << "RequestID not found or not one of your incoming requests! Please try again.\n";
 
-            if (wrongAttempts >= 2)
+            if (wrongAttempts >= 3)
             {
                 cout << "You've reached the maximum number of wrong attempts. Exiting...\n";
                 return false;
@@ -1143,21 +1155,18 @@ bool TimeBankSystem::promptRespondRequest()
         }
     } while (!isValidRequest);
 
-    // cout << "Checking today's date and listing's start date...\n"; // For debugging purpose
     if (!DateTime().isBeforeStartDate(findListingByID(findRequestByID(requestID).getListingID()).getWorkingTimeSlot().getStartDate()))
     {
         cout << "You cannot respond to this request because today's date is after the listing's start date!\n";
         return false;
     }
 
-    // cout << "Checking if the request is already accepted...\n"; // For debugging purpose
     else if (findRequestByID(requestID).getRequestStatus() == "Accepted")
     {
         cout << "You cannot respond to this request because it is already accepted!\n";
         return false;
     }
 
-    // cout << "Checking if the request is already rejected...\n"; // For debugging purpose
     else if (findRequestByID(requestID).getRequestStatus() == "Rejected")
     {
         cout << "You cannot respond to this request because it is already rejected!\n";
@@ -1208,7 +1217,7 @@ void TimeBankSystem::promptHostReview()
 
     std::string listingID, reviewID, reviewContent, reviewerName, revieweeName = "";
     int wrongAttempts = 0; // Counter for wrong attempts
-    // Exit the loop after 2 wrong attempts
+    // Exit the loop after 3 wrong attempts
     do
     {
         listingID = getValidStringInput("Enter listingID to begin making a review: ");
@@ -1223,7 +1232,7 @@ void TimeBankSystem::promptHostReview()
             wrongAttempts++;
         }
 
-        if (wrongAttempts == 2) // Check if wrong attempts have reached 2
+        if (wrongAttempts == 3) // Check if wrong attempts have reached 3
         {
             cout << "Maximum attempts reached. Returning to the menu.\n";
             regularMemberMenu();
@@ -1295,7 +1304,7 @@ void TimeBankSystem::promptSupporterReview()
     }
     std::string listingID, reviewID, reviewContent, reviewerName, revieweeName = "";
     int wrongAttempts = 0; // Counter for wrong attempts
-    // Exit the loop after 2 wrong attempts
+    // Exit the loop after 3 wrong attempts
     do
     {
         listingID = getValidStringInput("Enter listingID to begin making a review: ");
@@ -1310,7 +1319,7 @@ void TimeBankSystem::promptSupporterReview()
             wrongAttempts++;
         }
 
-        if (wrongAttempts == 2) // Check if wrong attempts have reached 2
+        if (wrongAttempts == 3) // Check if wrong attempts have reached 3
         {
             cout << "Maximum attempts reached. Returning to the menu.\n";
             regularMemberMenu();
@@ -1369,20 +1378,33 @@ void TimeBankSystem::promptSupporterReview()
 void TimeBankSystem::promptSearchMember()
 {
     std::string username;
+    int attempts = 0; // Initialize the attempts counter
+
     do
     {
         username = getValidStringInput("Enter username to search: ");
+
         if (isUniqueUsername(username))
         {
             cout << "User not found! Please try again.\n";
+            attempts++;
         }
         else if (username == this->currentMember->getUsername())
         {
             cout << "You cannot search yourself! Please try again.\n";
+            attempts++;
         }
         else if (username == "@dmin2023")
         {
             cout << "You cannot search the admin! Please try again.\n";
+            attempts++;
+        }
+
+        if (attempts >= 3) // Check if the maximum number of attempts (3) has been reached
+        {
+            cout << "Maximum number of attempts reached. Exiting...\n";
+            regularMemberMenu();
+            return; // Exit the function
         }
     } while (isUniqueUsername(username) || username == currentMember->getUsername() || username == "@dmin2023");
     RegularMember searchedMember = findMemberByUsername(username);
@@ -1571,7 +1593,7 @@ void TimeBankSystem::promptTopUp()
     {
         cout << "Top up failed! Please try again.\n";
     }
-    regularMemberMenu();
+    profileMenu();
 }
 
 void TimeBankSystem::promptSellCredits()
@@ -1587,7 +1609,7 @@ void TimeBankSystem::promptSellCredits()
     {
         cout << "Sell credits failed! Please try again.\n";
     }
-    regularMemberMenu();
+    profileMenu();
 }
 
 void TimeBankSystem::promptBlockMember()
@@ -1625,7 +1647,7 @@ void TimeBankSystem::promptBlockMember()
     {
         cout << "Block failed! Please try again.\n";
     }
-    regularMemberMenu();
+    profileMenu();
 }
 
 void TimeBankSystem::promptUnblockMember()
@@ -1697,7 +1719,7 @@ void TimeBankSystem::promptUnblockMember()
     {
         cout << "Unblock failed! Please try again.\n";
     }
-    regularMemberMenu();
+    profileMenu();
 }
 
 void TimeBankSystem::printRequestTableMember()
@@ -2264,8 +2286,10 @@ void TimeBankSystem::automaticallyUpdate()
     }
 }
 
-void TimeBankSystem::updateRatings() {
-    for (RegularMember& mem: this->memberList) {
+void TimeBankSystem::updateRatings()
+{
+    for (RegularMember &mem : this->memberList)
+    {
         this->currentMember = &mem;
         extractMemberData();
         mem.hostRatingScore = mem.getHostRatingScore();

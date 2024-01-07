@@ -115,7 +115,14 @@ void RegularMember::printTimeTable()
         for (int i = 0; i < this->timeTable.size(); i++)
         {
             cout << (this->timeTable[i])->getFormattedPeriod();
-            cout << "\n";
+            cout << " --> ";
+            for (SkillListing *listing : this->skillListings)
+            {
+                if (listing->getWorkingTimeSlot().isSameAs(*(this->timeTable[i])))
+                {
+                    cout << listing->getListingID() << "\n";
+                }
+            }
         }
     }
 }

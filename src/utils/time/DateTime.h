@@ -18,8 +18,8 @@ private:
 public:
     bool isValidFormat(const std::string &timestamp);
     bool isValidDate();
-    bool isLeapYear(int year);
-    int daysInMonth(int month, int year);
+    static bool isLeapYear(int year);
+    static int daysInMonth(int month, int year);
 
     // Default constructor sets to current system time
     DateTime();

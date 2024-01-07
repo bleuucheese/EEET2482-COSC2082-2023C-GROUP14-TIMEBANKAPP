@@ -752,6 +752,13 @@ void TimeBankSystem::viewReviews()
 void TimeBankSystem::viewTimeTable()
 {
     this->currentMember->printTimeTable();
+    cout << "--------------------------------------------------------------------------------------\n";
+    if (!this->currentMember->timeTable.empty())
+    {
+        cout << "Your busy periods are shown in red.\n";
+        Period::printYearCalendar(this->currentMember->timeTable);
+    }
+
     profileMenu();
 }
 
@@ -1089,7 +1096,7 @@ void TimeBankSystem::addRequestFromPrompt()
     receiverName = findListingByID(listingID).getSupporterName(); // supporter
 
     Request newRequest(requestID, listingID, requesterName, receiverName, DateTime(), requestStatus);
-    addRequest(newRequest);                                       // Add new request to the system's request list
+    addRequest(newRequest);                                                                  // Add new request to the system's request list
     (currentMember->sentreceivedRequests).push_back(&findRequestByID(newRequest.requestID)); // Add new request to the current member's request list
 
     cout << "Request added successfully!\n";

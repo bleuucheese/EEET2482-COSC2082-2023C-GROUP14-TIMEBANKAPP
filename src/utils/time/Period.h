@@ -27,10 +27,14 @@ public:
     // Method to compare two periods
     bool isSameAs(const Period &other) const;
 
+    // Function to print the calendar of the current year
+    static std::string printMonth(int n);
+    static void printYearCalendar(const std::vector<Period *> &busyPeriods);
+
     // Convert seconds to duration format (e.g. 1d 2h 3m 4s)
     static std::string convertSecToDuration(long n);
 
-    std::string getFormattedPeriod() const;   
+    std::string getFormattedPeriod() const;
 
     friend class TimeBankSystem;
     friend class FileHandler;

@@ -2168,7 +2168,7 @@ void TimeBankSystem::extractMemberData()
     // Get the current member's timetable, check 2 and 3 state of the listing of that user and push back the time slot to the timetable
     for (SkillListing &listing : this->skillListingList)
     {
-        if (listing.getSupporterName() == (this->currentMember)->getUsername())
+        if (listing.getSupporterName() == (this->currentMember)->getUsername() || listing.getHostName() == (this->currentMember)->getUsername())
         {
             if (listing.getListingState() == 2 || listing.getListingState() == 3)
             {

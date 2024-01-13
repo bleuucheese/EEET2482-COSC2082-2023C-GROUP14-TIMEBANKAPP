@@ -5,6 +5,9 @@
 #include <sstream>
 #include <string>
 #include <regex>
+#include <vector>
+#include <algorithm>
+#include <cmath>
 #include <stdexcept>
 #include "./myUtils.h"
 #include "myUtils.h"
@@ -472,7 +475,8 @@ bool deleteLine(const std::string &filename, int lineNumber)
     return true;
 }
 
-void printMenuLabel(const std::string &labelName) {
+void printMenuLabel(const std::string &labelName)
+{
     const int totalLength = 88;
 
     // 10 accounts for "=====" on both sides
@@ -481,14 +485,84 @@ void printMenuLabel(const std::string &labelName) {
     // Adjust the number of '=' characters if equalsCount is odd
     int leftEqualsCount = equalsCount / 2;
     int rightEqualsCount = equalsCount / 2;
-    if (equalsCount % 2 != 0) {
+    if (equalsCount % 2 != 0)
+    {
         rightEqualsCount++;
     }
 
     // Print the label with escape color code for bold and specific color
-    std::cout << "\e[38;5;24m" // Navy Color for '=' parts
+    std::cout << "\e[38;5;24m"                                                 // Navy Color for '=' parts
               << std::string(leftEqualsCount, '=') << "=====\e[1m\e[38;5;208m" // Bold and orang colored label start
-              << labelName << "\e[0m\e[38;5;24m=====" // Bold and orang colored label end
+              << labelName << "\e[0m\e[38;5;24m====="                          // Bold and orang colored label end
               << "" << std::string(rightEqualsCount, '=')
               << "\e[0m" << std::endl; // Reset to default formatting
+}
+
+// Function to round up a number to a specified number of decimal placess, and return the result as a string
+std::string roundUpToNDecimalPlaces(float number, int decimalPlaces)
+{
+    // Calculate the factor by which to multiply the number to round up
+    float factor = std::pow(10.0, decimalPlaces);
+
+    // Round the number up
+    float roundedNumber = std::ceil(number * factor) / factor;
+
+    // Convert the rounded number to a string with the specified decimal places
+    std::ostringstream oss;
+    oss << std::fixed << std::setprecision(decimalPlaces) << roundedNumber;
+
+    return oss.str();
+}
+// Function to determine the maximum width needed for each column
+std::vector<int> calculateWidths(const std::vector<std::string> &headers)
+{
+    std::vector<int> widths(headers.size(), 0);
+    // Calculate the width needed for headers
+    for (size_t i = 0; i < headers.size(); ++i)
+    {
+        widths[i] = headers[i].length() + 8;
+    }
+    return widths;
+}
+
+// A utility function to print a line
+void printLine(const std::vector<int> &widths, char c)
+{
+    std::cout << "+";
+    for (int width : widths)
+    {
+        std::cout << std::string(width + 2, c) << "+";
+    }
+    std::cout << std::endl;
+}
+
+// Function to print the header
+void printHeader(const std::vector<std::string> &headers, const std::vector<int> &widths)
+{
+    printLine(widths, '=');
+    std::cout << "|";
+    for (size_t i = 0; i < headers.size(); ++i)
+    {
+        std::cout << " " << std::left << std::setw(widths[i]) << "\e[1m\e[97m" << headers[i] << "\e[0m"
+                  << " |";
+    }
+    std::cout << std::endl;
+    printLine(widths, '=');
+}
+
+// Function to print a row
+void printRow(const std::vector<std::string> &data, const std::vector<int> &widths)
+{
+    std::cout << "|";
+    for (size_t i = 0; i < data.size(); ++i)
+    {
+        std::cout << " " << std::left << std::setw(widths[i]) << data[i] << " |";
+    }
+    std::cout << std::endl;
+}
+
+// Function to print the footer
+void printFooter(const std::vector<int> &widths)
+{
+    printLine(widths, '-');
 }

@@ -115,14 +115,17 @@ void RegularMember::printTimeTable()
         for (int i = 0; i < this->timeTable.size(); i++)
         {
             cout << (this->timeTable[i])->getFormattedPeriod();
-            cout << " --> ";
+            // Print the skill listing ID of the owner if the time slot is occupied
             for (SkillListing *listing : this->skillListings)
             {
                 if (listing->getWorkingTimeSlot().isSameAs(*(this->timeTable[i])))
                 {
-                    cout << listing->getListingID() << "\n";
+                    cout << " --> ";
+                    cout << listing->getListingID();
                 }
             }
+
+            cout << "\n";
         }
     }
 }
@@ -482,4 +485,30 @@ bool RegularMember::isBlockedBy(string blockerUsn)
     }
     blockFile.close();
     return false;
+}
+
+// Get the number of skills added by the member
+int RegularMember::getNumberOfSkills()
+{
+    return this->skills.size();
+}
+
+// Get the number of skill listings created by the member
+int RegularMember::getNumberOfSkillListings()
+{
+    return this->skillListings.size();
+}
+
+// Get the number of incoming requests
+int RegularMember::getNumberOfIncomingRequests()
+{
+    int count = 0;
+    for (int i = 0; i < sentreceivedRequests.size(); i++)
+    {
+        if (sentreceivedRequests[i]->getReceiverName() == this->getUsername() && sentreceivedRequests[i]->getRequestStatus() == "Pending")
+        {
+            count++;
+        }
+    }
+    return count;
 }

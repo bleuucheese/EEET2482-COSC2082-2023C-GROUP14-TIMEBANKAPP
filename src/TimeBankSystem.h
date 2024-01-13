@@ -56,7 +56,13 @@ public:
     bool isUniqueUsername(string username);
 
     // Functions for admin
+    // Comparison function for sorting in descending order
+    int findNumberOfListings(RegularMember &member);
+    // Function to find the top 5 members with the most skill listings
+    std::vector<RegularMember> findTop5Members(const std::vector<RegularMember> &members);
     void promptAdminChangePassword();
+    void viewBarGraph();
+
     // Functions for regular member
     void promptAddSkill();
     void promptAddListing();
@@ -85,6 +91,13 @@ public:
     void addRequest(Request &request);
     void addReview(Review &review);
 
+    // Use function template to add new objects to the system's vectors
+    template <typename T>
+    void addElement(std::vector<T> &vector, T &object)
+    {
+        vector.push_back(object);
+    }
+
     // Functions for dipslay objects in the system's vectors in pretty tabular format, used by admin or guests based on mode
     void printMemberTable(int mode);  // mode = 1 for admin, mode = 2 for guest
     void printListingTable(int mode); // mode = 1 for admin, mode = 2 for guest
@@ -112,7 +125,7 @@ public:
     void saveData(); // Save data from vectors to CSV files
 
     void automaticallyUpdate(); // Automatically update listing state based on current time, and automatically update member's credit based on listing state, and reject expired requests on start
-    void updateRatings(); // When the program ends, traverse the review vector and extract each user's rating once more.
+    void updateRatings();       // When the program ends, traverse the review vector and extract each user's rating once more.
     // Function to clear all vectors
     void clearData();
 

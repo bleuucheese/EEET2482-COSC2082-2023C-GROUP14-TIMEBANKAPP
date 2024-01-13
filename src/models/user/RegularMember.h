@@ -62,7 +62,7 @@ public:
     vector<SkillListing *> getSkillListings() { return skillListings; };
     vector<RegularMember *> getBlockedMembers() { return blockedMembers; };
     vector<Period *> getTimeTable() { return timeTable; };
-    
+
     void setCreditPoints(float creditPoints) { this->creditPoints = creditPoints; };
     void setPhoneNumber(string phoneNumber) { this->phoneNumber = phoneNumber; };
     void setEmail(string email) { this->email = email; };
@@ -78,6 +78,9 @@ public:
     vector<Review *> getReceivedSupporterReviews(); // get RS type reviews, reviewee - usn
 
     // Member functions
+    int getNumberOfSkills();
+    int getNumberOfSkillListings();
+    int getNumberOfIncomingRequests();
     void printReviews();
     void printSkills();
     void printTimeTable();

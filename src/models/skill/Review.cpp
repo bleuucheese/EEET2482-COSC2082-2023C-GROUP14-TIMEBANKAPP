@@ -50,8 +50,7 @@ Review::Review(string reviewID, string listingID, std::string comments, string r
 
 void Review::printReview()
 {
-    cout << "Review ID: " << this->reviewID << "\n";
-    cout << "Listing ID: " << this->listingID << "\n";
+    cout << "Review ID: " << this->reviewID << " on ListingID: " << this->listingID << "\n";
     cout << reviewer << " --> " << reviewee << " ~ posted on " << this->timestamp.getFormattedTimestamp() << "\n";
     if (this->skillRating != 0)
     {

@@ -43,6 +43,9 @@ int main()
 // Enable ANSI colors on Windows
 #if defined WIN32 || defined _WIN32 || defined WIN64 || defined _WIN64
     enableANSIColors();
+    // Set the console to UTF-8
+    SetConsoleOutputCP(CP_UTF8); // Print out special UTF-8 characters
+
 #endif
 
     TimeBankSystem sys;

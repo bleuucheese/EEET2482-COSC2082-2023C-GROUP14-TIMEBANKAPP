@@ -9,6 +9,7 @@
   Acknowledgement:
   https://patorjk.com/software/taag/#p=display&f=Big%20Money-nw&t=TIME%20BANK
   https://gist.github.com/JBlond/2fea43a3049b38287e5e9cefc87b2124
+  https://aarsoftx.com/blogs/make-bar-chart-on-consoleterminal-using-this-c-library
 */
 
 #include <iostream>
@@ -21,12 +22,12 @@
 #include "./models/user/User.h"
 #include "./utils/myUtils.h"
 #include "./utils/file/FileHandler.h"
+#include "./utils/ConsoleBarChart.h"
 
 using std::cin;
 using std::cout;
 using std::string;
-
-// Create a FileHandler object to handle all file operations
+using namespace aarsoftx; // For the ConsoleBarChart library
 
 // Constructor
 TimeBankSystem::TimeBankSystem()
@@ -162,24 +163,24 @@ void TimeBankSystem::adminMenu()
     cout << "1. View All Members\n";
     cout << "2. View All Listings\n";
     cout << "3. Reset Password for a particular Member\n";
-    cout << "4. View Sales Figures and Statistics\n"; // Revenue, number of members, number of skills, number of skill listings
+    cout << "4. View Sales Figures and Statistics\n"; // Revenue, number of members, number of skills, number of skill listings, who is most active,...
     cout << "5. Sign Out\n";
 
     switch (promptAndGetChoice(1, 5))
     {
     case 1:
-        // method to view all members
-        printMemberTable(1);
+        printMemberTable(1); // method to view all members
         break;
     case 2:
-        // method to view all listings
-        printListingTable(1);
+        printListingTable(1); // method to view all listings
         break;
     case 3:
         promptAdminChangePassword();
         break;
     case 4:
         // method to view sales figures and statistics
+        // TODO
+        viewBarGraph();
         cout << "SALES FIGURES AND STATISTICS\n";
         cout << "Revenue: $" << admin.revenue << "\n";
         cout << "Number of members: " << memberList.size() << "\n";
@@ -237,9 +238,7 @@ int TimeBankSystem::promptAndGetChoice(unsigned min, unsigned max)
     // Inclusive
     int choice = -1;
     std::string buffer;
-
-    // Clear the input buffer, esp when previously user has entered their info, \n is still in the buffer
-    fflush(stdin);
+    fflush(stdin); // Clear the input buffer, esp when previously user has entered their info, \n is still in the buffer
 
     do
     {
@@ -613,41 +612,51 @@ void TimeBankSystem::requestMenu()
     {
     case 1:
         // method to view requests, and prompt them to get the ID of the request they want to respond.
-        printRequestTableMember();
-        char choice;
-        do
+        // Check if the user does not have incomming requests, then print out a message and go back to the menu
+        if (this->currentMember->getNumberOfIncomingRequests() == 0)
         {
-            cout << "Do you want to respond to a request? (Y/N): ";
-            cin >> choice;
-
-        } while (choice != 'Y' & choice != 'y' & choice != 'N' & choice != 'n');
-        if (choice == 'Y' || choice == 'y')
-        {
-            cout << "1. Accept Request\n";
-            cout << "2. Reject Request\n";
-            switch (promptAndGetChoice(1, 2))
-            {
-            case 1:
-                if (promptRespondRequest())
-                {
-                    respondRequestFromPrompt('A');
-                }
-                else
-                {
-                    cout << "Cannot accept this request. Please try again.\n";
-                    regularMemberMenu();
-                }
-                break;
-            case 2:
-                // method to reject request
-                respondRequestFromPrompt('R');
-                break;
-            }
-        }
-        else if (choice == 'N' || choice == 'n')
-        {
+            cout << "You have no incoming requests!\n";
             regularMemberMenu();
             break;
+        }
+        else
+        {
+            printRequestTableMember();
+            char choice;
+            do
+            {
+                cout << "Do you want to respond to a request? (Y/N): ";
+                cin >> choice;
+
+            } while (choice != 'Y' & choice != 'y' & choice != 'N' & choice != 'n');
+            if (choice == 'Y' || choice == 'y')
+            {
+                cout << "1. Accept Request\n";
+                cout << "2. Reject Request\n";
+                switch (promptAndGetChoice(1, 2))
+                {
+                case 1:
+                    if (promptRespondRequest())
+                    {
+                        respondRequestFromPrompt('A');
+                    }
+                    else
+                    {
+                        cout << "Cannot accept this request. Please try again.\n";
+                        regularMemberMenu();
+                    }
+                    break;
+                case 2:
+                    // method to reject request
+                    respondRequestFromPrompt('R');
+                    break;
+                }
+            }
+            else if (choice == 'N' || choice == 'n')
+            {
+                regularMemberMenu();
+                break;
+            }
         }
         break;
 
@@ -662,7 +671,6 @@ void TimeBankSystem::requestMenu()
         }
         else
         {
-            // cout << "Request failed! Please try again.\n";
             regularMemberMenu();
         }
         break;
@@ -683,16 +691,13 @@ void TimeBankSystem::reviewMenu()
     switch (promptAndGetChoice(1, 4))
     {
     case 1:
-        // method to view reviews
-        viewReviews();
+        viewReviews(); // method to view reviews
         break;
     case 2:
-        // method for a supporter to add review: #RH type
-        promptHostReview();
+        promptHostReview(); // method for a supporter to add review: #RH type
         break;
     case 3:
-        // method for a host to add review: #RS type
-        promptSupporterReview();
+        promptSupporterReview(); // method for a host to add review: #RS type
         break;
 
     case 4:
@@ -711,12 +716,10 @@ void TimeBankSystem::searchMenu()
     switch (promptAndGetChoice(1, 3))
     {
     case 1:
-        // method to search by username
-        promptSearchMember();
+        promptSearchMember(); // method to search by username
         break;
     case 2:
-        // method to search by location, and min host rate, and by current credits: isEligibleToView()
-        promptSearchListing();
+        promptSearchListing(); // method to search by location, and min host rate, and by current credits: isEligibleToView()
         break;
     case 3:
         regularMemberMenu();
@@ -798,6 +801,51 @@ void TimeBankSystem::promptAdminChangePassword()
         cout << "Please try again\n";
     }
     adminMenu();
+}
+int TimeBankSystem::findNumberOfListings(RegularMember &member)
+{
+    int count = 0;
+    for (SkillListing &listing : TimeBankSystem::skillListingList)
+    {
+        if (listing.getSupporterName() == member.getUsername())
+        {
+            count++;
+        }
+    }
+    return count;
+}
+
+// Function to find the top 5 members with the most skill listings
+std::vector<RegularMember> TimeBankSystem::findTop5Members(const std::vector<RegularMember> &members)
+{
+    std::vector<RegularMember> sortedMembers = members;
+    // Capture the TimeBankSystem instance in a lambda
+    auto compareMembers = [this](RegularMember &a, RegularMember &b)
+    {
+        return this->findNumberOfListings(a) > this->findNumberOfListings(b);
+    };
+    std::sort(sortedMembers.begin(), sortedMembers.end(), compareMembers);
+
+    // Ensure that there are at least 5 members
+    if (sortedMembers.size() < 5)
+    {
+        return sortedMembers;
+    }
+
+    // Return the top 5 members
+    return std::vector<RegularMember>(sortedMembers.begin(), sortedMembers.begin() + 5);
+}
+
+void TimeBankSystem::viewBarGraph()
+{
+    vector<ConsoleChartData> result;
+    vector<RegularMember> top5Members = findTop5Members(this->memberList);
+    for (RegularMember &member : top5Members)
+    {
+        result.push_back({member.getUsername(), findNumberOfListings(member)});
+    }
+    ConsoleBarChart *cbc = new ConsoleBarChart("Most Active Users", 3, 1, result);
+    cbc->show();
 }
 
 bool TimeBankSystem::isSkillIDExistAndOwned(string skillID)
@@ -898,13 +946,21 @@ void TimeBankSystem::promptAddListing()
     float minHostRatingScore = -1;
     int listingState = 0; // 0 = available, 1 = hidden, 2 = booked, 3 = completed; default = available when listing is created
     Period workingTimeSlot;
-
+    // Exit the loop after 3 wrong attempts
+    int attempts = 0;
     do
     {
         skillID = getValidStringInput("Enter skillID to begin making a Job Listing on the market: ");
         if (!isSkillIDExistAndOwned(skillID))
         {
             cout << "SkillID not found or not one of your added skills! Please try again.\n";
+            attempts++;
+        }
+        if (attempts >= 3)
+        {
+            cout << "You've reached the maximum number of wrong attempts. Exiting...\n";
+            listingMenu();
+            return;
         }
     } while (!isSkillIDExistAndOwned(skillID));
 
@@ -964,12 +1020,20 @@ void TimeBankSystem::promptHideListing()
 {
     std::string listingID;
     // Prompt user to enter listingID until they enter a valid listingID that is owned by them
+    int attempts = 0;
     do
     {
         listingID = getValidStringInput("Enter listingID to hide: ");
         if (!isListingIDExistAndOwned(listingID))
         {
             cout << "ListingID not found or not one of your added listings! Please try again.\n";
+            attempts++;
+        }
+        if (attempts >= 3)
+        {
+            cout << "You've reached the maximum number of wrong attempts. Exiting...\n";
+            listingMenu();
+            return;
         }
 
     } while ((!isListingIDExistAndOwned(listingID)));
@@ -982,19 +1046,34 @@ void TimeBankSystem::promptHideListing()
     {
         cout << "Listing hide failed! Please try again.\n";
     }
-    regularMemberMenu();
+    listingMenu();
 }
 
 void TimeBankSystem::promptUnhideListing()
 {
     std::string listingID;
     // Prompt user to enter listingID until they enter a valid listingID that is owned by them
+    // Exit the loop after 3 wrong attempts
+    int attempts = 0;
     do
     {
         listingID = getValidStringInput("Enter listingID to unhide: ");
         if (!isListingIDExistAndOwned(listingID))
         {
             cout << "ListingID not found or not one of your added listings! Please try again.\n";
+            attempts++;
+        }
+
+        else if (findListingByID(listingID).getListingState() != 1)
+        {
+            cout << "Listing is not hidden! Please try again.\n";
+            attempts++;
+        }
+        if (attempts >= 3)
+        {
+            cout << "You've reached the maximum number of wrong attempts. Exiting...\n";
+            listingMenu();
+            return;
         }
 
     } while ((!isListingIDExistAndOwned(listingID)) || findListingByID(listingID).getListingState() != 1);
@@ -1007,7 +1086,7 @@ void TimeBankSystem::promptUnhideListing()
     {
         cout << "Listing unhide failed! Please try again.\n";
     }
-    regularMemberMenu();
+    listingMenu();
 }
 
 bool TimeBankSystem::promptAddRequest()
@@ -1016,12 +1095,19 @@ bool TimeBankSystem::promptAddRequest()
     std::string requestID, listingID, requesterName, receiverName, requestStatus = "";
 
     std::string buffer = "";
+    int attempts = 0;
+    // Exit the loop when wrong attempts is bigger than 3
     do
     {
         listingID = getValidStringInput("Enter listingID to begin making a request: ");
         if (!isListingIDExistAndNotOwned(listingID))
         {
             cout << "ListingID not found or is one of your added listings! Please try again.\n";
+            attempts++;
+        }
+        if (attempts == 3)
+        {
+            return false;
         }
     } while (!isListingIDExistAndNotOwned(listingID));
 
@@ -1208,7 +1294,7 @@ bool TimeBankSystem::promptRespondRequest()
 void TimeBankSystem::promptHostReview()
 {
     // Print a table of completed listings that wasn't given a host review yet
-    cout << "UNREVIEWED LISTINGS: \n";
+    cout << "UNREVIEWED LISTINGS\n";
     for (SkillListing &listing : this->skillListingList)
     {
         if (listing.listingState == 4 && listing.getSupporterName() == (this->currentMember)->getUsername())
@@ -1731,24 +1817,25 @@ void TimeBankSystem::promptUnblockMember()
 
 void TimeBankSystem::printRequestTableMember()
 {
-    // Check if there is any incoming request
-    std::cout << std::setw(12) << "RequestID" << std::setw(15) << "ListingID"
-              << std::setw(15) << "Requester" << std::setw(15) << "Receiver"
-              << std::setw(25) << "Timestamp" << std::setw(15) << "Status" << std::endl;
-    std::cout << std::setfill('-') << std::setw(94) << "" << std::setfill(' ') << std::endl;
+    vector<string> headers = {"RequestID", "ListingID", "Requester", "Receiver", "Timestamp", "Status"};
+    vector<int> widths = {12, 15, 15, 15, 25, 15};
 
+    // Print the header
+    printHeader(headers, widths);
     for (const auto &request : this->currentMember->sentreceivedRequests)
     {
         if (request->getReceiverName() == (this->currentMember)->getUsername())
         {
-            std::cout << std::setw(12) << request->requestID
-                      << std::setw(15) << request->listingID
-                      << std::setw(15) << request->requesterName
-                      << std::setw(15) << request->receiverName
-                      << std::setw(25) << request->requestTimeStamp.getFormattedTimestamp()
-                      << std::setw(15) << request->requestStatus << std::endl;
+            string requestID = request->getRequestID();
+            string listingID = request->getListingID();
+            string requesterName = request->getRequesterName();
+            string receiverName = request->getReceiverName();
+            string requestTimeStamp = request->getRequestTimeStamp().getFormattedTimestamp();
+            string requestStatus = request->getRequestStatus();
+            printRow({requestID, listingID, requesterName, receiverName, requestTimeStamp, requestStatus}, widths);
         }
     }
+    printFooter(widths);
     cout << "\nPotential Hosts' Information: \n";
 
     // Create a set to store processed usernames
@@ -1772,24 +1859,23 @@ void TimeBankSystem::printRequestTableMember()
 
 void TimeBankSystem::printOutgoingRequestTableMember()
 {
-
-    std::cout << std::setw(10) << "RequestID" << std::setw(15) << "ListingID"
-              << std::setw(15) << "Requester" << std::setw(15) << "Receiver"
-              << std::setw(20) << "Timestamp" << std::setw(15) << "Status" << std::endl;
-    std::cout << std::setfill('-') << std::setw(90) << "" << std::setfill(' ') << std::endl;
-
+    vector<string> headers = {"RequestID", "ListingID", "Requester", "Receiver", "Timestamp", "Status"};
+    vector<int> widths = {10, 15, 15, 15, 20, 15};
+    printHeader(headers, widths);
     for (const auto &request : this->currentMember->sentreceivedRequests)
     {
         if (request->getRequesterName() == (this->currentMember)->getUsername())
         {
-            std::cout << std::setw(10) << request->requestID
-                      << std::setw(15) << request->listingID
-                      << std::setw(15) << request->requesterName
-                      << std::setw(15) << request->receiverName
-                      << std::setw(25) << request->requestTimeStamp.getFormattedTimestamp()
-                      << std::setw(10) << request->requestStatus << std::endl;
+            string requestID = request->getRequestID();
+            string listingID = request->getListingID();
+            string requesterName = request->getRequesterName();
+            string receiverName = request->getReceiverName();
+            string requestTimeStamp = request->getRequestTimeStamp().getFormattedTimestamp();
+            string requestStatus = request->getRequestStatus();
+            printRow({requestID, listingID, requesterName, receiverName, requestTimeStamp, requestStatus}, widths);
         }
     }
+    printFooter(widths);
     cout << "\nRequested Listings Information: \n";
 
     for (const auto &request : this->currentMember->sentreceivedRequests)
@@ -1811,25 +1897,35 @@ void TimeBankSystem::printOwnedListing()
     else
     {
         cout << "Here are your added listings:\n";
-        std::cout << std::setw(12) << "ListingID" << std::setw(12) << "SkillID"
-                  << std::setw(7) << "Cost" << std::setw(15) << "MinHostRating"
-                  << std::setw(7) << "State" << std::setw(15) << "Supporter"
-                  << std::setw(15) << "Host" << std::setw(50) << "WorkingTimeSlot" << std::endl;
-        std::cout << std::setfill('-') << std::setw(133) << "" << std::setfill(' ') << std::endl;
+        vector<string> headers = {"ListingID", "SkillID", "Cost", "MinHostRating", "State", "Supporter", "Host", "WorkingTimeSlot"};
+        vector<int> widths = {11, 11, 7, 15, 6, 15, 15, 45};
+        // Print the header
+        printHeader(headers, widths);
 
-        for (const auto &listing : this->currentMember->skillListings) // Assuming skillListings is a collection of SkillListing objects
+        for (SkillListing *&listing : this->currentMember->skillListings)
         {
-            std::string workingTime = listing->getWorkingTimeSlot().getFormattedPeriod(); // Assuming a method to get formatted time slot
+            string rating;
+            std::string workingTime = listing->getWorkingTimeSlot().getFormattedPeriod();
+            string listingID = listing->getListingID();
+            string skillID = listing->getSkillID();
+            string cost = roundUpToNDecimalPlaces(listing->calculateTotalCreds(), 1);
+            if (listing->getMinHostRatingScore() == -1)
+            {
+                rating = "Any";
+            }
+            else
+            {
+                rating = roundUpToNDecimalPlaces(listing->getMinHostRatingScore(), 2);
+            }
 
-            std::cout << std::setw(12) << listing->getListingID()
-                      << std::setw(12) << listing->getSkillID()
-                      << std::setw(7) << listing->calculateTotalCreds()
-                      << std::setw(15) << listing->getMinHostRatingScore()
-                      << std::setw(7) << listing->getListingState()
-                      << std::setw(15) << listing->getSupporterName()
-                      << std::setw(15) << listing->getHostName()
-                      << std::setw(50) << workingTime << std::endl;
+            string state = std::to_string(listing->getListingState());
+            string supporter = listing->getSupporterName();
+            string host = listing->getHostName();
+            printRow({listingID, skillID, cost, rating, state, supporter, host, workingTime}, widths);
         }
+
+        // Print the footer
+        printFooter(widths);
     }
     // listingMenu();
 }
@@ -1843,27 +1939,25 @@ void TimeBankSystem::printOwnedSkill()
     else
     {
         cout << "Here are your added skills:\n";
-        std::cout << std::setw(12) << "SkillID" << std::setw(25) << "SkillName"
-                  << std::setw(80) << "SkillDescription" << std::setw(20) << "SkillEfficiency"
-                  << std::endl;
-        std::cout << std::setfill('-') << std::setw(137) << "" << std::setfill(' ') << std::endl;
+        vector<string> headers = {"SkillID", "SkillName", "Description", "Efficiency"};
+        vector<int> widths = {12, 25, 80, 20};
+        printHeader(headers, widths); // Print the header
 
-        for (const auto &skill : this->currentMember->skills) // Assuming skillListings is a collection of SkillListing objects
+        for (const auto &skill : this->currentMember->skills)
         {
-            std::cout << std::setw(12) << skill->getSkillID()
-                      << std::setw(25) << skill->getSkillName()
-                      << std::setw(80) << skill->getDescription()
-                      << std::setw(20) << skill->getSkillEfficiency()
-                      << std::endl;
+            string skillID = skill->getSkillID();
+            string skillName = skill->getSkillName();
+            string description = skill->getDescription();
+            string efficiency = skill->getSkillEfficiency();
+            printRow({skillID, skillName, description, efficiency}, widths);
         }
+        printFooter(widths); // Print the footer
     }
-
-    // skillMenu();
 }
 
 void TimeBankSystem::printListingTableMember()
 {
-    // print all listings on the market, make sure the current member is not the supporter of the listing, and they are
+    // print all listings on the market, make sure the current member is not the supporter of the listing, and they are eligible to view the listing
     cout << "Here are available listings on the market:\n";
     if (this->skillListingList.size() == 0)
     {
@@ -1897,7 +1991,6 @@ void TimeBankSystem::printListingTableMember()
         }
         else
         {
-            // cout << "Request failed! Please try again.\n";
             listingMenu();
         }
     }
@@ -1932,9 +2025,7 @@ void TimeBankSystem::printSkillListingTable(SkillListing &listing)
 
     // Draw the header row
     drawRow("Supporter Info", "\e[1;93mListing ID: " + listing.listingID + "\033[0m" + " - Total Credits Cost: " + std::to_string(listing.calculateTotalCreds()), leftColumnWidth, rightColumnWidth + colorCodeLength);
-
-    // Draw line after header
-    drawTableLine(leftColumnWidth + rightColumnWidth + 3);
+    drawTableLine(leftColumnWidth + rightColumnWidth + 3); // Draw line after header
 
     // Draw rows of the table
     drawRow("username: " + listing.getSupporterName(), "Skill perform:", leftColumnWidth, rightColumnWidth);
@@ -1947,30 +2038,30 @@ void TimeBankSystem::printSkillListingTable(SkillListing &listing)
     drawRow("skillRatingScore: " + std::to_string(supporter.getSkillRatingScore()), "Status: " + listingStatus, leftColumnWidth, rightColumnWidth);
     drawRow("supporterRatingScore: " + std::to_string(supporter.getSupporterRatingScore()), "Minimum hostRatingScore required: " + minHostRatingScore, leftColumnWidth, rightColumnWidth);
     drawRow("", "Distance from you: \e[38;5;213m" + distance + " kilometers\033[0m", leftColumnWidth, rightColumnWidth + colorCodeLength2);
-    // ... add more rows as needed ...
 
-    // Draw the bottom line of the table
-    drawTableLine(leftColumnWidth + rightColumnWidth + 3);
+    drawTableLine(leftColumnWidth + rightColumnWidth + 3); // Draw the bottom line of the table
 
+    // Print comments
     for (Review &review : this->reviewList)
     {
         if (review.getReviewee() == supporter.getUsername())
         {
-            drawRow2(review.getReviewID() + ": " + review.getReviewer() + " posted on " + review.timestamp.getFormattedTimestamp(), "", rightColumnWidth, leftColumnWidth);
+            drawRow2("\e[1m\e[38;5;217m" + review.getReviewID() + +"\e[0m"
+                                                                   ": " +
+                         review.getReviewer() + " posted on " + review.timestamp.getFormattedTimestamp(),
+                     "", rightColumnWidth, leftColumnWidth);
             drawRow2("Skill: " + findSkillByID(findListingByID(review.listingID).skillID).skillName, "", rightColumnWidth, leftColumnWidth);
             if (review.reviewID[1] == 'H')
             {
-                // cout << review.reviewID[1] << std::endl;
                 drawRow2("hostRatingScore: " + std::to_string(review.hostRating), "", rightColumnWidth, leftColumnWidth);
             }
             else if (review.reviewID[1] == 'S')
             {
-                // cout << review.reviewID[1] << std::endl;
                 drawRow2("skillRatingScore: " + std::to_string(review.skillRating), "", rightColumnWidth, leftColumnWidth);
                 drawRow2("supporterRatingScore: " + std::to_string(review.supporterRating), "", rightColumnWidth, leftColumnWidth);
             }
             drawRow2("Comments: " + review.comments, "", leftColumnWidth, rightColumnWidth);
-            drawRow2("", "", rightColumnWidth, leftColumnWidth);
+            // drawRow2("", "", rightColumnWidth, leftColumnWidth);
         }
     }
     drawTableLine(leftColumnWidth + rightColumnWidth + 3);
@@ -1986,7 +2077,7 @@ void TimeBankSystem::printListingNoReviews(SkillListing &listing)
     string city = (supporter.city == 24) ? "Hanoi" : "Saigon";
     int secs = listing.workingTimeSlot.durationInSeconds();
     // double distance = supporter.calculateDistance(*currentMember);
-    string minHostRatingScore = (listing.minHostRatingScore == -1) ? "N/A" : std::to_string(listing.minHostRatingScore);
+    string minHostRatingScore = (listing.minHostRatingScore == -1) ? "Any" : std::to_string(listing.minHostRatingScore);
     string listingStatus = (listing.listingState == 0) ? "Available" : (listing.listingState == 1) ? "Hidden"
                                                                    : (listing.listingState == 2)   ? "Booked"
                                                                    : (listing.listingState == 3)   ? "Ongoing"

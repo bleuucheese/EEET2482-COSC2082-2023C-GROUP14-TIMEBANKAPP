@@ -65,7 +65,10 @@
     "xutility": "cpp",
     "regex": "cpp",
     "unordered_set": "cpp",
-    "xhash": "cpp"
+    "xhash": "cpp",
+    "functional": "cpp",
+    "unordered_map": "cpp",
+    "variant": "cpp"
   },
   "C_Cpp.errorSquiggles": "enabled"
 }

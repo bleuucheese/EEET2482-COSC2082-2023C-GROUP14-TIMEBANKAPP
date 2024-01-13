@@ -1,7 +1,13 @@
 #ifndef EEET2482_COSC2082_2023C_GROUP14_TIMEBANKAPP_SRC_UTILS_MYUTILS_H
 #define EEET2482_COSC2082_2023C_GROUP14_TIMEBANKAPP_SRC_UTILS_MYUTILS_H
 #include <iostream>
+#include <iomanip>
+#include <vector>
 #include <string>
+#include <algorithm>
+#include <sstream>
+#include <cmath>
+
 
 // Function to generate random ID numbers with 8 digits long
 std::string generateRandomID();
@@ -38,6 +44,13 @@ std::string getValidTimestamp(const std::string &prompt); // DD/MM/YYYY HH:MM:SS
 void drawTableLine(int width);
 void drawRow(const std::string &left, const std::string &right, int leftWidth, int rightWidth);
 void drawRow2(const std::string &left, const std::string &right, int leftWidth, int rightWidth);
+
+std::string roundUpToNDecimalPlaces(float number, int decimalPlaces);
+std::vector<int> calculateWidths(const std::vector<std::string> &headers);
+void printHeader(const std::vector<std::string> &headers, const std::vector<int> &widths);
+void printLine(const std::vector<int> &widths, char c);
+void printRow(const std::vector<std::string> &data, const std::vector<int> &widths);
+void printFooter(const std::vector<int> &widths);
 
 // Function to delete a line from a file
 bool deleteLine(const std::string &filename, int lineNumber);

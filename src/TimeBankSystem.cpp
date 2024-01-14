@@ -22,7 +22,9 @@
 #include "./models/user/User.h"
 #include "./utils/myUtils.h"
 #include "./utils/file/FileHandler.h"
-#include "./utils/ConsoleBarChart.h"
+#include "./utils/time/Period.h"
+#include "./utils/time/DateTime.h"
+#include "./utils/graphs/ConsoleBarChart.h"
 
 using std::cin;
 using std::cout;
@@ -141,12 +143,10 @@ void TimeBankSystem::guestMenu()
     switch (promptAndGetChoice(1, 4))
     {
     case 1:
-        // view all members
-        printMemberTable(2);
+        printMemberTable(2); // view all members
         break;
     case 2:
-        // method to list all skill listings
-        printListingTable(2);
+        printListingTable(2); // method to list all skill listings
         break;
     case 3:
         promptRegister();
@@ -844,7 +844,7 @@ void TimeBankSystem::viewBarGraph()
     {
         result.push_back({member.getUsername(), findNumberOfListings(member)});
     }
-    ConsoleBarChart *cbc = new ConsoleBarChart("Most Active Users", 3, 1, result);
+    ConsoleBarChart *cbc = new ConsoleBarChart("Most Active Users (by listings made)", 3, 1, result);
     cbc->show();
 }
 
@@ -2102,7 +2102,6 @@ void TimeBankSystem::printListingNoReviews(SkillListing &listing)
     drawRow("skillRatingScore: " + std::to_string(supporter.getSkillRatingScore()), "Status: " + listingStatus, leftColumnWidth, rightColumnWidth);
     drawRow("supporterRatingScore: " + std::to_string(supporter.getSupporterRatingScore()), "Minimum hostRatingScore required: " + minHostRatingScore, leftColumnWidth, rightColumnWidth);
     // drawRow("", "Distance from you: " + std::to_string(distance) + " kilometers", leftColumnWidth, rightColumnWidth);
-    // ... add more rows as needed ...
 
     // Draw the bottom line of the table
     drawTableLine(leftColumnWidth + rightColumnWidth + 3);

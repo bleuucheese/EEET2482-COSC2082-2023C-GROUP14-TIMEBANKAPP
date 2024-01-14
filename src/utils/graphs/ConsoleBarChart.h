@@ -93,7 +93,9 @@ namespace aarsoftx
             int size = this->size;
             int x_width = (int)this->result.size() * size;
 
-            cout << "====[ " << this->title << " ]";
+            cout << "=====[ "
+                 << "\e[38;5;77m" << this->title << "\e[0m"
+                 << " ]";
             for (int z = 0; z < x_width * 2; z++)
                 cout << "=";
             cout << endl;

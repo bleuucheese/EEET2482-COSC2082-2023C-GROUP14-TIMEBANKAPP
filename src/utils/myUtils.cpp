@@ -543,8 +543,7 @@ void printHeader(const std::vector<std::string> &headers, const std::vector<int>
     std::cout << "|";
     for (size_t i = 0; i < headers.size(); ++i)
     {
-        std::cout << " " << std::left << std::setw(widths[i]) << "\e[1m\e[97m" << headers[i] << "\e[0m"
-                  << " |";
+        std::cout << " " << std::left << std::setw(widths[i]) << headers[i] << " |";
     }
     std::cout << std::endl;
     printLine(widths, '=');

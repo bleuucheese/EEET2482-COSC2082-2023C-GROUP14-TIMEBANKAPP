@@ -505,7 +505,7 @@ int RegularMember::getNumberOfIncomingRequests()
     int count = 0;
     for (int i = 0; i < sentreceivedRequests.size(); i++)
     {
-        if (sentreceivedRequests[i]->getReceiverName() == this->getUsername() && sentreceivedRequests[i]->getRequestStatus() == "Pending")
+        if (sentreceivedRequests[i]->getReceiverName() == this->getUsername())
         {
             count++;
         }

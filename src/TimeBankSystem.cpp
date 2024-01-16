@@ -971,9 +971,18 @@ void TimeBankSystem::promptAddListing()
         cin >> buffer;
         if (buffer == "Y" || buffer == "y")
         {
-            minHostRatingScore = getValidFloat("Enter minimum host rating score: ");
+            // Must range from 0 to 5 in floating
+            do
+            {
+                minHostRatingScore = getValidFloat("Enter minimum host rating score: ");
+                if (minHostRatingScore < 0 || minHostRatingScore > 5)
+                {
+                    cout << "Please only enter numbers ranging from 0-5! Please try again.\n";
+                }
+            } while (minHostRatingScore < 0 || minHostRatingScore > 5);
             break;
         }
+
         else if (buffer == "N" || buffer == "n")
         {
             minHostRatingScore = -1;
@@ -1018,8 +1027,7 @@ void TimeBankSystem::promptAddListing()
 
 void TimeBankSystem::promptHideListing()
 {
-    std::string listingID;
-    // Prompt user to enter listingID until they enter a valid listingID that is owned by them
+    std::string listingID; // Prompt user to enter listingID until they enter a valid listingID that is owned by them
     int attempts = 0;
     do
     {
@@ -1053,8 +1061,7 @@ void TimeBankSystem::promptUnhideListing()
 {
     std::string listingID;
     // Prompt user to enter listingID until they enter a valid listingID that is owned by them
-    // Exit the loop after 3 wrong attempts
-    int attempts = 0;
+    int attempts = 0; // Exit the loop after 3 wrong attempts
     do
     {
         listingID = getValidStringInput("Enter listingID to unhide: ");
@@ -1095,8 +1102,7 @@ bool TimeBankSystem::promptAddRequest()
     std::string requestID, listingID, requesterName, receiverName, requestStatus = "";
 
     std::string buffer = "";
-    int attempts = 0;
-    // Exit the loop when wrong attempts is bigger than 3
+    int attempts = 0; // Exit the loop when wrong attempts is bigger than 3
     do
     {
         listingID = getValidStringInput("Enter listingID to begin making a request: ");
@@ -1111,7 +1117,6 @@ bool TimeBankSystem::promptAddRequest()
         }
     } while (!isListingIDExistAndNotOwned(listingID));
 
-    // cout << "Checking today's date and listing's start date...\n"; // For debugging purpose
     if (!DateTime().isBeforeStartDate(findListingByID(listingID).getWorkingTimeSlot().getStartDate()))
     {
         cout << "You cannot make a request for this listing because today's date is after the listing's start date!\n";
@@ -1163,14 +1168,12 @@ bool TimeBankSystem::promptAddRequest()
         }
     }
 
-    // isEligibleToBook method
     SkillListing listing = findListingByID(listingID);
     if (!listing.isEligibleToBook(*currentMember))
     {
         cout << "You cannot make a request for this listing because some of the requirements are not met!\n";
         return false;
     }
-    // Proceed to create a new request when all the above conditions are met
     return true;
 }
 
@@ -1309,8 +1312,7 @@ void TimeBankSystem::promptHostReview()
     }
 
     std::string listingID, reviewID, reviewContent, reviewerName, revieweeName = "";
-    int wrongAttempts = 0; // Counter for wrong attempts
-    // Exit the loop after 3 wrong attempts
+    int wrongAttempts = 0; // Counter for wrong attempts & Exit the loop after 3 wrong attempts
     do
     {
         listingID = getValidStringInput("Enter listingID to begin making a review: ");
@@ -1362,13 +1364,19 @@ void TimeBankSystem::promptHostReview()
         else
         {
             reviewContent = getValidStringInput("Enter review content: ");
-            int hostRatingScore = getValidInt("Enter host rating score (1-5): ");
+            int hostRatingScore;
+            do
+            {
+                hostRatingScore = getValidInt("Enter minimum host rating score (1-5): ");
+                if (hostRatingScore < 0 || hostRatingScore > 5)
+                {
+                    cout << "Please only enter numbers ranging from 0-5! Please try again.\n";
+                }
+            } while (hostRatingScore < 0 || hostRatingScore > 5);
             reviewerName = (this->currentMember)->getUsername();
             Review newReview(reviewID, listingID, reviewContent, reviewerName, revieweeName, DateTime(), hostRatingScore);
             addReview(newReview);
             (currentMember->sentreceivedReviews).push_back(&newReview);
-            // Also add to the reviewee's review list
-            // findMemberByUsername(revieweeName).sentreceivedReviews.push_back(&newReview);
             cout << "Review added successfully!\n";
             regularMemberMenu();
         }
@@ -1449,14 +1457,28 @@ void TimeBankSystem::promptSupporterReview()
         else
         {
             reviewContent = getValidStringInput("Enter review content: ");
-            int skillRatingScore = getValidInt("Enter skill rating score (1-5): ");
-            int supporterRatingScore = getValidInt("Enter supporter rating score (1-5): ");
+            int skillRatingScore, supporterRatingScore;
+            do
+            {
+                skillRatingScore = getValidInt("Enter skill rating score (1-5): ");
+                if (skillRatingScore < 0 || skillRatingScore > 5)
+                {
+                    cout << "Please only enter numbers ranging from 0-5! Please try again.\n";
+                }
+            } while (skillRatingScore < 0 || skillRatingScore > 5);
+            do
+            {
+                supporterRatingScore = getValidInt("Enter supporter rating score (1-5): ");
+                if (supporterRatingScore < 0 || supporterRatingScore > 5)
+                {
+                    cout << "Please only enter numbers ranging from 0-5! Please try again.\n";
+                }
+            } while (supporterRatingScore < 0 || supporterRatingScore > 5);
+
             reviewerName = (this->currentMember)->getUsername();
             Review newReview(reviewID, listingID, skillRatingScore, supporterRatingScore, reviewContent, reviewerName, revieweeName, DateTime());
             addReview(newReview);
             (currentMember->sentreceivedReviews).push_back(&newReview);
-            // Also add to the reviewee's review list
-            // findMemberByUsername(revieweeName).sentreceivedReviews.push_back(&newReview);
             cout << "Review added successfully!\n";
             regularMemberMenu();
         }
@@ -1783,7 +1805,6 @@ void TimeBankSystem::promptUnblockMember()
     RegularMember unblockedMember = findMemberByUsername(username);
     if (currentMember->unblockMember(unblockedMember))
     {
-        // cout << "Unblock successful!\n";
         // Delete the unblocked member directly from the file by finding the info line, then delete that line
         std::string line;
         std::ifstream blockFile("./databases/blocklist.csv");
@@ -1796,7 +1817,7 @@ void TimeBankSystem::promptUnblockMember()
                 break;
             }
         }
-        cout << "Line count: " << lineCount << std::endl;
+        // cout << "Line count: " << lineCount << std::endl; // Good for debugging
 
         blockFile.close();
         if (deleteLine("./databases/blocklist.csv", lineCount))
@@ -1820,8 +1841,7 @@ void TimeBankSystem::printRequestTableMember()
     vector<string> headers = {"RequestID", "ListingID", "Requester", "Receiver", "Timestamp", "Status"};
     vector<int> widths = {12, 15, 15, 15, 25, 15};
 
-    // Print the header
-    printHeader(headers, widths);
+    printHeader(headers, widths); // Print the header
     for (const auto &request : this->currentMember->sentreceivedRequests)
     {
         if (request->getReceiverName() == (this->currentMember)->getUsername())
@@ -1924,8 +1944,7 @@ void TimeBankSystem::printOwnedListing()
             printRow({listingID, skillID, cost, rating, state, supporter, host, workingTime}, widths);
         }
 
-        // Print the footer
-        printFooter(widths);
+        printFooter(widths); // Print the footer
     }
     // listingMenu();
 }

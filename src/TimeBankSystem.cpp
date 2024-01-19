@@ -1100,7 +1100,6 @@ void TimeBankSystem::promptUnhideListing()
 
 bool TimeBankSystem::promptAddRequest()
 {
-
     std::string requestID, listingID, requesterName, receiverName, requestStatus = "";
 
     std::string buffer = "";
@@ -1118,6 +1117,21 @@ bool TimeBankSystem::promptAddRequest()
             return false;
         }
     } while (!isListingIDExistAndNotOwned(listingID));
+
+    // Check if the user still has enough credits to make a request
+    float tobePaid = 0;
+    for (SkillListing *listing : this->currentMember->incompletedBookedListings)
+    {
+        tobePaid += listing->calculateTotalCreds();
+    }
+    // cout << "You have to pay " << tobePaid << " credits for your incompleted bookings.\n";
+    float testCredit = this->currentMember->getCreditPoints() - tobePaid - findListingByID(listingID).calculateTotalCreds();
+    // cout << testCredit;
+    if (testCredit < 0)
+    {
+        cout << "You have to reserved your remaing credits for booked listing. Please try again later.\n";
+        return false;
+    }
 
     if (!DateTime().isBeforeStartDate(findListingByID(listingID).getWorkingTimeSlot().getStartDate()))
     {
@@ -2249,6 +2263,7 @@ void TimeBankSystem::extractMemberData()
     (this->currentMember)->receivedHostReviews.clear();
     (this->currentMember)->receivedSupporterReviews.clear();
     (this->currentMember)->timeTable.clear();
+    (this->currentMember)->incompletedBookedListings.clear();
 
     // Extract data from skillList, skillListingList, requestList, reviewList to current user's skillListings, requests, reviews vectors of pointers
     /*skill*/
@@ -2292,6 +2307,18 @@ void TimeBankSystem::extractMemberData()
         else if (review.getReviewee() == (this->currentMember)->getUsername())
         {
             (this->currentMember)->sentreceivedReviews.push_back(&review); // receivedReview
+        }
+    }
+
+    /*Incomplete Booked Listings*/
+    for (SkillListing &listing : this->skillListingList)
+    {
+        if (listing.getHostName() == (this->currentMember)->getUsername())
+        {
+            if (listing.getListingState() == 2 || listing.getListingState() == 3)
+            {
+                (this->currentMember)->incompletedBookedListings.push_back(&listing);
+            }
         }
     }
 

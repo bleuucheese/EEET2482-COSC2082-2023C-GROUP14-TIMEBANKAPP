@@ -91,12 +91,6 @@ public:
     void addRequest(Request &request);
     void addReview(Review &review);
 
-    // Use function template to add new objects to the system's vectors
-    template <typename T>
-    void addElement(std::vector<T> &vector, T &object)
-    {
-        vector.push_back(object);
-    }
 
     // Functions for dipslay objects in the system's vectors in pretty tabular format, used by admin or guests based on mode
     void printMemberTable(int mode);  // mode = 1 for admin, mode = 2 for guest

@@ -41,6 +41,7 @@ private:
     float hostRatingScore;
     vector<Skill *> skills = {};
     vector<SkillListing *> skillListings = {};
+    vector<SkillListing *> incompletedBookedListings = {};
     vector<Review *> sentreceivedReviews = {};
     vector<Review *> receivedHostReviews = {};
     vector<Review *> receivedSupporterReviews = {};

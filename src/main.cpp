@@ -49,8 +49,16 @@ int main()
 #endif
 
     TimeBankSystem sys;
-    sys.loadData();
-    sys.automaticallyUpdate();
+    if (sys.databaseDetected())
+    {
+        sys.loadData();
+        sys.automaticallyUpdate();
+    }
+    else
+    {
+        cout << "No database detected. Creating a new database...\n";
+        sys.createDatabase();
+    }
     sys.welcomeScreen();
     sys.systemMenu();
     sys.updateRatings();

@@ -14,6 +14,7 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <cstdlib> // for system()
 
 #include "../../models/user/User.h"
 #include "../../models/user/Admin.h"
@@ -474,4 +475,70 @@ void FileHandler::saveRequests(const std::string &filename, const std::vector<Re
              << request.getRequestTimeStamp().getFormattedTimestamp() << ','
              << request.getRequestStatus() << std::endl;
     }
+}
+
+void FileHandler::initDatabase()
+{
+    std::string databasePath = "./databases";
+
+    // Check and create the directory based on the operating system
+    #if defined(_WIN32)
+        std::string command = "if not exist \"" + databasePath + "\" mkdir \"" + databasePath + "\"";
+    #elif defined(__unix__) || defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+        std::string command = "mkdir -p " + databasePath;
+    #else
+    #error "Unknown operating system"
+    #endif
+
+    if (system(command.c_str()) != 0)
+    {
+        std::cerr << "Failed to create directory: " << databasePath << std::endl;
+        return;
+    }
+
+    // Create the database files
+    std::ofstream userFile(databasePath + "/users.csv");
+    std::ofstream adminFile(databasePath + "/admin.csv");
+    std::ofstream skillFile(databasePath + "/skills.csv");
+    std::ofstream listingFile(databasePath + "/listings.csv");
+    std::ofstream requestFile(databasePath + "/requests.csv");
+    std::ofstream reviewFile(databasePath + "/reviews.csv");
+    std::ofstream blockFile(databasePath + "/blocklist.csv");
+    std::ofstream ccFile(databasePath + "/samplecards.txt");
+
+    // Check if the files were created successfully and write headers
+    if (userFile)
+        userFile << "username,password,role,isAuthenticated,fullname,phoneNumber,email,homeAddress,city,latitude,longitude,creditCardNumber,balance,creditPoints,skillRatingScore,supporterRatingScore,hostRatingScore\n";
+    if (adminFile)
+        adminFile << "username,password,role,isAuthenticated,revenue\n";
+    adminFile << "@dmin2023,aptfinalproject,Admin,False,0\n";
+    if (skillFile)
+        skillFile << "skillID,skillName,description,skillEfficiency,ownerName\n";
+    if (listingFile)
+        listingFile << "listingID,skillID,cost,minHostRatingScore,listingState,supporterName,hostName,startDate,endDate\n";
+    if (requestFile)
+        requestFile << "requestID,listingID,requesterName,receiverName,requestTimeStamp,requestStatus\n";
+    if (reviewFile)
+        reviewFile << "reviewID,listingID,skillRating,supporterRating,comments,reviewer,reviewee,timestamp\n";
+    if (blockFile)
+        blockFile << "blocker,blockedMember\n";
+    if (ccFile)
+    {
+        ccFile << "# This is a sample of credit card numbers, they are not real, but they are valid according to the Luhn algorithm.\n";
+        ccFile << "# You can use these numbers to test the system.\n";
+        ccFile << "// References:\n";
+        ccFile << "[1] https://www.freeformatter.com/credit-card-number-generator-validator.html\n";
+        ccFile << "[2] https://support.bluesnap.com/docs/test-credit-card-numbers\n";
+        ccFile << "--------------------------\n";
+        ccFile << "6011000990139424\n374245455400126\n378282246310005\n5011054488597827\n6271701225979642\n6034932528973614\n6250941006528599\n60115564485789458\n6011000991300009\n6362970000457013\n6062826786276634\n3566000020000410\n3530111333300000\n5425233430109903\n2222420000001113\n2223000048410010\n5895626746595650\n5200533989557118\n6034883265619896\n4263982640269299\n4917484589897107\n4001919257537193\n4007702835532454\n4701322211111234\n4347699988887777\n ";
+    }
+
+    // Close the files
+    userFile.close();
+    adminFile.close();
+    skillFile.close();
+    listingFile.close();
+    requestFile.close();
+    reviewFile.close();
+    blockFile.close();
 }

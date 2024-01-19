@@ -121,6 +121,8 @@ public:
     Request &findRequestByID(string requestID);
 
     // This two functions use method from FileHandler.cpp to load data from CSV files to vectors and vice versa
+    bool databaseDetected(); // Check if the database is detected
+    void createDatabase();   // Create database if not detected
     void loadData(); // Load data from CSV files to vectors
     void saveData(); // Save data from vectors to CSV files
 

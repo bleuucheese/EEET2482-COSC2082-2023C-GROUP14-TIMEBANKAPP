@@ -15,6 +15,8 @@
 #include <iostream>
 #include <string>
 #include <unordered_set>
+#include <fstream>
+#include <cstdlib> // for system()
 
 #include "TimeBankSystem.h"
 #include "./models/user/Admin.h"
@@ -996,9 +998,9 @@ void TimeBankSystem::promptAddListing()
     fflush(stdin); // Clear input buffer
     std::string supporterName = (this->currentMember)->getUsername();
     std::string hostName = ""; // Host name is empty when listing is created, will be updated when the listing is booked by that host
-    startDate = getValidTimestamp("Enter start date in DD/MM/YYYY HH:MM:SS format: ");
 
     // Improve algorithm to make sure that the start date is after today's date
+    startDate = getValidTimestamp("Enter start date in DD/MM/YYYY HH:MM:SS format: ");
     DateTime checkStartDate(startDate);
     while (!DateTime().isBeforeStartDate(checkStartDate))
     {
@@ -1543,9 +1545,9 @@ void TimeBankSystem::promptSearchMember()
 
 void TimeBankSystem::promptSearchListing()
 {
-    std::string startDay, endDay, city;
     // This method will filter the listings based on the city, start date, end date
     // The displayed listings will be based on if the current member is eligible to view them
+    std::string startDay, endDay, city;
 
     // Prompt user to enter the city
     city = getValidCity();
@@ -1976,21 +1978,37 @@ void TimeBankSystem::printOwnedSkill()
 
 void TimeBankSystem::printListingTableMember()
 {
-    // print all listings on the market, make sure the current member is not the supporter of the listing, and they are eligible to view the listing
-    cout << "Here are available listings on the market:\n";
-    if (this->skillListingList.size() == 0)
+    bool found = false;
+    for (SkillListing &l : this->skillListingList)
+    {
+        if (skillListingList.size() == 0)
+        {
+            cout << "N/A" << std::endl;
+            listingMenu();
+            return;
+        }
+        else if (l.getSupporterName() != (this->currentMember)->getUsername() && l.listingState == 0 && l.isEligibleToView(*currentMember))
+        {
+            found = true;
+            break;
+        }
+    }
+
+    if (!found)
     {
         cout << "N/A" << std::endl;
+        listingMenu();
+        return;
     }
-    else
+
+    // print all listings on the market, make sure the current member is not the supporter of the listing, and they are eligible to view the listing
+    cout << "Here are available listings on the market:\n";
+    for (SkillListing &listing : this->skillListingList)
     {
-        for (SkillListing &listing : this->skillListingList)
+        if (listing.supporterName != this->currentMember->getUsername() && listing.listingState == 0 && listing.isEligibleToView(*currentMember))
         {
-            if (listing.supporterName != this->currentMember->getUsername() && listing.listingState == 0 && listing.isEligibleToView(*currentMember))
-            {
-                printSkillListingTable(listing);
-                cout << std::endl;
-            }
+            printSkillListingTable(listing);
+            cout << std::endl;
         }
     }
 
@@ -2171,6 +2189,32 @@ void TimeBankSystem::printListingTable(int mode)
     }
 }
 
+bool TimeBankSystem::databaseDetected()
+{
+    // Check if the database files exist
+    std::ifstream userFile("./databases/users.csv");
+    std::ifstream adminFile("./databases/admin.csv");
+    std::ifstream skillFile("./databases/skills.csv");
+    std::ifstream listingFile("./databases/listings.csv");
+    std::ifstream requestFile("./databases/requests.csv");
+    std::ifstream reviewFile("./databases/reviews.csv");
+
+    if (userFile.good() && adminFile.good() && skillFile.good() && listingFile.good() && requestFile.good() && reviewFile.good())
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+void TimeBankSystem::createDatabase()
+{
+    FileHandler fileHandler;
+    fileHandler.initDatabase();
+}
+
 void TimeBankSystem::loadData()
 {
     FileHandler fileHandler;
@@ -2293,7 +2337,7 @@ void TimeBankSystem::extractMemberData()
         }
     }
 
-    // Automatically update the pending request state to rejected when when the supporter timetable conflicts with the requested listing time slot.
+    // Automatically update the pending request state to rejected when the supporter timetable conflicts with the requested listing time slot.
     for (Request &request : this->requestList)
     {
         if (request.getRequestStatus() == "Pending" && request.receiverName == (this->currentMember)->getUsername())

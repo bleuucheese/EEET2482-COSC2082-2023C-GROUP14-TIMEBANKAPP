@@ -9,7 +9,7 @@ We will work with the following project idea (revised and developed from ISYS341
 The task for this assignment is to design and implement a program in C++ namely “Time Bank” in Viet Nam.
 
 
-## APP FOR VACATION HOUSE EXCHANGE
+## APP FOR SKILL EXCHANGE
 Assume that you are involved in a start-up who came up with an idea to make an app namely “Time Bank” for people to support each other in daily activities, such as plumbing repairs, tutoring, garden care, house cleaning, etc...
 
 There is an initial entry fee of $20 (pay to the system) when registering as a member, which earns the new member 20 credit points. Initial registrations must capture all the information necessary to be a 
@@ -72,10 +72,10 @@ Implement and test each feature. The application should have the following basic
 
 ***Note: The program should validate user input accordingly. All attributes should be private for data encapsulation***
 
-#### C. Time Period Feature:
+#### C. TIME PERIOD FEATURE:
 When you already completed the basic features above, improve the application by supporting time period matter for the program as in its description, especially for features 5-9 (e.g. list himself/herself available for specific time periods; search for a specified time period and city; request the supporter in a period; only automatically reject non-accepted requests with overlapped time, etc.)
 
-#### D. Welcome Screen
+#### D. WELCOME SCREEN
 When completing your application, it should have a welcome screen with example content structure as below (you are free to adjust its format to your preference).
 
 ```

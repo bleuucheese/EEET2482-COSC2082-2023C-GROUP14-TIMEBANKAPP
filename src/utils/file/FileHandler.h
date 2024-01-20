@@ -58,7 +58,7 @@ public:
     void saveRequests(const std::string &filename, const std::vector<Request> &requestList);
 
     // Function to create a directory for the database
-    void initDatabase();
+    bool initDatabase();
 };
 
 #endif // EEEET2482_COSC2082_2023C_GROUP14_TIMEBANKAPP_SRC_UTILS_FILE_FILEHANDLER_H

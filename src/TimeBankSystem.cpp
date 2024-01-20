@@ -4,7 +4,7 @@
   Semester: 2023-3
   Assignment: Final Group Project
   Author: Trinh Nguyen Ha (s3981134)
-  Compiler used: g++ (MinGW.org GCC-6.3.0-1) 6.3.0
+  Compiler used: g++ 13.2
   Created date: 22/12/2023
   Acknowledgement:
   https://patorjk.com/software/taag/#p=display&f=Big%20Money-nw&t=TIME%20BANK
@@ -635,6 +635,8 @@ void TimeBankSystem::requestMenu()
                 cin >> choice;
 
             } while (choice != 'Y' & choice != 'y' & choice != 'N' & choice != 'n');
+            cin.ignore();
+            fflush(stdin); // Clear input buffer
             if (choice == 'Y' || choice == 'y')
             {
                 cout << "1. Accept Request\n";
@@ -1000,6 +1002,7 @@ void TimeBankSystem::promptAddListing()
             cout << "Invalid input! Please try again.\n";
         }
     } while (buffer != "Y" || buffer != "y" || buffer != "N" || buffer != "n");
+    cin.ignore();
     fflush(stdin); // Clear input buffer
     std::string supporterName = (this->currentMember)->getUsername();
     std::string hostName = ""; // Host name is empty when listing is created, will be updated when the listing is booked by that host
@@ -1388,7 +1391,7 @@ void TimeBankSystem::promptHostReview()
             int hostRatingScore;
             do
             {
-                hostRatingScore = getValidInt("Enter minimum host rating score (1-5): ");
+                hostRatingScore = getValidInt("Enter host rating score (1-5): ");
                 if (hostRatingScore < 0 || hostRatingScore > 5)
                 {
                     cout << "Please only enter numbers ranging from 0-5! Please try again.\n";
@@ -1399,6 +1402,8 @@ void TimeBankSystem::promptHostReview()
             addReview(newReview);
             (currentMember->sentreceivedReviews).push_back(&newReview);
             cout << "Review added successfully!\n";
+            cin.ignore();
+            fflush(stdin);
             regularMemberMenu();
         }
     }
@@ -1501,12 +1506,16 @@ void TimeBankSystem::promptSupporterReview()
             addReview(newReview);
             (currentMember->sentreceivedReviews).push_back(&newReview);
             cout << "Review added successfully!\n";
+            cin.ignore();
+            fflush(stdin);
             regularMemberMenu();
         }
     }
     else
     {
         cout << "You cannot review this listing because it is not completed yet!\n";
+        cin.ignore();
+        fflush(stdin);
         regularMemberMenu();
     }
 }
@@ -1570,6 +1579,7 @@ void TimeBankSystem::promptSearchListing()
 
     // Prompt user to enter the city
     city = getValidCity();
+    cin.ignore();
     fflush(stdin); // Clear input buffer
     vector<SkillListing> saigonListings;
     vector<SkillListing> hanoiListings;
@@ -1729,13 +1739,15 @@ void TimeBankSystem::promptTopUp()
     {
         cout << "Top up failed! Please try again.\n";
     }
+    cin.ignore();
+    fflush(stdin); // Clear input buffer
     profileMenu();
 }
 
 void TimeBankSystem::promptSellCredits()
 {
     // This will transfer 90% value of the amount of credits to the member's bank account from the system's revenue
-    float amount = getValidFloat("Enter amount of credit to sell: ");
+    float amount = getValidFloat("Enter amount of credit to sell (you will only get 90\% of your money back!): ");
     if (currentMember->sellCredits(amount))
     {
         cout << "Sell credits successful! Added $" << amount * 0.9 << " to your account.\n";
@@ -1745,6 +1757,8 @@ void TimeBankSystem::promptSellCredits()
     {
         cout << "Sell credits failed! Please try again.\n";
     }
+    cin.ignore();
+    fflush(stdin); // Clear input buffer
     profileMenu();
 }
 
@@ -1752,7 +1766,7 @@ void TimeBankSystem::promptBlockMember()
 {
     string username;
     std::fstream blockFile("./databases/blocklist.csv", std::ios::app);
-
+    int attempts = 0; // Exit the loop after 3 wrong attempts
     do
     {
         cout << "Enter the username of the member you want to block: ";
@@ -1760,14 +1774,25 @@ void TimeBankSystem::promptBlockMember()
         if (isUniqueUsername(username))
         {
             cout << "User not found! Please try again.\n";
+            attempts++;
         }
         else if (username == this->currentMember->getUsername())
         {
             cout << "You cannot block yourself! Please try again.\n";
+            attempts++;
         }
         else if (username == "@dmin2023")
         {
             cout << "You cannot block the admin! Please try again.\n";
+            attempts++;
+        }
+        if (attempts >= 3)
+        {
+            cout << "You've reached the maximum number of wrong attempts. Exiting...\n";
+            cin.ignore();
+            fflush(stdin); // Clear input buffer
+            profileMenu();
+            return;
         }
 
     } while (isUniqueUsername(username) || username == currentMember->getUsername() || username == "@dmin2023");
@@ -1783,6 +1808,8 @@ void TimeBankSystem::promptBlockMember()
     {
         cout << "Block failed! Please try again.\n";
     }
+    cin.ignore();
+    fflush(stdin); // Clear input buffer
     profileMenu();
 }
 
@@ -1792,6 +1819,7 @@ void TimeBankSystem::promptUnblockMember()
     if (currentMember->blockedMembers.size() == 0)
     {
         cout << "You have not blocked anyone yet!\n";
+        profileMenu();
     }
     else
     {
@@ -1801,60 +1829,63 @@ void TimeBankSystem::promptUnblockMember()
             cout << member->getUsername() << std::endl;
         }
         cout << "==============================================\n";
-    }
-    string username;
-    std::fstream blockFile("./databases/blocklist.csv", std::ios::app);
 
-    do
-    {
-        cout << "Enter the username of the member you want to unblock: ";
-        cin >> username;
-        if (isUniqueUsername(username))
-        {
-            cout << "User not found! Please try again.\n";
-        }
-        else if (username == this->currentMember->getUsername())
-        {
-            cout << "You cannot unblock yourself! Please try again.\n";
-        }
-        else if (username == "@dmin2023")
-        {
-            cout << "You cannot unblock the admin! Please try again.\n";
-        }
+        string username;
+        std::fstream blockFile("./databases/blocklist.csv", std::ios::app);
 
-    } while (isUniqueUsername(username) || username == currentMember->getUsername() || username == "@dmin2023");
-    RegularMember unblockedMember = findMemberByUsername(username);
-    if (currentMember->unblockMember(unblockedMember))
-    {
-        // Delete the unblocked member directly from the file by finding the info line, then delete that line
-        std::string line;
-        std::ifstream blockFile("./databases/blocklist.csv");
-        int lineCount = 0;
-        while (getline(blockFile, line))
+        do
         {
-            lineCount++;
-            if (line.find(currentMember->getUsername() + "," + username) != std::string::npos)
+            cout << "Enter the username of the member you want to unblock: ";
+            cin >> username;
+            if (isUniqueUsername(username))
             {
-                break;
+                cout << "User not found! Please try again.\n";
             }
-        }
-        // cout << "Line count: " << lineCount << std::endl; // Good for debugging
+            else if (username == this->currentMember->getUsername())
+            {
+                cout << "You cannot unblock yourself! Please try again.\n";
+            }
+            else if (username == "@dmin2023")
+            {
+                cout << "You cannot unblock the admin! Please try again.\n";
+            }
 
-        blockFile.close();
-        if (deleteLine("./databases/blocklist.csv", lineCount))
+        } while (isUniqueUsername(username) || username == currentMember->getUsername() || username == "@dmin2023");
+        RegularMember unblockedMember = findMemberByUsername(username);
+        if (currentMember->unblockMember(unblockedMember))
         {
-            cout << "Unblock successful!\n";
+            // Delete the unblocked member directly from the file by finding the info line, then delete that line
+            std::string line;
+            std::ifstream blockFile("./databases/blocklist.csv");
+            int lineCount = 0;
+            while (getline(blockFile, line))
+            {
+                lineCount++;
+                if (line.find(currentMember->getUsername() + "," + username) != std::string::npos)
+                {
+                    break;
+                }
+            }
+            // cout << "Line count: " << lineCount << std::endl; // Good for debugging
+
+            blockFile.close();
+            if (deleteLine("./databases/blocklist.csv", lineCount))
+            {
+                cout << "Unblock successful!\n";
+            }
+            else
+            {
+                cout << "Unblock failed! Please try again.\n";
+            }
         }
         else
         {
             cout << "Unblock failed! Please try again.\n";
         }
+        cin.ignore();
+        fflush(stdin); // Clear input buffer
+        profileMenu();
     }
-    else
-    {
-        cout << "Unblock failed! Please try again.\n";
-    }
-    profileMenu();
 }
 
 void TimeBankSystem::printRequestTableMember()
@@ -1967,7 +1998,6 @@ void TimeBankSystem::printOwnedListing()
 
         printFooter(widths); // Print the footer
     }
-    // listingMenu();
 }
 
 void TimeBankSystem::printOwnedSkill()
@@ -2038,6 +2068,7 @@ void TimeBankSystem::printListingTableMember()
         cin >> choice;
 
     } while (choice != 'Y' & choice != 'y' & choice != 'N' & choice != 'n');
+    cin.ignore();
     fflush(stdin); // Clear input buffer
     if (choice == 'Y' || choice == 'y')
     {
@@ -2165,9 +2196,16 @@ void TimeBankSystem::printListingNoReviews(SkillListing &listing)
 
 void TimeBankSystem::printMemberTable(int mode)
 {
+
     // Mode 1 print for admin, mode 2 for guests
     if (mode == 1)
     {
+        if (this->memberList.size() == 0)
+        {
+            cout << "There's no members in our system!" << std::endl;
+            adminMenu();
+            return;
+        }
         for (RegularMember &mem : this->memberList)
         {
             mem.showRestrictedMemberInfo();
@@ -2176,6 +2214,12 @@ void TimeBankSystem::printMemberTable(int mode)
     }
     else if (mode == 2)
     {
+        if (this->memberList.size() == 0)
+        {
+            cout << "There's no members in our system!" << std::endl;
+            guestMenu();
+            return;
+        }
         for (RegularMember &mem : this->memberList)
         {
             mem.showRestrictedMemberInfo();
@@ -2186,9 +2230,16 @@ void TimeBankSystem::printMemberTable(int mode)
 
 void TimeBankSystem::printListingTable(int mode)
 {
+
     // Admin mode can view comments and all modes
     if (mode == 1)
     {
+        if (this->skillListingList.size() == 0)
+        {
+            cout << "There's no listings in our system!" << std::endl;
+            adminMenu();
+            return;
+        }
         for (SkillListing &listing : this->skillListingList)
         {
             printSkillListingTable(listing);
@@ -2197,6 +2248,12 @@ void TimeBankSystem::printListingTable(int mode)
     }
     else if (mode == 2) // Guests mode cannot view comments, and only see the available ones
     {
+        if (this->skillListingList.size() == 0)
+        {
+            cout << "There's no listings in our system!" << std::endl;
+            guestMenu();
+            return;
+        }
         for (SkillListing &listing : this->skillListingList)
         {
             if (listing.listingState == 0)
@@ -2231,7 +2288,12 @@ bool TimeBankSystem::databaseDetected()
 void TimeBankSystem::createDatabase()
 {
     FileHandler fileHandler;
-    fileHandler.initDatabase();
+    if (!fileHandler.initDatabase())
+    {
+        cout << "Oops! Something's wrong when trying to init the databases!\n";
+        return;
+    }
+    cout << "Database created successfully!\n";
 }
 
 void TimeBankSystem::loadData()

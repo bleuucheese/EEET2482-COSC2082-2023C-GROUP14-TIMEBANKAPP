@@ -4,7 +4,7 @@
   Semester: 2023-3
   Assignment: Final Group Project
   Author: Trinh Nguyen Ha (s3981134)
-  Compiler used: g++ (MinGW.org GCC-6.3.0-1) 6.3.0
+  Compiler used: g++ 13.2
   Created date: 25/12/2023
   Last modified: 02/01/2024
   Acknowledgement: https://superuser.com/questions/413073/windows-console-with-ansi-colors-handling

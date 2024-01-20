@@ -4,7 +4,7 @@
   Semester: 2023-3
   Assignment: Final Group Project
   Author: Trinh Nguyen Ha (s3981134)
-  Compiler used: g++ (MinGW.org GCC-6.3.0-1) 6.3.0
+  Compiler used: g++ 13.2
   Created date: 23/12/2023
   Acknowledgement: https://stackoverflow.com/questions/70380743/deleting-a-line-in-a-txt-file-without-using-another-file-or-array-in-c
 */
@@ -481,7 +481,7 @@ void FileHandler::saveRequests(const std::string &filename, const std::vector<Re
     }
 }
 
-void FileHandler::initDatabase()
+bool FileHandler::initDatabase()
 {
     std::string databasePath = "./databases";
 
@@ -497,7 +497,7 @@ void FileHandler::initDatabase()
     if (system(command.c_str()) != 0)
     {
         std::cerr << "Failed to create directory: " << databasePath << std::endl;
-        return;
+        return false;
     }
 
     // Create the database files
@@ -545,4 +545,5 @@ void FileHandler::initDatabase()
     requestFile.close();
     reviewFile.close();
     blockFile.close();
+    return true;
 }

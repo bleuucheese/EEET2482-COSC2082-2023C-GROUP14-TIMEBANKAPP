@@ -79,20 +79,24 @@ RegularMember FileHandler::parseCSVLine(const std::string &csvLine)
     allowedCities city = (cityCode == "24") ? Hanoi : Saigon;
 
     // Depending on the "role" field, create RegularMember object
-    if (role == "RegularMember")
+    // Check for valid role
+    if (role != "RegularMember")
     {
-        if (cityCode == "24")
-        {
-            return RegularMember(username, password, fullName, phoneNumber, email, homeAddress, Hanoi, latitude, longitude, creditCardNumber, balance, creditPoints, skillRatingScore, supporterRatingScore, hostRatingScore);
-        }
-        else if (cityCode == "28")
-        {
-            return RegularMember(username, password, fullName, phoneNumber, email, homeAddress, Saigon, latitude, longitude, creditCardNumber, balance, creditPoints, skillRatingScore, supporterRatingScore, hostRatingScore);
-        }
+        throw std::runtime_error("Invalid role: " + role);
+    }
+
+    // Check for valid city codes and create RegularMember object
+    if (cityCode == "24")
+    {
+        return RegularMember(username, password, fullName, phoneNumber, email, homeAddress, Hanoi, latitude, longitude, creditCardNumber, balance, creditPoints, skillRatingScore, supporterRatingScore, hostRatingScore);
+    }
+    else if (cityCode == "28")
+    {
+        return RegularMember(username, password, fullName, phoneNumber, email, homeAddress, Saigon, latitude, longitude, creditCardNumber, balance, creditPoints, skillRatingScore, supporterRatingScore, hostRatingScore);
     }
     else
     {
-        throw std::runtime_error("Invalid role: " + role);
+        throw std::runtime_error("Invalid city code: " + cityCode);
     }
 }
 
@@ -481,14 +485,14 @@ void FileHandler::initDatabase()
 {
     std::string databasePath = "./databases";
 
-    // Check and create the directory based on the operating system
-    #if defined(_WIN32)
-        std::string command = "if not exist \"" + databasePath + "\" mkdir \"" + databasePath + "\"";
-    #elif defined(__unix__) || defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
-        std::string command = "mkdir -p " + databasePath;
-    #else
-    #error "Unknown operating system"
-    #endif
+// Check and create the directory based on the operating system
+#if defined(_WIN32)
+    std::string command = "if not exist \"" + databasePath + "\" mkdir \"" + databasePath + "\"";
+#elif defined(__unix__) || defined(__linux__) || defined(__APPLE__) || defined(__MACH__)
+    std::string command = "mkdir -p " + databasePath;
+#else
+#error "Unknown operating system"
+#endif
 
     if (system(command.c_str()) != 0)
     {

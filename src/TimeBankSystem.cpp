@@ -433,10 +433,14 @@ void TimeBankSystem::promptLogin()
 
     if (username == "@dmin2023")
     {
+        cin.ignore();
+        fflush(stdin); // Clear input buffer
         adminMenu();
     }
     else
     {
+        cin.ignore();
+        fflush(stdin); // Clear input buffer
         regularMemberMenu();
     }
 }
@@ -2060,8 +2064,8 @@ void TimeBankSystem::printSkillListingTable(SkillListing &listing)
     Skill skill = findSkillByID(listing.skillID);
     string city = (supporter.city == 24) ? "Hanoi" : "Saigon";
     int secs = listing.workingTimeSlot.durationInSeconds();
-    string distance = (supporter.calculateDistance(*currentMember) > 10000) ? "~" : std::to_string(supporter.calculateDistance(*currentMember));
-    string minHostRatingScore = (listing.minHostRatingScore == -1) ? "Any" : std::to_string(listing.minHostRatingScore);
+    string distance = (supporter.calculateDistance(*currentMember) > 3000) ? "~" : std::to_string(supporter.calculateDistance(*currentMember));
+    string minHostRatingScore = (listing.minHostRatingScore == -1) ? "Any" : roundUpToNDecimalPlaces(listing.minHostRatingScore, 2);
     string listingStatus = (listing.listingState == 0) ? "Available" : (listing.listingState == 1) ? "Hidden"
                                                                    : (listing.listingState == 2)   ? "Booked"
                                                                    : (listing.listingState == 3)   ? "Ongoing"
@@ -2075,7 +2079,7 @@ void TimeBankSystem::printSkillListingTable(SkillListing &listing)
     int colorCodeLength2 = colorCode2.length() + colorReset.length();
 
     // Draw the header row
-    drawRow("Supporter Info", "\e[1;93mListing ID: " + listing.listingID + "\033[0m" + " - Total Credits Cost: " + std::to_string(listing.calculateTotalCreds()), leftColumnWidth, rightColumnWidth + colorCodeLength);
+    drawRow("Supporter Info", "\e[1;93mListing ID: " + listing.listingID + "\033[0m" + " - Total Credits Cost: " + roundUpToNDecimalPlaces(listing.calculateTotalCreds(), 2), leftColumnWidth, rightColumnWidth + colorCodeLength);
     drawTableLine(leftColumnWidth + rightColumnWidth + 3); // Draw line after header
 
     // Draw rows of the table
@@ -2085,9 +2089,9 @@ void TimeBankSystem::printSkillListingTable(SkillListing &listing)
     drawRow("email: " + supporter.email, "+ Efficiency: " + skill.skillEfficiency, leftColumnWidth, rightColumnWidth);
     drawRow("home address: " + supporter.homeAddress, "Start Date: " + listing.workingTimeSlot.getStartDate().getFormattedTimestamp(), leftColumnWidth, rightColumnWidth);
     drawRow("city: " + city, "End Date: " + listing.workingTimeSlot.getEndDate().getFormattedTimestamp(), leftColumnWidth, rightColumnWidth);
-    drawRow("hostRatingScore: " + std::to_string(supporter.getHostRatingScore()), listing.workingTimeSlot.convertSecToDuration(secs), leftColumnWidth, rightColumnWidth);
-    drawRow("skillRatingScore: " + std::to_string(supporter.getSkillRatingScore()), "Status: " + listingStatus, leftColumnWidth, rightColumnWidth);
-    drawRow("supporterRatingScore: " + std::to_string(supporter.getSupporterRatingScore()), "Minimum hostRatingScore required: " + minHostRatingScore, leftColumnWidth, rightColumnWidth);
+    drawRow("hostRatingScore: " + roundUpToNDecimalPlaces(supporter.getHostRatingScore(), 1), listing.workingTimeSlot.convertSecToDuration(secs), leftColumnWidth, rightColumnWidth);
+    drawRow("skillRatingScore: " + roundUpToNDecimalPlaces(supporter.getSkillRatingScore(), 1), "Status: " + listingStatus, leftColumnWidth, rightColumnWidth);
+    drawRow("supporterRatingScore: " + roundUpToNDecimalPlaces(supporter.getSupporterRatingScore(), 1), "Minimum hostRatingScore required: " + minHostRatingScore, leftColumnWidth, rightColumnWidth);
     drawRow("", "Distance from you: \e[38;5;213m" + distance + " kilometers\033[0m", leftColumnWidth, rightColumnWidth + colorCodeLength2);
 
     drawTableLine(leftColumnWidth + rightColumnWidth + 3); // Draw the bottom line of the table
@@ -2128,7 +2132,7 @@ void TimeBankSystem::printListingNoReviews(SkillListing &listing)
     string city = (supporter.city == 24) ? "Hanoi" : "Saigon";
     int secs = listing.workingTimeSlot.durationInSeconds();
     // double distance = supporter.calculateDistance(*currentMember);
-    string minHostRatingScore = (listing.minHostRatingScore == -1) ? "Any" : std::to_string(listing.minHostRatingScore);
+    string minHostRatingScore = (listing.minHostRatingScore == -1) ? "Any" : roundUpToNDecimalPlaces(listing.minHostRatingScore, 2);
     string listingStatus = (listing.listingState == 0) ? "Available" : (listing.listingState == 1) ? "Hidden"
                                                                    : (listing.listingState == 2)   ? "Booked"
                                                                    : (listing.listingState == 3)   ? "Ongoing"
@@ -2137,7 +2141,7 @@ void TimeBankSystem::printListingNoReviews(SkillListing &listing)
     drawTableLine(leftColumnWidth + rightColumnWidth + 3);
 
     // Draw the header row
-    drawRow(" Supporter Info", " Listing ID: " + listing.listingID + " - Total Credits Cost: " + std::to_string(listing.calculateTotalCreds()), leftColumnWidth, rightColumnWidth);
+    drawRow(" Supporter Info", " Listing ID: " + listing.listingID + " - Total Credits Cost: " + roundUpToNDecimalPlaces(listing.calculateTotalCreds(), 2), leftColumnWidth, rightColumnWidth);
 
     // Draw line after header
     drawTableLine(leftColumnWidth + rightColumnWidth + 3);
@@ -2149,9 +2153,9 @@ void TimeBankSystem::printListingNoReviews(SkillListing &listing)
     drawRow("email: " + supporter.email, "+ Efficiency: " + skill.skillEfficiency, leftColumnWidth, rightColumnWidth);
     drawRow("home address: " + supporter.homeAddress, "Start Date: " + listing.workingTimeSlot.getStartDate().getFormattedTimestamp(), leftColumnWidth, rightColumnWidth);
     drawRow("city: " + city, "End Date: " + listing.workingTimeSlot.getEndDate().getFormattedTimestamp(), leftColumnWidth, rightColumnWidth);
-    drawRow("hostRatingScore: " + std::to_string(supporter.getHostRatingScore()), listing.workingTimeSlot.convertSecToDuration(secs), leftColumnWidth, rightColumnWidth);
-    drawRow("skillRatingScore: " + std::to_string(supporter.getSkillRatingScore()), "Status: " + listingStatus, leftColumnWidth, rightColumnWidth);
-    drawRow("supporterRatingScore: " + std::to_string(supporter.getSupporterRatingScore()), "Minimum hostRatingScore required: " + minHostRatingScore, leftColumnWidth, rightColumnWidth);
+    drawRow("hostRatingScore: " + roundUpToNDecimalPlaces(supporter.getHostRatingScore(), 1), listing.workingTimeSlot.convertSecToDuration(secs), leftColumnWidth, rightColumnWidth);
+    drawRow("skillRatingScore: " + roundUpToNDecimalPlaces(supporter.getSkillRatingScore(), 1), "Status: " + listingStatus, leftColumnWidth, rightColumnWidth);
+    drawRow("supporterRatingScore: " + roundUpToNDecimalPlaces(supporter.getSupporterRatingScore(), 1), "Minimum hostRatingScore required: " + minHostRatingScore, leftColumnWidth, rightColumnWidth);
     // drawRow("", "Distance from you: " + std::to_string(distance) + " kilometers", leftColumnWidth, rightColumnWidth);
 
     // Draw the bottom line of the table

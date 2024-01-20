@@ -800,6 +800,7 @@ void TimeBankSystem::promptAdminChangePassword()
         }
 
     } while (isUniqueUsername(username) || username == "@dmin2023");
+    cin.ignore();
     fflush(stdin); // Clear input buffer
     newPassword = getValidPassword();
     if (!admin.resetPasswordForMember(findMemberByUsername(username), newPassword))
